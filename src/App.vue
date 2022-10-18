@@ -27,7 +27,10 @@ export default {
       MENU_URL : 'https://api.themoviedb.org/3/discover/movie',
       API_KEY : 'e95aab0b32ea685f4064a7364dec77f4',
       MOVIE_IMG : 'https://image.tmdb.org/t/p/original',
-      movies : [],
+      action_movies : [],
+      comedy_movies : [],
+      fear_movies : [],
+      animation_movies : [],
       displaySize : 0,
       tablet : false,
       mobile : false,
@@ -55,36 +58,56 @@ export default {
     }
   },
   // watch는 computed와 같이 사용한다 -> computed의 값을 감지한다?
+  // watch는 확인 및 할당? -> watch를 해야만 실시간으로 동적할당이 되는데 이거 공부해보기 -> 할당이 아닌 그냥 선언만했는데 동적선언이 된다?
   watch: {
     displayWidthSize(e) {
       e = window.innerWidth;
-      console.log(e)
     },
     tabletSize(e) {
       // console.log(e)
-      console.log("tablet :" + e)
     },
     mobileSize(e) {
       // console.log(e)
-      console.log("mobile :" + e)
     }
   },
   mounted() {
     this.displaySize = window.innerWidth;
+    // 영화 타이틀 id 확인
+    axios.get(`${this.BASE_URL}?api_key=${this.API_KEY}&language=ko`)
+    .then((res) => {
+      console.log(res)
+    }).catch((error) => {
+      console.log(error)
+    })
+
+
     // 영화 타이틀에 맞는 -> 영화 목록
+    // 액션 -> 28
     axios.get(`${this.MENU_URL}?api_key=${this.API_KEY}&language=kr&with_genres=28`)
     .then((res) => {
       // console.log(res);
-      this.movies = res.data.results
+      this.action_movies = res.data.results
       // console.log(this.movies)
     }).catch((error) => {
       console.log(error)
     })
 
-    // 영화 타이틀
-    axios.get(`${this.BASE_URL}?api_key=${this.API_KEY}&language=ko`)
+    // 로맨스 -> 35
+    axios.get(`${this.MENU_URL}?api_key=${this.API_KEY}&language=kr&with_genres=35`)
     .then((res) => {
-      // console.log(res)
+      console.log(res);
+      this.comedy_movies = res.data.results
+      // console.log(this.movies)
+    }).catch((error) => {
+      console.log(error)
+    })
+
+    // 애니메이션 -> 16
+    axios.get(`${this.MENU_URL}?api_key=${this.API_KEY}&language=kr&with_genres=16`)
+    .then((res) => {
+      console.log(res);
+      this.animation_movies = res.data.results
+      // console.log(this.movies)
     }).catch((error) => {
       console.log(error)
     })
@@ -103,20 +126,33 @@ export default {
       <div class="mv__first">
         <div class="first" :class="{ tablet, mobile }">액션</div>
         <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7 : (displaySize > 768) ? 5 : 3" :space-between="30" :modules="modules" Navigation="false">
-          <swiper-slide v-for="movie in movies" :key="movie">
+          <swiper-slide v-for="movie in action_movies" :key="movie">
+            <img class="mv__poster" :class="{ tablet, mobile }" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
+          </swiper-slide>
+          <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
+        </swiper>
+      </div>
+      <!-- 2 swiper -->
+      <div class="mv__first">
+        <div class="first" :class="{ tablet, mobile }">코미디</div>
+        <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7 : (displaySize > 768) ? 5 : 3" :space-between="30" :modules="modules" Navigation="false">
+          <swiper-slide v-for="movie in comedy_movies" :key="movie">
+            <img class="mv__poster" :class="{ tablet, mobile }" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
+          </swiper-slide>
+          <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
+        </swiper>
+      </div>
+      <!-- 3 swiper -->
+      <div class="mv__first">
+        <div class="first" :class="{ tablet, mobile }">애니메이션</div>
+        <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7 : (displaySize > 768) ? 5 : 3" :space-between="30" :modules="modules" Navigation="false">
+          <swiper-slide v-for="movie in animation_movies" :key="movie">
             <img class="mv__poster" :class="{ tablet, mobile }" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
           </swiper-slide>
           <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
         </swiper>
       </div>
     </div>
-
-    <!-- 반응형 -->
-    <!-- <div class="container">
-      <div class="row">
-
-      </div>
-    </div> -->
   </div>
 </template>
 
@@ -125,8 +161,8 @@ export default {
 @import "./scss/main.scss";
   .mv {
     font-family: 'Nanum Gothic', sans-serif !important;
-    width: 100vw;
-    height: 100vh;
+    // width: 100vw;
+    // height: 100vh;
     background: #000;
     .mv__logo {
       height: 50vh;
@@ -135,14 +171,14 @@ export default {
       // background-position: center;
       background-size: 100%;
       .__logo {
-        width: 10vw;
+        width: 13vw;
         cursor: pointer;
       }
       .tablet {
-        width: 15vw;
+        width: 20vw;
       }
       .mobile {
-        width: 25vw;
+        width: 30vw;
       }
     }
     .mv__logo.mobile {
