@@ -1,7 +1,8 @@
 import { createApp } from 'vue'
 
-// css같은건 import만으로 적용이된다, 플러그인들같은거만 use()로 붙인다
-
+// components
 import App from './App.vue'
+// plugin
+import router from './routers'
 
-createApp(App).mount('#app')
+createApp(App).use(router).mount('#app')
