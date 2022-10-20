@@ -28,8 +28,10 @@ export default {
       BASE_URL : 'https://api.themoviedb.org/3/genre/movie/list',
       MENU_URL : 'https://api.themoviedb.org/3/discover/movie',
       NEW_URL : 'https://api.themoviedb.org/3/movie/upcoming',
-      POPULAR_URL : 'https://api.themoviedb.org/3/movie/popular',
-      MOVIE_URL : 'https://api.themoviedb.org/3/movie',
+      POPULAR_URL : 'https://api.themoviedb.org/3/movie/popular', 
+      TRAND_URL : 'https://api.themoviedb.org/3/trending/movie/day',
+
+      NEW_VIDEO : 'https://api.themoviedb.org/3/movie',
 
       // KEY -> env로 관리하기
       API_KEY : 'e95aab0b32ea685f4064a7364dec77f4',
@@ -40,18 +42,11 @@ export default {
       // MOVIE_LIST
       new_movies : [],
       popular_moviles : [],
+      trand_movies : [],
 
-      // random movie(10)
-      action_movies : [],
-      adventure_movies : [],
-      animation_movies : [],
-      comedy_movies : [],
-      drama_movies : [],
-      fantasy_movies : [],
-      history_movies : [],
-      hurt_movies : [],
-      thriller_movies : [],
-      War_movies : [],
+      // MOVIE_VIDEO
+      new_video_id_one : '',
+      new_video_id_two : '',
 
       displaySize : 0
     }
@@ -88,7 +83,7 @@ export default {
     })
 
 
-    // 최신 영화 목록
+    // 개봉예정 영화 목록
     axios.get(`${this.NEW_URL}?api_key=${this.API_KEY}&language=ko`)
     .then((res) => {
       // console.log(res);
@@ -105,91 +100,32 @@ export default {
     }).catch((error) => {
       console.log(error)
     })
-    
-    // 영화 타이틀에 맞는 -> 영화 목록 (10개 선정)
-    // 액션 -> 28
-    axios.get(`${this.MENU_URL}?api_key=${this.API_KEY}&language=ko&with_genres=28&page=10`)
+
+    // 트렌드 영화
+    axios.get(`${this.TRAND_URL}?api_key=${this.API_KEY}&language=ko`)
     .then((res) => {
-      // console.log(res);
-      this.action_movies = res.data.results
+      console.log(res)
+      this.trand_movies = res.data.results
     }).catch((error) => {
       console.log(error)
     })
 
-    // 모험-> 12
-    axios.get(`${this.MENU_URL}?api_key=${this.API_KEY}&language=ko&with_genres=12&page=9`)
+    // 최신 영화 비디오 - (아바타, 와칸다포에버)
+    axios.get(`${this.NEW_VIDEO}/19995/videos?api_key=${this.API_KEY}&language=ko`)
     .then((res) => {
-      // console.log(res);
-      this.adventure_movies = res.data.results
+      console.log(res)
+      this.new_video_id_one = res.data.results[0].key
+    }).catch((error) => {
+      console.log(error)
+    })
+    axios.get(`${this.NEW_VIDEO}/505642/videos?api_key=${this.API_KEY}&language=ko`)
+    .then((res) => {
+      console.log(res)
+      this.new_video_id_two = res.data.results[0].key
     }).catch((error) => {
       console.log(error)
     })
 
-    // 애니메이션 -> 16
-    axios.get(`${this.MENU_URL}?api_key=${this.API_KEY}&language=ko&with_genres=16&page=4`)
-    .then((res) => {
-      // console.log(res);
-      this.animation_movies = res.data.results
-    }).catch((error) => {
-      console.log(error)
-    })
-    // 코미디 -> 35
-    axios.get(`${this.MENU_URL}?api_key=${this.API_KEY}&language=ko&with_genres=35&page=13`)
-    .then((res) => {
-      // console.log(res);
-      this.comedy_movies = res.data.results
-    }).catch((error) => {
-      console.log(error)
-    })
-
-    // 드라마 -> 18
-    axios.get(`${this.MENU_URL}?api_key=${this.API_KEY}&language=ko&with_genres=18&page=3`)
-    .then((res) => {
-      // console.log(res);
-      this.drama_movies = res.data.results
-    }).catch((error) => {
-      console.log(error)
-    })
-    // 판타지 -> 14
-    axios.get(`${this.MENU_URL}?api_key=${this.API_KEY}&language=ko&with_genres=14&page=3`)
-    .then((res) => {
-      // console.log(res);
-      this.fantasy_movies = res.data.results
-    }).catch((error) => {
-      console.log(error)
-    })
-    // 역사-> 36
-    axios.get(`${this.MENU_URL}?api_key=${this.API_KEY}&language=ko&with_genres=36&page=9`)
-    .then((res) => {
-      // console.log(res);
-      this.history_movies = res.data.results
-    }).catch((error) => {
-      console.log(error)
-    })
-    // 공포 -> 27
-    axios.get(`${this.MENU_URL}?api_key=${this.API_KEY}&language=ko&with_genres=27&page=5`)
-    .then((res) => {
-      // console.log(res);
-      this.hurt_movies  = res.data.results
-    }).catch((error) => {
-      console.log(error)
-    })
-    // 스릴러 -> 53
-    axios.get(`${this.MENU_URL}?api_key=${this.API_KEY}&language=ko&with_genres=53&page=3`)
-    .then((res) => {
-      // console.log(res);
-      this.thriller_movies = res.data.results
-    }).catch((error) => {
-      console.log(error)
-    })
-    // 전쟁 -> 10752
-    axios.get(`${this.MENU_URL}?api_key=${this.API_KEY}&language=ko&with_genres=10752&page=7`)
-    .then((res) => {
-      // console.log(res);
-      this.War_movies = res.data.results
-    }).catch((error) => {
-      console.log(error)
-    })
   },
 }
 </script>
@@ -197,7 +133,7 @@ export default {
 
 <template>
   <div class="mv__container">
-    <!-- 1 swiper -->
+    <!-- 1 swiper -> new -->
     <div class="mv__first">
       <div class="first">개봉예정영화</div>
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
@@ -207,7 +143,7 @@ export default {
         <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
       </swiper>
     </div>
-    <!-- 2 swiper -->
+    <!-- 2 swiper -> popular -->
     <div class="mv__first">
       <div class="first">인기영화</div>
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
@@ -217,101 +153,23 @@ export default {
         <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
       </swiper>
     </div>
-    <!-- 3 swiper -->
+    <!-- 3 swiper -> video -->
     <div class="mv__first">
-      <div class="first">액션</div>
-      <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in action_movies" :key="movie">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
+      <div class="first">최신예고편</div>
+      <swiper class="first__swiper video__swiper" :slides-per-view="(displaySize > 1024) ? 2 : 1" :space-between="30" :modules="modules" Navigation="false">
+        <swiper-slide>
+          <iframe :src="`https://www.youtube.com/embed/${new_video_id_one}?autoplay=1`" frameborder="0"></iframe>
         </swiper-slide>
-        <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
+        <swiper-slide>
+          <iframe :src="`https://www.youtube.com/embed/${new_video_id_two}?autoplay=1`" frameborder="0"></iframe>
+        </swiper-slide>
       </swiper>
     </div>
-    <!-- 4 swiper -->
+    <!-- 4 swiper -> trand -->
     <div class="mv__first">
-      <div class="first">모험</div>
+      <div class="first">실시간 급상승</div>
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in adventure_movies" :key="movie">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
-        </swiper-slide>
-        <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
-      </swiper>
-    </div>
-    <!-- 5 swiper -->
-    <div class="mv__first">
-      <div class="first">애니메이션</div>
-      <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in animation_movies" :key="movie">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
-        </swiper-slide>
-        <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
-      </swiper>
-    </div>
-    <!-- 6 swiper -->
-    <div class="mv__first">
-      <div class="first">코미디</div>
-      <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in comedy_movies" :key="movie">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
-        </swiper-slide>
-        <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
-      </swiper>
-    </div>
-    <!-- 7 swiper -->
-    <div class="mv__first">
-      <div class="first">드라마</div>
-      <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in drama_movies" :key="movie">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
-        </swiper-slide>
-        <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
-      </swiper>
-    </div>
-    <!-- 3 swiper -->
-    <div class="mv__first">
-      <div class="first">판타지</div>
-      <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in fantasy_movies" :key="movie">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
-        </swiper-slide>
-        <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
-      </swiper>
-    </div>
-    <!-- 8 swiper -->
-    <div class="mv__first">
-      <div class="first">역사</div>
-      <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in history_movies" :key="movie">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
-        </swiper-slide>
-        <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
-      </swiper>
-    </div>
-    <!-- 9 swiper -->
-    <div class="mv__first">
-      <div class="first">공포</div>
-      <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in hurt_movies" :key="movie">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
-        </swiper-slide>
-        <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
-      </swiper>
-    </div>
-    <!-- 10 swiper -->
-    <div class="mv__first">
-      <div class="first">스릴러</div>
-      <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in thriller_movies " :key="movie">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
-        </swiper-slide>
-        <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
-      </swiper>
-    </div>
-    <!-- 11 swiper -->
-    <div class="mv__first">
-      <div class="first">전쟁</div>
-      <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in War_movies" :key="movie">
+        <swiper-slide v-for="movie in trand_movies" :key="movie">
           <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
         </swiper-slide>
         <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
@@ -328,7 +186,7 @@ export default {
   .mv__container {
     .mv__first {
       .first {
-        font-size: 4vw !important;
+        font-size: 3vw !important;
       }
       .first__swiper {
         .mv__poster {
@@ -404,6 +262,15 @@ export default {
           span {
             font-size: 4vw;
           }
+        }
+      }
+      .video__swiper {
+        background: #101010;
+        border-radius: 10px;
+        height: 50vh;
+        iframe {
+          width: 100%;
+          height: 100%;
         }
       }
     }
