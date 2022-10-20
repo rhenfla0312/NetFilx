@@ -93,7 +93,7 @@ export default {
     })
     
     // 인기 영화 목록
-    axios.get(`${this.POPULAR_URL}?api_key=${this.API_KEY}&language=ko&page=4`)
+    axios.get(`${this.POPULAR_URL}?api_key=${this.API_KEY}&language=ko&page=5`)
     .then((res) => {
       // console.log(res)
       this.popular_moviles = res.data.results
@@ -111,7 +111,7 @@ export default {
     })
 
     // 최신 영화 비디오 - (아바타, 와칸다포에버)
-    axios.get(`${this.NEW_VIDEO}/19995/videos?api_key=${this.API_KEY}&language=ko`)
+    axios.get(`${this.NEW_VIDEO}/76600/videos?api_key=${this.API_KEY}&language=ko`)
     .then((res) => {
       console.log(res)
       this.new_video_id_one = res.data.results[0].key
@@ -158,10 +158,10 @@ export default {
       <div class="first">최신예고편</div>
       <swiper class="first__swiper video__swiper" :slides-per-view="(displaySize > 1024) ? 2 : 1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide>
-          <iframe :src="`https://www.youtube.com/embed/${new_video_id_one}?autoplay=1`" frameborder="0"></iframe>
+          <iframe :src="`https://www.youtube.com/embed/${new_video_id_one}?autoplay=1&mute=1&loop=1`" frameborder="0"></iframe>
         </swiper-slide>
         <swiper-slide>
-          <iframe :src="`https://www.youtube.com/embed/${new_video_id_two}?autoplay=1`" frameborder="0"></iframe>
+          <iframe :src="`https://www.youtube.com/embed/${new_video_id_two}?autoplay=1&mute=1&loop=1`" frameborder="0"></iframe>
         </swiper-slide>
       </swiper>
     </div>
