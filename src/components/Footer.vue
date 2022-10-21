@@ -13,6 +13,6 @@ export default {
 <style lang="scss" scoped>
   .footer {
     height: 30vh;
-    background: #101010;
+    background: rgba(0,0,0,.35);
   }
 </style>

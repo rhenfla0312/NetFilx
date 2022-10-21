@@ -1,20 +1,34 @@
 <script>
 export default {
-
+  data() {
+    return {
+      searchData : false,
+    }
+  },
+  methods: {
+    search() {
+      this.searchData = true;
+    }
+  },
 }
 </script>
 
 <template>
   <div class="mv__header">
     <div class="mv__menu">
-      <!-- pc -->
       <div class="__title">SPMV</div>
       <div class="__movie">영화</div>
       <div class="__tv">TV프로그램</div>
-      <div class="__search"><span class="material-symbols-outlined">search</span></div>
+      <div class="__searchBox">
+        <input type="text" class="__searchText" :class="{ searchData }" />
+        <div class="__search" :class="{ searchData }"><span @click="search()" class="material-symbols-outlined">search</span></div>
+      </div>
       <div class="__myInfo">Y</div>
+      <div class="mobileMenu"><span class="material-symbols-outlined">menu</span></div>
     </div>
-    <div class="mv__img"></div>
+    <div class="mv__img">
+      <img src="https://www.justwatch.com/appassets/img/home/tv/tv.webp" alt="">
+    </div>
   </div>
 </template>
 
@@ -22,7 +36,7 @@ export default {
 <style lang="scss">
 // font
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700&family=Source+Sans+Pro:wght@600&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
 
 @media screen and (max-width: 1024px) {
   .mv__header {
@@ -40,13 +54,20 @@ export default {
       }
       .__search {
         span {
-          font-size: 3vw !important;
+          font-size: 4vw !important;
         }
       }
       .__myInfo {
         width: 3vw !important;
         height: 3vw !important;
         font-size: 2vw !important;
+      }
+    }
+    .mv__img {
+      height: 70vh !important;
+      img {
+        padding-top: 3rem !important;
+        width: 100% !important;
       }
     }
   }
@@ -68,20 +89,38 @@ export default {
       .__tv {
         display: none;
       }
-      .__search {
-        span {
-          font-size: 5vw !important;
+      .__searchBox {
+        height: 50%;
+        .__search {
+          span {
+            font-size: 7vw !important;
+          }
+        }
+        .__searchText.searchData {
+          width: 70% !important;
         }
       }
       .__myInfo {
+        display: none !important;
         margin-right: 7vw !important;
         width: 5vw !important;
         height: 5vw !important;
         font-size: 3vw !important;
       }
+      .mobileMenu {
+        margin-right: 7vw !important;
+        display: block !important;
+        span {
+          font-size: 6vw !important;
+        }
+      }
     }
     .mv__img {
-      height: 30vh !important;
+      height: 50vh !important;
+      img {
+        padding-top: 6rem !important;
+        width: 100% !important;
+      }
     }
   }
 }
@@ -89,12 +128,13 @@ export default {
 
 .mv__header {
   font-family: 'Source Sans Pro', Arial, sans-serif;
+  font-family: 'Orbitron', sans-serif;
   // height: 10vh;
   .mv__menu {
     width: 100vw;
     height: 10vh;
-    border-bottom: 1px solid #101010;
-    background-color: #101010;
+    border-bottom: 1px solid rgba(0,0,0,.35);
+    background-color: rgba(0,0,0,.35);
     display: flex;
     align-items: center;
     position: fixed;
@@ -115,19 +155,48 @@ export default {
 
     }
     .__tv {
-      margin-right: auto;
       font-size: 1vw;
       cursor: pointer;
     }
-    .__search {
+    .__searchBox {
+      position: relative;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-right: 2vw;
-      margin-top: 0.1vw;
-      span {
-        cursor: pointer;
-        font-size: 2vw;
+      margin-left: auto;
+      .__search {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: auto;
+        margin-right: 2vw;
+        margin-top: 0.1vw;
+        span {
+          cursor: pointer;
+          font-size: 2vw;
+        }
+      }
+      .__search.searchData {
+        position: absolute;
+        right: 2.5vw;
+        z-index: 200;
+        color: #000;
+        margin-right: 0;
+      }
+      .__searchText {
+        width: 0;
+        opacity: 0;
+        transition: .4s;
+      }
+      .__searchText.searchData {
+        margin-left: auto;
+        width: 100%;
+        border-radius: 20px;
+        outline: none;
+        border: none;
+        font-size: 20px;
+        padding: 5px;
+        opacity: 1;
+        transition: .4s;
+        margin-right: 2vw;
       }
     }
     .__myInfo {
@@ -143,13 +212,22 @@ export default {
       justify-content: center;
       align-items: center;
     }
+    .mobileMenu {
+      display: none;
+      margin-right: 6vw;
+      cursor: pointer;
+      font-size: 1vw;
+    }
   }
   .mv__img {
-    height: 50vh;
-    background-image: url('https://assets.nflxext.com/ffe/siteui/vlv3/28b69a57-cadf-43d9-8a95-e5f2e11199de/4490a703-c009-4266-8f15-938d80811812/KR-ko-20221010-popsignuptwoweeks-perspective_alpha_website_large.jpg');
+    height: 100vh;
+    background-image: url('https://www.justwatch.com/appassets/img/home/bg-tiles/bg-tiles.webp');
     background-repeat: no-repeat;
-    // background-position: center;
+    background-position: center;
     background-size: 100%;
+    img {
+      width: 100%;
+    }
   }
 }
 </style>
