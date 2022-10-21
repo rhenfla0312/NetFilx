@@ -66,7 +66,6 @@ export default {
     .mv__img {
       height: 70vh !important;
       img {
-        padding-top: 3rem !important;
         width: 100% !important;
       }
     }
@@ -118,7 +117,6 @@ export default {
     .mv__img {
       height: 50vh !important;
       img {
-        padding-top: 6rem !important;
         width: 100% !important;
       }
     }
@@ -224,7 +222,7 @@ export default {
     background-image: url('https://www.justwatch.com/appassets/img/home/bg-tiles/bg-tiles.webp');
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 100%;
+    // background-size: 100%;
     img {
       width: 100%;
     }
