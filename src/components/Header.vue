@@ -3,11 +3,15 @@ export default {
   data() {
     return {
       searchData : false,
+      searchItem : ''
     }
   },
   methods: {
     search() {
       this.searchData = true;
+      if(this.searchItem) {
+        // 검색 API 요청
+      }
     }
   },
 }
@@ -66,6 +70,7 @@ export default {
     .mv__img {
       height: 70vh !important;
       img {
+        // padding-top: 2rem !important;
         width: 100% !important;
       }
     }
@@ -117,6 +122,7 @@ export default {
     .mv__img {
       height: 50vh !important;
       img {
+        padding-top: 3rem !important;
         width: 100% !important;
       }
     }
