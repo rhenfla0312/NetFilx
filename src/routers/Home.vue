@@ -104,27 +104,28 @@ export default {
     // 트렌드 영화
     axios.get(`${this.TRAND_URL}?api_key=${this.API_KEY}&language=ko`)
     .then((res) => {
-      console.log(res)
+      // console.log(res)
       this.trand_movies = res.data.results
     }).catch((error) => {
       console.log(error)
     })
 
-    // 최신 영화 비디오 - (아바타, 와칸다포에버)
+    // 최신 영화 비디오 4개 선정 - (아바타 - 76600, 와칸다포에버 - 505642, 헤어질결심 - , 블랙아담 - 436270)
     axios.get(`${this.NEW_VIDEO}/76600/videos?api_key=${this.API_KEY}&language=ko`)
     .then((res) => {
       console.log(res)
-      this.new_video_id_one = res.data.results[0].key
     }).catch((error) => {
       console.log(error)
     })
     axios.get(`${this.NEW_VIDEO}/505642/videos?api_key=${this.API_KEY}&language=ko`)
     .then((res) => {
-      console.log(res)
+      // console.log(res)
       this.new_video_id_two = res.data.results[0].key
     }).catch((error) => {
       console.log(error)
     })
+
+    
 
   },
 }
@@ -135,7 +136,7 @@ export default {
   <div class="mv__container">
     <!-- 1 swiper -> new -->
     <div class="mv__first">
-      <div class="first">개봉예정영화</div>
+      <div class="first">개봉예정</div>
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in new_movies" :key="movie">
           <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
@@ -145,7 +146,7 @@ export default {
     </div>
     <!-- 2 swiper -> popular -->
     <div class="mv__first">
-      <div class="first">인기영화</div>
+      <div class="first">인기</div>
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in popular_moviles" :key="movie">
           <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
@@ -156,12 +157,8 @@ export default {
     <!-- 3 swiper -> video -->
     <div class="mv__first">
       <div class="first">최신예고편</div>
-      <swiper class="first__swiper video__swiper" :slides-per-view="(displaySize > 1024) ? 2 : 1" :space-between="30" :modules="modules" Navigation="false">
+      <swiper class="first__swiper video__swiper" :slides-per-view="(displaySize > 1024) ? 4 : 2" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide>
-          <iframe :src="`https://www.youtube.com/embed/${new_video_id_one}?autoplay=1&mute=1&loop=1`" frameborder="0"></iframe>
-        </swiper-slide>
-        <swiper-slide>
-          <iframe :src="`https://www.youtube.com/embed/${new_video_id_two}?autoplay=1&mute=1&loop=1`" frameborder="0"></iframe>
         </swiper-slide>
       </swiper>
     </div>
