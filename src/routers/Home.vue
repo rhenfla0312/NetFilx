@@ -91,10 +91,10 @@ export default {
 
       this.$refs.detail_new_bg.style.backgroundImage = `url(${this.MOVIE_IMG}/${bg})`;
       this.$refs.detail_new_bg.style.backgroundPosition = 'center';
-      if(this.displaySize > 1024) {
+      if(this.displaySize >= 1024) {
         this.$refs.detail_new_bg.style.backgroundSize = '100%';
-      } else {
-        // this.$refs.detail_new_bg.style.backgroundSize = '0';
+      } else if(this.displaySize < 1024) {
+        this.$refs.detail_new_bg.style.backgroundSize = 'auto';
       }
       this.$refs.detail_new_bg.style.backgroundRepeat = 'no-repeat';
       
@@ -130,10 +130,10 @@ export default {
       // 해당 id에 맞는 영화정보 불러오기
       this.$refs.detail_popular_bg.style.backgroundImage = `url(${this.MOVIE_IMG}/${bg})`;
       this.$refs.detail_popular_bg.style.backgroundPosition = 'center';
-      if(this.displaySize > 1024) {
+      if(this.displaySize >= 1024) {
         this.$refs.detail_popular_bg.style.backgroundSize = '100%';
-      } else {
-        // this.$refs.detail_popular_bg.style.backgroundSize = '0';
+      } else if(this.displaySize < 1024) {
+        this.$refs.detail_popular_bg.style.backgroundSize = 'auto';
       }
       this.$refs.detail_popular_bg.style.backgroundRepeat = 'no-repeat';
       
@@ -169,10 +169,10 @@ export default {
       // 해당 id에 맞는 영화정보 불러오기
       this.$refs.detail_video_bg.style.backgroundImage = `url(${this.MOVIE_IMG}/${bg})`;
       this.$refs.detail_video_bg.style.backgroundPosition = 'center';
-      if(this.displaySize > 1024) {
-        this.$refs.detail_video_bg.style.backgroundSize = '100%';
-      } else {
-        // this.$refs.detail_video_bg.style.backgroundSize = '0';
+      if(this.displaySize >= 1024) {
+        this.$refs.detail_popular_bg.style.backgroundSize = '100%';
+      } else if(this.displaySize < 1024) {
+        this.$refs.detail_video_bg.style.backgroundSize = 'auto';
       }
       this.$refs.detail_video_bg.style.backgroundRepeat = 'no-repeat';
       
@@ -206,10 +206,10 @@ export default {
       // 해당 id에 맞는 영화정보 불러오기
       this.$refs.detail_trand_bg.style.backgroundImage = `url(${this.MOVIE_IMG}/${bg})`;
       this.$refs.detail_trand_bg.style.backgroundPosition = 'center';
-      if(this.displaySize > 1024) {
+      if(this.displaySize >= 1024) {
         this.$refs.detail_trand_bg.style.backgroundSize = '100%';
-      } else {
-        // this.$refs.detail_trand_bg.style.backgroundSize = '0';
+      } else if(this.displaySize < 1024) {
+        this.$refs.detail_trand_bg.style.backgroundSize = 'auto';
       }
       this.$refs.detail_trand_bg.style.backgroundRepeat = 'no-repeat';
       
