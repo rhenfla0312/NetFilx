@@ -158,6 +158,8 @@ export default {
         display: block !important;
         span {
           font-size: 6vw !important;
+          transform: rotate(0);
+          transition: .3s;
           &:hover {
             transform: rotate(180deg);
             transition: .3s;

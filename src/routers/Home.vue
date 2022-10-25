@@ -31,7 +31,7 @@ export default {
       POPULAR_URL : 'https://api.themoviedb.org/3/movie/popular', 
       TRAND_URL : 'https://api.themoviedb.org/3/trending/movie/day',
 
-      NEW_VIDEO : 'https://api.themoviedb.org/3/movie',
+      MOVIE_INFO_URL : 'https://api.themoviedb.org/3/movie',
 
       // KEY -> env로 관리하기
       API_KEY : 'e95aab0b32ea685f4064a7364dec77f4',
@@ -45,10 +45,25 @@ export default {
       trand_movies : [],
 
       // MOVIE_VIDEO
-      new_video_id_one : '',
-      new_video_id_two : '',
+      new_video_infos : [],
 
-      displaySize : 0
+      displaySize : 0,
+
+      // MOVIE_DETAIL_INFO_check
+      movie_info_new : false,
+      movie_info_popular : false,
+      movie_info_video : false,
+      movie_info_trand : false,
+      // MOVIE_DETAIL_INFO
+      movie_info_new_data : {},
+      movie_info_popular_data : {},
+      movie_info_video_data : {},
+      movie_info_trand_data : {},
+      // MOVIE_DETAIL_INFO_id
+      movie_info_new_id : '',
+      movie_info_popular_id : '',
+      movie_info_video_id : '',
+      movie_info_trand_id : '',
     }
   },
   computed: {
@@ -56,77 +71,248 @@ export default {
       return window.onresize  = ((e) => {
         return this.displaySize = window.innerWidth;
       })
+    },
+  },
+  methods: {
+    mvBack(bg) {
+      this.$refs.mv_bg.style.backgroundImage = `url(${this.MOVIE_IMG}/${bg})`;
+      this.$refs.mv_bg.style.backgroundPosition = 'center';
+      this.$refs.mv_bg.style.backgroundSize = '100%';
+      this.$refs.mv_bg.style.backgroundRepeat = 'no-repeat';
+    },
+    // new
+    async new_movieInfo(id, bg) {
+      this.movie_info_new_id = ''
+
+      this.movie_info_new = true;
+      this.movie_info_popular = false;
+      this.movie_info_video = false;
+      this.movie_info_trand = false;
+
+      this.$refs.detail_new_bg.style.backgroundImage = `url(${this.MOVIE_IMG}/${bg})`;
+      this.$refs.detail_new_bg.style.backgroundPosition = 'center';
+      if(this.displaySize > 1024) {
+        this.$refs.detail_new_bg.style.backgroundSize = '100%';
+      } else {
+        // this.$refs.detail_new_bg.style.backgroundSize = '0';
+      }
+      this.$refs.detail_new_bg.style.backgroundRepeat = 'no-repeat';
+      
+      // id에 맞는 영화정보 불러오기
+      await axios.get(`${this.MOVIE_INFO_URL}/${id}?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        console.log(res)
+        this.movie_info_new_data = res.data;
+      }).catch((error) => {
+        console.log(error)
+      })
+      // id에 맞는 영상 가져오기
+      await axios.get(`${this.MOVIE_INFO_URL}/${id}/videos?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        // console.log(res)
+        this.movie_info_new_id = res.data.results[0].key;
+      }).catch((error) => {
+        console.log(error)
+      }) 
+    },
+    new_movieInfo_close() {
+      this.movie_info_new = false;
+    },  
+    // popular
+    async popular_movieInfo(id, bg) {
+      this.movie_info_popular_id = '';
+
+      this.movie_info_new = false;
+      this.movie_info_popular = true;
+      this.movie_info_video = false;
+      this.movie_info_trand = false;
+
+      // 해당 id에 맞는 영화정보 불러오기
+      this.$refs.detail_popular_bg.style.backgroundImage = `url(${this.MOVIE_IMG}/${bg})`;
+      this.$refs.detail_popular_bg.style.backgroundPosition = 'center';
+      if(this.displaySize > 1024) {
+        this.$refs.detail_popular_bg.style.backgroundSize = '100%';
+      } else {
+        // this.$refs.detail_popular_bg.style.backgroundSize = '0';
+      }
+      this.$refs.detail_popular_bg.style.backgroundRepeat = 'no-repeat';
+      
+      // id에 맞는 영화정보 불러오기
+      await axios.get(`${this.MOVIE_INFO_URL}/${id}?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        console.log(res)
+        this.movie_info_popular_data = res.data;
+      }).catch((error) => {
+        console.log(error)
+      })
+      // id에 맞는 영상 가져오기
+      await axios.get(`${this.MOVIE_INFO_URL}/${id}/videos?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        // console.log(res)
+        this.movie_info_popular_id = res.data.results[0].key;
+      }).catch((error) => {
+        console.log(error)
+      }) 
+    },
+    popular_movieInfo_close() {
+      this.movie_info_popular = false;
+    },
+    // video
+    async video_movieInfo(id, bg) {
+      this.movie_info_video_id = '';
+
+      this.movie_info_new = false;
+      this.movie_info_popular = false;
+      this.movie_info_video = true;
+      this.movie_info_trand = false;
+
+      // 해당 id에 맞는 영화정보 불러오기
+      this.$refs.detail_video_bg.style.backgroundImage = `url(${this.MOVIE_IMG}/${bg})`;
+      this.$refs.detail_video_bg.style.backgroundPosition = 'center';
+      if(this.displaySize > 1024) {
+        this.$refs.detail_video_bg.style.backgroundSize = '100%';
+      } else {
+        // this.$refs.detail_video_bg.style.backgroundSize = '0';
+      }
+      this.$refs.detail_video_bg.style.backgroundRepeat = 'no-repeat';
+      
+      // id에 맞는 영화정보 불러오기
+      await axios.get(`${this.MOVIE_INFO_URL}/${id}?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        console.log(res)
+        this.movie_info_video_data = res.data;
+      }).catch((error) => {
+        console.log(error)
+      })
+      // id에 맞는 영상 가져오기
+      await axios.get(`${this.MOVIE_INFO_URL}/${id}/videos?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        // console.log(res)
+        this.movie_info_video_id = res.data.results[0].key;
+      }).catch((error) => {
+        console.log(error)
+      }) 
+    },
+    video_movieInfo_close() {
+      this.movie_info_video = false;
+    },
+    // trand
+    async trand_movieInfo(id, bg) {
+      this.movie_info_new = false;
+      this.movie_info_popular = false;
+      this.movie_info_video = false;
+      this.movie_info_trand = true;
+
+      // 해당 id에 맞는 영화정보 불러오기
+      this.$refs.detail_trand_bg.style.backgroundImage = `url(${this.MOVIE_IMG}/${bg})`;
+      this.$refs.detail_trand_bg.style.backgroundPosition = 'center';
+      if(this.displaySize > 1024) {
+        this.$refs.detail_trand_bg.style.backgroundSize = '100%';
+      } else {
+        // this.$refs.detail_trand_bg.style.backgroundSize = '0';
+      }
+      this.$refs.detail_trand_bg.style.backgroundRepeat = 'no-repeat';
+      
+      // id에 맞는 영화정보 불러오기
+      await axios.get(`${this.MOVIE_INFO_URL}/${id}?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        console.log(res)
+        this.movie_info_trand_data = res.data;
+      }).catch((error) => {
+        console.log(error)
+      })
+      // id에 맞는 영상 가져오기
+      await axios.get(`${this.MOVIE_INFO_URL}/${id}/videos?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        // console.log(res)
+        this.movie_info_video_id = res.data.results[0].key;
+      }).catch((error) => {
+        console.log(error)
+      }) 
+    },
+    trand_movieInfo_close() {
+      this.movie_info_trand = false;
     }
   },
   watch: {
     displayWidthSize(e) {
       e = window.innerWidth;
-    }
+    },
+
   },
-  mounted() {
+  async mounted() {
     this.displaySize = window.innerWidth;
-    // id에 맞는 영상 가져오기 - 테스트용
-    // axios.get(`${this.MOVIE_URL}/760161/videos?api_key=${this.API_KEY}&language=ko`)
-    // .then((res) => {
-    //   // console.log(res)
-    // }).catch((error) => {
-    //   console.log(error)
-    // })
     
-    
-    // 영화 장르 확인
-    axios.get(`${this.BASE_URL}?api_key=${this.API_KEY}&language=ko`)
-    .then((res) => {
-      // console.log(res)
-    }).catch((error) => {
-      console.log(error)
-    })
-
-
-    // 개봉예정 영화 목록
-    axios.get(`${this.NEW_URL}?api_key=${this.API_KEY}&language=ko`)
-    .then((res) => {
-      // console.log(res);
-      this.new_movies = res.data.results
-    }).catch((error) => {
-      console.log(error)
-    })
-    
-    // 인기 영화 목록
-    axios.get(`${this.POPULAR_URL}?api_key=${this.API_KEY}&language=ko&page=5`)
-    .then((res) => {
-      // console.log(res)
-      this.popular_moviles = res.data.results
-    }).catch((error) => {
-      console.log(error)
-    })
-
-    // 트렌드 영화
-    axios.get(`${this.TRAND_URL}?api_key=${this.API_KEY}&language=ko`)
-    .then((res) => {
-      // console.log(res)
-      this.trand_movies = res.data.results
-    }).catch((error) => {
-      console.log(error)
-    })
-
-    // 최신 영화 비디오 4개 선정 - (아바타 - 76600, 와칸다포에버 - 505642, 헤어질결심 - , 블랙아담 - 436270)
-    axios.get(`${this.NEW_VIDEO}/76600/videos?api_key=${this.API_KEY}&language=ko`)
-    .then((res) => {
-      console.log(res)
-    }).catch((error) => {
-      console.log(error)
-    })
-    axios.get(`${this.NEW_VIDEO}/505642/videos?api_key=${this.API_KEY}&language=ko`)
-    .then((res) => {
-      // console.log(res)
-      this.new_video_id_two = res.data.results[0].key
-    }).catch((error) => {
-      console.log(error)
-    })
-
-    
-
+    try {
+      // 영화 장르 확인
+      await axios.get(`${this.BASE_URL}?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        // console.log(res)
+      }).catch((error) => {
+        console.log(error)
+      })
+  
+  
+      // 개봉예정 영화 목록
+      await axios.get(`${this.NEW_URL}?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        // console.log(res);
+        this.new_movies = res.data.results
+      }).catch((error) => {
+        console.log(error)
+      })
+      
+      // 인기 영화 목록
+      await axios.get(`${this.POPULAR_URL}?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        // console.log(res)
+        this.popular_moviles = res.data.results
+      }).catch((error) => {
+        console.log(error)
+      })
+  
+      // 트렌드 영화
+      await axios.get(`${this.TRAND_URL}?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        // console.log(res)
+        this.trand_movies = res.data.results
+      }).catch((error) => {
+        console.log(error)
+      })
+  
+      // 최신 영화 비디오_세부정보 4개 선정 - (아바타 - 76600, 와칸다포에버 - 505642, 블랙사이트 - 848123 , 블랙아담 - 436270)
+      await axios.get(`${this.MOVIE_INFO_URL}/76600?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        // console.log(res)
+        this.new_video_infos.push(res.data);
+      }).catch((error) => {
+        console.log(error)
+      })
+      await axios.get(`${this.MOVIE_INFO_URL}/505642?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        // console.log(res)
+        this.new_video_infos.push(res.data);
+      }).catch((error) => {
+        console.log(error)
+      })
+      await axios.get(`${this.MOVIE_INFO_URL}/848123?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        // console.log(res)
+        this.new_video_infos.push(res.data);
+      }).catch((error) => {
+        console.log(error)
+      })
+      await axios.get(`${this.MOVIE_INFO_URL}/436270?api_key=${this.API_KEY}&language=ko`)
+      .then((res) => {
+        // console.log(res)
+        this.new_video_infos.push(res.data);
+      }).catch((error) => {
+        console.log(error)
+      })
+    } catch (e) {
+      // console.log가 아닌 error는 콘솔의 에러를 뱉는다
+      console.error(e)
+    }
   },
 }
 </script>
@@ -138,39 +324,106 @@ export default {
     <div class="mv__first">
       <div class="first">개봉예정</div>
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in new_movies" :key="movie">
+        <swiper-slide v-for="movie in new_movies" :key="movie" @click="new_movieInfo(movie.id, movie.backdrop_path)">
           <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
         </swiper-slide>
         <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
       </swiper>
+      <!-- mv__detail__info -->
+      <div class="mv__detail__info" :class="{ movie_info_new }" ref="detail_new_bg">
+        <div class="detail__info">
+          <img :src="`${this.MOVIE_IMG}/${movie_info_new_data.poster_path}`" alt="" class="detail__poster" />
+          <div class="detail__text">
+            <div class="__header">
+              <div class="__title">{{ movie_info_new_data.title }}</div>
+              <div class="__close"><span class="material-symbols-outlined" @click="new_movieInfo_close()">close</span></div>
+            </div>
+            <div class="__des">{{ movie_info_new_data.overview }}</div>
+            <div class="detail__video">
+              <iframe :src="`https://www.youtube.com/embed/${movie_info_new_id}?autoplay=1&mute=1`"></iframe>
+            </div>
+          </div>
+        </div>
+        <div class="detail__similar__info"></div>
+      </div>  
     </div>
     <!-- 2 swiper -> popular -->
     <div class="mv__first">
       <div class="first">인기</div>
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in popular_moviles" :key="movie">
+        <swiper-slide v-for="movie in popular_moviles" :key="movie" @click="popular_movieInfo(movie.id, movie.backdrop_path)">
           <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
         </swiper-slide>
         <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
       </swiper>
+      <!-- mv__detail__info -->
+      <div class="mv__detail__info" :class="{ movie_info_popular }" ref="detail_popular_bg">
+        <div class="detail__info">
+          <img :src="`${this.MOVIE_IMG}/${movie_info_popular_data.poster_path}`" alt="" class="detail__poster" />
+          <div class="detail__text">
+            <div class="__header">
+              <div class="__title">{{ movie_info_popular_data.title }}</div>
+              <div class="__close"><span class="material-symbols-outlined" @click="popular_movieInfo_close()">close</span></div>
+            </div>
+            <div class="__des">{{ movie_info_popular_data.overview }}</div>
+            <div class="detail__video">
+              <iframe :src="`https://www.youtube.com/embed/${movie_info_popular_id}?autoplay=1&mute=1`"></iframe>
+            </div>
+          </div>
+        </div>
+        <div class="detail__similar__info"></div>
+      </div>
     </div>
     <!-- 3 swiper -> video -->
     <div class="mv__first">
-      <div class="first">최신예고편</div>
-      <swiper class="first__swiper video__swiper" :slides-per-view="(displaySize > 1024) ? 4 : 2" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide>
-        </swiper-slide>
-      </swiper>
+      <div class="video__swiper" ref="mv_bg">
+        <div class="first first__video">최신예고편</div>
+        <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 4 : (displaySize > 768) ? 3 : 2" :space-between="30" :modules="modules" Navigation="false">
+          <swiper-slide class="mv__video" v-for="movie in new_video_infos" :key="movie" @click="video_movieInfo(movie.id, movie.backdrop_path)">
+            <div class="mv__box">
+              <img class="mv__video__poster" :src="`${this.MOVIE_IMG}/${movie.backdrop_path}`" @mouseover="mvBack(movie.backdrop_path)" >
+              <div class="mv__video__title">{{ movie.title }}</div>
+              <span class="material-symbols-outlined mv__play">play_circle</span>
+            </div>
+          </swiper-slide>
+        </swiper>
+        <!-- mv__detail__info -->
+        <div class="mv__detail__info" :class="{ movie_info_video }"  ref="detail_video_bg">
+          <!-- <div class="__close">
+            <span class="material-symbols-outlined" @click="video_movieInfo_close()">close</span>
+          </div> -->
+          <div class="detail__video">
+            <iframe :src="`https://www.youtube.com/embed/${movie_info_video_id}?autoplay=1&mute=1`"></iframe>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- 4 swiper -> trand -->
     <div class="mv__first">
       <div class="first">실시간 급상승</div>
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in trand_movies" :key="movie">
+        <swiper-slide v-for="movie in trand_movies" :key="movie" @click="trand_movieInfo(movie.id, movie.backdrop_path)">
           <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
         </swiper-slide>
         <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
       </swiper>
+      <!-- mv__detail__info -->
+      <div class="mv__detail__info" :class="{ movie_info_trand }"  ref="detail_trand_bg">
+        <div class="detail__info">
+          <img :src="`${this.MOVIE_IMG}/${movie_info_trand_data.poster_path}`" alt="" class="detail__poster" />
+          <div class="detail__text">
+            <div class="__header">
+              <div class="__title">{{ movie_info_trand_data.title }}</div>
+              <div class="__close"><span class="material-symbols-outlined" @click="trand_movieInfo_close()">close</span></div>
+            </div>
+            <div class="__des">{{ movie_info_trand_data.overview }}</div>
+            <div class="detail__video">
+              <iframe :src="`https://www.youtube.com/embed/${movie_info_trand_id}?autoplay=1&mute=1`"></iframe>
+            </div>
+          </div>
+        </div>
+        <div class="detail__similar__info"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -190,11 +443,24 @@ export default {
           width: 15vw !important;
           height: 25vh !important;
         }
+        .mv__video {
+          padding-bottom: 20px !important;
+          width: 27vw !important;
+          height: 25vh !important;
+          .mv__box {
+            .mv__video__title {
+              font-size: 20px !important;
+            }
+          }
+        } 
         .mv__next {
           span {
             font-size: 6vw !important;
           }
         }
+      }
+      .video__swiper {
+        height: 40vh !important;
       }
     }
   }
@@ -212,11 +478,24 @@ export default {
           width: 25vw !important;
           height: 25vh !important;
         }
+        .mv__video {
+          padding-bottom: 50px !important;
+          width: 39vw !important;
+          height: 22vh !important;
+          .mv__box {
+            .mv__video__title {
+              font-size: 16px !important;
+            }
+          }
+        } 
         .mv__next {
           span {
             font-size: 10vw !important;
           }
         }
+      }
+      .video__swiper {
+        height: 35vh !important;
       }
     }
   } 
@@ -230,6 +509,7 @@ export default {
       padding-top: 30px;
       .first {
         padding-left: 20px;
+        padding-top: 30px;
         font-size: 2vw;
         color: #fff;
       }  
@@ -249,6 +529,43 @@ export default {
             cursor: pointer;
           }
         }
+        .mv__video {
+          position: relative;
+          padding-bottom: 50px;
+          width: 30vw;
+          height: 30vh;
+          transition: all 0.3s ease;
+          .mv__box {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            &:hover {
+              transform: scale(1.1);
+              transition: all 0.3s ease;
+              z-index: 100;
+              cursor: pointer;
+            }
+            .mv__video__poster {
+              width: 100%;
+              height: 100%;
+              border-radius: 5px;
+            }
+            .mv__video__title {
+              padding-top: 10px;
+              color: #fff;
+              font-size: 25px;
+              text-align: center;
+            }
+            .mv__play {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              font-size: 5em;
+              color: #fff;
+            }
+          }
+        }
         .mv__next {
           height: auto;
           display: flex;
@@ -264,10 +581,323 @@ export default {
       .video__swiper {
         background: #101010;
         border-radius: 10px;
-        height: 50vh;
+        height: 45vh;
         iframe {
           width: 100%;
           height: 100%;
+        }
+      }
+    }
+    .mv__first {
+      position: relative;
+
+      // movie__detail__info
+      .mv__detail__info {
+        animation: fadeOut 1s;
+        @keyframes fadeOut {
+          0% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, 100%);
+          }
+        }
+        display: none;
+
+      }
+      .mv__detail__info.movie_info_new {
+        display: block;
+        width: 80vw;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        border-radius: 20px;
+        padding: 2rem;
+        animation: fadeInUp 1s;
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            // translate(x, y)
+            transform: translate(-50%, 100%);
+
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+        }
+        .detail__info {
+          display: flex;
+          .detail__poster {
+            width: 25vw;
+            border-radius: 10px;
+          }
+          .detail__text {
+            width: 100%;
+            padding-left: 20px;
+            .__header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              .__title {
+                font-size: 30px;
+                font-weight: 600;  
+                color: #000;
+              }
+              .__close {
+                
+                span {
+                  font-size: 40px;
+                  cursor: pointer;
+                  transition: .3s;
+                  transform: rotate(0);
+                  &:hover {
+                    transition: .3s;
+                    transform : rotate(180deg);
+                  }
+                }
+              }
+            }
+            .__des {
+              min-height: 17vh;
+              padding-top: 20px;
+              padding-bottom: 20px;
+              font-size: 19px;
+              font-weight: 600;
+              color: #000;
+            }
+            .detail__video {
+              padding-top: 56.25%;
+              position: relative;
+              iframe {
+                border-radius: 10px;
+                background: black;
+                position: absolute;
+                top:0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+              }
+            }
+          }
+        }
+      }
+      .mv__detail__info.movie_info_popular {
+        display: block;
+        width: 80vw;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        border-radius: 20px;
+        padding: 2rem;
+        animation: fadeInUp 1s;
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            // translate(x, y)
+            transform: translate(-50%, 100%);
+
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+        }
+        .detail__info {
+          display: flex;
+          .detail__poster {
+            width: 25vw;
+            border-radius: 10px;
+          }
+          .detail__text {
+            width: 100%;
+            padding-left: 20px;
+            .__header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              .__title {
+                font-size: 30px;
+                font-weight: 600;  
+                color: #000;
+              }
+              .__close {
+                span {
+                  font-size: 40px;
+                  cursor: pointer;
+                  transition: .3s;
+                  transform: rotate(0);
+                  color: #000;
+                  &:hover {
+                    transition: .3s;
+                    transform : rotate(180deg);
+                  }
+                }
+              }
+            }
+            .__des {
+              min-height: 17vh;
+              padding-top: 20px;
+              padding-bottom: 20px;
+              font-size: 19px;
+              font-weight: 600;
+              color: #000;
+            }
+            .detail__video {
+              padding-top: 56.25%;
+              position: relative;
+              iframe {
+                border-radius: 10px;
+                background: black;
+                position: absolute;
+                top:0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+              }
+            }
+          }
+        }
+      }
+      .mv__detail__info.movie_info_video {
+        display: block;
+        width: 80vw;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        border-radius: 20px;
+        padding: 3rem;
+        animation: fadeInUp 1s;
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            // translate(x, y)
+            transform: translate(-50%, 100%);
+
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+        }
+        // .__close {
+        //   position: absolute;
+        //   z-index: 200;
+        //   // right: 20px;
+        //   right: 15px;
+        //   top: 60px;
+        color: #000;
+        //   span {
+        //     font-size: 40px;
+        //     cursor: pointer;
+        //     transition: .3s;
+        //     transform: rotate(0);
+        //     &:hover {
+        //       transition: .3s;
+        //       transform : rotate(180deg);
+        //     }
+        //   }
+        // }
+        .detail__video {
+          padding-top: 56.25%;
+          position: relative;
+          iframe {
+            border-radius: 10px;
+            background: black;
+            position: absolute;
+            top:0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+      .mv__detail__info.movie_info_trand {
+        display: block;
+        width: 80vw;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        border-radius: 20px;
+        padding: 2rem;
+        animation: fadeInUp 1s;
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            // translate(x, y)
+            transform: translate(-50%, 100%);
+
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+        }
+        .detail__info {
+          display: flex;
+          .detail__poster {
+            width: 25vw;
+            border-radius: 10px;
+          }
+          .detail__text {
+            width: 100%;
+            padding-left: 20px;
+            .__header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              .__title {
+                font-size: 30px;
+                font-weight: 600;  
+                color: #000;
+              }
+              .__close {
+                
+                span {
+                  font-size: 40px;
+                  cursor: pointer;
+                  transition: .3s;
+                  transform: rotate(0);
+                  color: #000;
+                  &:hover {
+                    transition: .3s;
+                    transform : rotate(180deg);
+                  }
+                }
+              }
+            }
+            .__des {
+              min-height: 17vh;
+              padding-top: 20px;
+              padding-bottom: 20px;
+              font-size: 19px;
+              font-weight: 600;
+              color: #000;
+            }
+            .detail__video {
+              padding-top: 56.25%;
+              position: relative;
+              iframe {
+                border-radius: 10px;
+                background: black;
+                position: absolute;
+                top:0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+              }
+            }
+          }
         }
       }
     }
