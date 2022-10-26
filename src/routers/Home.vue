@@ -73,6 +73,11 @@ export default {
       })
     },
   },
+  watch: {
+    displayWidthSize(e) {
+      e = window.innerWidth;
+    },
+  },
   methods: {
     mvBack(bg) {
       this.$refs.mv_bg.style.backgroundImage = `url(${this.MOVIE_IMG}/${bg})`;
@@ -80,6 +85,17 @@ export default {
       this.$refs.mv_bg.style.backgroundSize = '100%';
       this.$refs.mv_bg.style.backgroundRepeat = 'no-repeat';
     },
+
+    // detail page
+    detail(id) {
+      this.$router.push({
+        name: "DetailInfo",
+        params: {
+          id: id
+        }
+      })
+    },
+
     // new
     async new_movieInfo(id, bg) {
       this.movie_info_new_id = ''
@@ -101,7 +117,7 @@ export default {
       // id에 맞는 영화정보 불러오기
       await axios.get(`${this.MOVIE_INFO_URL}/${id}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
-        console.log(res)
+        // console.log(res)
         this.movie_info_new_data = res.data;
       }).catch((error) => {
         console.log(error)
@@ -140,7 +156,7 @@ export default {
       // id에 맞는 영화정보 불러오기
       await axios.get(`${this.MOVIE_INFO_URL}/${id}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
-        console.log(res)
+        // console.log(res)
         this.movie_info_popular_data = res.data;
       }).catch((error) => {
         console.log(error)
@@ -179,7 +195,7 @@ export default {
       // id에 맞는 영화정보 불러오기
       await axios.get(`${this.MOVIE_INFO_URL}/${id}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
-        console.log(res)
+        // console.log(res)
         this.movie_info_video_data = res.data;
       }).catch((error) => {
         console.log(error)
@@ -216,7 +232,7 @@ export default {
       // id에 맞는 영화정보 불러오기
       await axios.get(`${this.MOVIE_INFO_URL}/${id}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
-        console.log(res)
+        // console.log(res)
         this.movie_info_trand_data = res.data;
       }).catch((error) => {
         console.log(error)
@@ -234,15 +250,20 @@ export default {
       this.movie_info_trand = false;
     }
   },
-  watch: {
-    displayWidthSize(e) {
-      e = window.innerWidth;
-    },
-
-  },
+  // window esc event
+  //   updated() {
+  //     window.onkeydown = function(event){
+  //       if(event.keyCode == 27){
+  //         this.movie_info_new = false;
+  //         this.movie_info_popular = false;
+  //         this.movie_info_video = false;
+  //         this.movie_info_trand = false;
+  //       };
+  //     }
+  //   },
   async mounted() {
     this.displaySize = window.innerWidth;
-    
+
     try {
       // 영화 장르 확인
       await axios.get(`${this.BASE_URL}?api_key=${this.API_KEY}&language=ko`)
@@ -280,7 +301,7 @@ export default {
         console.log(error)
       })
   
-      // 최신 영화 비디오_세부정보 4개 선정 - (아바타 - 76600, 와칸다포에버 - 505642, 블랙사이트 - 848123 , 블랙아담 - 436270)
+      // 최신 영화 비디오_세부정보 4개 선정 - (아바타2 - 76600, 와칸다포에버 - 505642, 아바타 - 19995 , 블랙아담 - 436270)
       await axios.get(`${this.MOVIE_INFO_URL}/76600?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         // console.log(res)
@@ -295,7 +316,7 @@ export default {
       }).catch((error) => {
         console.log(error)
       })
-      await axios.get(`${this.MOVIE_INFO_URL}/848123?api_key=${this.API_KEY}&language=ko`)
+      await axios.get(`${this.MOVIE_INFO_URL}/19995?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         // console.log(res)
         this.new_video_infos.push(res.data);
@@ -319,6 +340,9 @@ export default {
 
 
 <template>
+  <div class="mv__img">
+    <img src="https://www.justwatch.com/appassets/img/home/tv/tv.webp" alt="">
+  </div>
   <div class="mv__container">
     <!-- 1 swiper -> new -->
     <div class="mv__first">
@@ -332,13 +356,21 @@ export default {
       <!-- mv__detail__info -->
       <div class="mv__detail__info" :class="{ movie_info_new }" ref="detail_new_bg">
         <div class="detail__info">
-          <img :src="`${this.MOVIE_IMG}/${movie_info_new_data.poster_path}`" alt="" class="detail__poster" />
+          <!-- <img :src="(displaySize > 768) ? `${this.MOVIE_IMG}/${movie_info_new_data.poster_path}` : `${this.MOVIE_IMG}/${movie_info_new_data.backdrop_path}`" alt="" class="detail__poster" /> -->
+          <div class="detail__box" v-if="displaySize > 768">
+            <img :src="`${this.MOVIE_IMG}/${movie_info_new_data.poster_path}`" class="detail__poster" />
+            <div class="detail__btn" @click="detail(movie_info_new_data.id)">상세보기</div>
+          </div>
           <div class="detail__text">
             <div class="__header">
               <div class="__title">{{ movie_info_new_data.title }}</div>
               <div class="__close"><span class="material-symbols-outlined" @click="new_movieInfo_close()">close</span></div>
             </div>
-            <div class="__des">{{ movie_info_new_data.overview }}</div>
+            <div class="detail__box" v-if="displaySize < 768">
+              <img :src="`${this.MOVIE_IMG}/${movie_info_new_data.backdrop_path}`" class="detail__poster" />
+              <div class="detail__btn" @click="detail(movie_info_new_data.id)">상세보기</div>
+            </div>
+            <div class="__des">{{ movie_info_new_data.overview !== "" ? movie_info_new_data.overview : "상세설명이 없습니다" }}</div>
             <div class="detail__video">
               <iframe :src="`https://www.youtube.com/embed/${movie_info_new_id}?autoplay=1&mute=1`"></iframe>
             </div>
@@ -359,13 +391,20 @@ export default {
       <!-- mv__detail__info -->
       <div class="mv__detail__info" :class="{ movie_info_popular }" ref="detail_popular_bg">
         <div class="detail__info">
-          <img :src="`${this.MOVIE_IMG}/${movie_info_popular_data.poster_path}`" alt="" class="detail__poster" />
+          <div class="detail__box" v-if="displaySize > 768">
+            <img :src="`${this.MOVIE_IMG}/${movie_info_popular_data.poster_path}`" class="detail__poster" />
+            <div class="detail__btn" @click="detail(movie_info_popular_data.id)">상세보기</div>
+          </div>
           <div class="detail__text">
             <div class="__header">
               <div class="__title">{{ movie_info_popular_data.title }}</div>
               <div class="__close"><span class="material-symbols-outlined" @click="popular_movieInfo_close()">close</span></div>
             </div>
-            <div class="__des">{{ movie_info_popular_data.overview }}</div>
+            <div class="detail__box" v-if="displaySize < 768">
+              <img :src="`${this.MOVIE_IMG}/${movie_info_popular_data.backdrop_path}`" class="detail__poster" />
+              <div class="detail__btn" @click="detail(movie_info_popular_data.id)">상세보기</div>
+            </div>
+            <div class="__des">{{ movie_info_popular_data.overview !== "" ? movie_info_popular_data.overview : "상세설명이 없습니다" }}</div>
             <div class="detail__video">
               <iframe :src="`https://www.youtube.com/embed/${movie_info_popular_id}?autoplay=1&mute=1`"></iframe>
             </div>
@@ -381,9 +420,9 @@ export default {
         <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 4 : (displaySize > 768) ? 3 : 2" :space-between="30" :modules="modules" Navigation="false">
           <swiper-slide class="mv__video" v-for="movie in new_video_infos" :key="movie" @click="video_movieInfo(movie.id, movie.backdrop_path)">
             <div class="mv__box">
-              <img class="mv__video__poster" :src="`${this.MOVIE_IMG}/${movie.backdrop_path}`" @mouseover="mvBack(movie.backdrop_path)" >
-              <div class="mv__video__title">{{ movie.title }}</div>
-              <span class="material-symbols-outlined mv__play">play_circle</span>
+              <img class="mv__video__poster" :src="`${this.MOVIE_IMG}/${movie.backdrop_path}`" @mouseover="mvBack(movie.backdrop_path)" />
+              <div class="mv__video__title">{{ movie.title == "아바타" ? "[리마스터링] " + movie.title : movie.title  }}</div>
+              <span class="material-symbols-outlined mv__play">youtube_activity</span>
             </div>
           </swiper-slide>
         </swiper>
@@ -410,13 +449,20 @@ export default {
       <!-- mv__detail__info -->
       <div class="mv__detail__info" :class="{ movie_info_trand }"  ref="detail_trand_bg">
         <div class="detail__info">
-          <img :src="`${this.MOVIE_IMG}/${movie_info_trand_data.poster_path}`" alt="" class="detail__poster" />
+          <div class="detail__box" v-if="displaySize > 768">
+            <img :src="`${this.MOVIE_IMG}/${movie_info_trand_data.poster_path}`" class="detail__poster" />
+            <div class="detail__btn" @click="detail(movie_info_trand_data.id)">상세보기</div>
+          </div>
           <div class="detail__text">
             <div class="__header">
               <div class="__title">{{ movie_info_trand_data.title }}</div>
               <div class="__close"><span class="material-symbols-outlined" @click="trand_movieInfo_close()">close</span></div>
             </div>
-            <div class="__des">{{ movie_info_trand_data.overview }}</div>
+            <div class="detail__box" v-if="displaySize < 768">
+              <img :src="`${this.MOVIE_IMG}/${movie_info_trand_data.backdrop_path}`" class="detail__poster" />
+              <div class="detail__btn" @click="detail(movie_info_trand_data.id)">상세보기</div>
+            </div>
+            <div class="__des">{{ movie_info_trand_data.overview !== "" ? movie_info_trand_data.overview : "상세설명이 없습니다" }}</div>
             <div class="detail__video">
               <iframe :src="`https://www.youtube.com/embed/${movie_info_trand_id}?autoplay=1&mute=1`"></iframe>
             </div>
@@ -432,7 +478,13 @@ export default {
 <style lang="scss" scoped>
 
 @media screen and (max-width: 1024px) {
-
+  .mv__img {
+    height: 70vh !important;
+    img {
+      // padding-top: 2rem !important;
+      width: 100% !important;
+    }
+  }
   .mv__container {
     .mv__first {
       .first {
@@ -463,11 +515,355 @@ export default {
         height: 40vh !important;
       }
     }
+    .mv__first {
+      position: relative;
+      // movie__detail__info
+      .mv__detail__info {
+        animation: fadeOut 1s;
+        @keyframes fadeOut {
+          0% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, 100%);
+          }
+        }
+        display: none;
+
+      }
+      .mv__detail__info.movie_info_new {
+        display: block;
+        width: 80vw;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        border-radius: 20px;
+        padding: 2rem;
+        animation: fadeInUp 1s;
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            // translate(x, y)
+            transform: translate(-50%, 100%);
+
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+        }
+        .detail__info {
+          display: flex;
+          .detail__text {
+            width: 100%;
+            padding-left: 0 !important;
+            .detail__poster {
+              margin-top: 10px;
+              width: 100% !important;
+              border-radius: 10px;
+            }
+            .__header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              .__title {
+                font-size: 30px;
+                font-weight: 600;  
+                color: #000;
+              }
+              .__close {
+                
+                span {
+                  font-size: 40px;
+                  cursor: pointer;
+                  transition: .3s;
+                  transform: rotate(0);
+                  &:hover {
+                    transition: .3s;
+                    transform : rotate(180deg);
+                  }
+                }
+              }
+            }
+            .__des {
+              width: 100%;
+              min-height: 17vh;
+              padding-top: 20px;
+              padding-bottom: 20px;
+              font-size: 19px;
+              font-weight: 600;
+              color: #000;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              word-break: break-word;
+              display: -webkit-box;
+              -webkit-line-clamp: 5; // 원하는 라인수
+              -webkit-box-orient: vertical;
+            }
+            .detail__video {
+              display: none !important;
+              padding-top: 56.25%;
+              position: relative;
+              iframe {
+                border-radius: 10px;
+                background: black;
+                position: absolute;
+                top:0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+              }
+            }
+          }
+        }
+      }
+      .mv__detail__info.movie_info_popular {
+        display: block;
+        width: 80vw;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        border-radius: 20px;
+        padding: 2rem;
+        animation: fadeInUp 1s;
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            // translate(x, y)
+            transform: translate(-50%, 100%);
+
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+        }
+        .detail__info {
+          display: flex;
+          .detail__text {
+            width: 100%;
+            padding-left: 0 !important;
+            .detail__poster {
+              margin-top: 10px;
+              width: 100% !important;
+              border-radius: 10px;
+            }
+            .__header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              .__title {
+                font-size: 30px;
+                font-weight: 600;  
+                color: #000;
+              }
+              .__close {
+                
+                span {
+                  font-size: 40px;
+                  cursor: pointer;
+                  transition: .3s;
+                  transform: rotate(0);
+                  &:hover {
+                    transition: .3s;
+                    transform : rotate(180deg);
+                  }
+                }
+              }
+            }
+            .__des {
+              width: 100%;
+              min-height: 17vh;
+              padding-top: 20px;
+              padding-bottom: 20px;
+              font-size: 19px;
+              font-weight: 600;
+              color: #000;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              word-break: break-word;
+              display: -webkit-box;
+              -webkit-line-clamp: 5; // 원하는 라인수
+              -webkit-box-orient: vertical;
+            }
+            .detail__video {
+              display: none !important;
+              padding-top: 56.25%;
+              position: relative;
+              iframe {
+                border-radius: 10px;
+                background: black;
+                position: absolute;
+                top:0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+              }
+            }
+          }
+        }
+      }
+      .mv__detail__info.movie_info_video {
+        display: block;
+        width: 80vw;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        border-radius: 20px;
+        padding: 3rem;
+        animation: fadeInUp 1s;
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            // translate(x, y)
+            transform: translate(-50%, 100%);
+
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+        }
+        // .__close {
+        //   position: absolute;
+        //   z-index: 200;
+        //   // right: 20px;
+        //   right: 15px;
+        //   top: 60px;
+        // color: #000;
+        //   span {
+        //     font-size: 40px;
+        //     cursor: pointer;
+        //     transition: .3s;
+        //     transform: rotate(0);
+        //     &:hover {
+        //       transition: .3s;
+        //       transform : rotate(180deg);
+        //     }
+        //   }
+        // }
+        .detail__video {
+          padding-top: 56.25%;
+          position: relative;
+          iframe {
+            border-radius: 10px;
+            background: black;
+            position: absolute;
+            top:0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+      .mv__detail__info.movie_info_trand {
+        display: block;
+        width: 80vw;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        border-radius: 20px;
+        padding: 2rem;
+        animation: fadeInUp 1s;
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            // translate(x, y)
+            transform: translate(-50%, 100%);
+
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+        }
+        .detail__info {
+          display: flex;
+          .detail__text {
+            width: 100%;
+            padding-left: 0 !important;
+            .detail__poster {
+              margin-top: 10px;
+              width: 100% !important;
+              border-radius: 10px;
+            }
+            .__header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              .__title {
+                font-size: 30px;
+                font-weight: 600;  
+                color: #000;
+              }
+              .__close {
+                
+                span {
+                  font-size: 40px;
+                  cursor: pointer;
+                  transition: .3s;
+                  transform: rotate(0);
+                  &:hover {
+                    transition: .3s;
+                    transform : rotate(180deg);
+                  }
+                }
+              }
+            }
+            .__des {
+              width: 100%;
+              min-height: 17vh;
+              padding-top: 20px;
+              padding-bottom: 20px;
+              font-size: 19px;
+              font-weight: 600;
+              color: #000;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              word-break: break-word;
+              display: -webkit-box;
+              -webkit-line-clamp: 5; // 원하는 라인수
+              -webkit-box-orient: vertical;
+            }
+            .detail__video {
+              display: none !important;
+              padding-top: 56.25%;
+              position: relative;
+              iframe {
+                border-radius: 10px;
+                background: black;
+                position: absolute;
+                top:0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
 @media screen and (max-width: 768px) {
-
+  .mv__img {
+    height: 50vh !important;
+    img {
+      padding-top: 5rem !important;
+      width: 100% !important;
+    }
+  }
   .mv__container {
     .mv__first {
       .first {
@@ -498,9 +894,356 @@ export default {
         height: 35vh !important;
       }
     }
-  } 
+    .mv__first {
+      position: relative;
+      // movie__detail__info
+      .mv__detail__info {
+        animation: fadeOut 1s;
+        @keyframes fadeOut {
+          0% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, 100%);
+          }
+        }
+        display: none;
 
+      }
+      .mv__detail__info.movie_info_new {
+        display: block;
+        width: 80vw;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        border-radius: 20px;
+        padding: 2rem;
+        animation: fadeInUp 1s;
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            // translate(x, y)
+            transform: translate(-50%, 100%);
+
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+        }
+        .detail__info {
+          display: flex;
+          .detail__text {
+            width: 100%;
+            padding-left: 0 !important;
+            .detail__poster {
+              margin-top: 10px;
+              width: 100% !important;
+              border-radius: 10px;
+            }
+            .__header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              .__title {
+                font-size: 30px;
+                font-weight: 600;  
+                color: #000;
+              }
+              .__close {
+                
+                span {
+                  font-size: 40px;
+                  cursor: pointer;
+                  transition: .3s;
+                  transform: rotate(0);
+                  &:hover {
+                    transition: .3s;
+                    transform : rotate(180deg);
+                  }
+                }
+              }
+            }
+            .__des {
+              width: 100%;
+              min-height: 17vh;
+              padding-top: 20px;
+              padding-bottom: 20px;
+              font-size: 19px;
+              font-weight: 600;
+              color: #000;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              word-break: break-word;
+              display: -webkit-box;
+              -webkit-line-clamp: 5; // 원하는 라인수
+              -webkit-box-orient: vertical;
+            }
+            .detail__video {
+              display: none !important;
+              padding-top: 56.25%;
+              position: relative;
+              iframe {
+                border-radius: 10px;
+                background: black;
+                position: absolute;
+                top:0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+              }
+            }
+          }
+        }
+      }
+      .mv__detail__info.movie_info_popular {
+        display: block;
+        width: 80vw;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        border-radius: 20px;
+        padding: 2rem;
+        animation: fadeInUp 1s;
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            // translate(x, y)
+            transform: translate(-50%, 100%);
+
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+        }
+        .detail__info {
+          display: flex;
+          .detail__text {
+            width: 100%;
+            padding-left: 0 !important;
+            .detail__poster {
+              margin-top: 10px;
+              width: 100% !important;
+              border-radius: 10px;
+            }
+            .__header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              .__title {
+                font-size: 30px;
+                font-weight: 600;  
+                color: #000;
+              }
+              .__close {
+                
+                span {
+                  font-size: 40px;
+                  cursor: pointer;
+                  transition: .3s;
+                  transform: rotate(0);
+                  &:hover {
+                    transition: .3s;
+                    transform : rotate(180deg);
+                  }
+                }
+              }
+            }
+            .__des {
+              width: 100%;
+              min-height: 17vh;
+              padding-top: 20px;
+              padding-bottom: 20px;
+              font-size: 19px;
+              font-weight: 600;
+              color: #000;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              word-break: break-word;
+              display: -webkit-box;
+              -webkit-line-clamp: 5; // 원하는 라인수
+              -webkit-box-orient: vertical;
+            }
+            .detail__video {
+              display: none !important;
+              padding-top: 56.25%;
+              position: relative;
+              iframe {
+                border-radius: 10px;
+                background: black;
+                position: absolute;
+                top:0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+              }
+            }
+          }
+        }
+      }
+      .mv__detail__info.movie_info_video {
+        display: block;
+        width: 90vw !important;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        border-radius: 20px;
+        padding: 1rem;
+        animation: fadeInUp 1s;
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            // translate(x, y)
+            transform: translate(-50%, 100%);
+
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+        }
+        // .__close {
+        //   position: absolute;
+        //   z-index: 200;
+        //   // right: 20px;
+        //   right: 15px;
+        //   top: 60px;
+        // color: #000;
+        //   span {
+        //     font-size: 40px;
+        //     cursor: pointer;
+        //     transition: .3s;
+        //     transform: rotate(0);
+        //     &:hover {
+        //       transition: .3s;
+        //       transform : rotate(180deg);
+        //     }
+        //   }
+        // }
+        .detail__video {
+          padding-top: 56.25%;
+          position: relative;
+          iframe {
+            border-radius: 10px;
+            background: black;
+            position: absolute;
+            top:0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+      .mv__detail__info.movie_info_trand {
+        display: block;
+        width: 80vw;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        border-radius: 20px;
+        padding: 2rem;
+        animation: fadeInUp 1s;
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            // translate(x, y)
+            transform: translate(-50%, 100%);
+
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+        }
+        .detail__info {
+          display: flex;
+          .detail__text {
+            width: 100%;
+            padding-left: 0 !important;
+            .detail__poster {
+              margin-top: 10px;
+              width: 100% !important;
+              border-radius: 10px;
+            }
+            .__header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              .__title {
+                font-size: 30px;
+                font-weight: 600;  
+                color: #000;
+              }
+              .__close {
+                
+                span {
+                  font-size: 40px;
+                  cursor: pointer;
+                  transition: .3s;
+                  transform: rotate(0);
+                  &:hover {
+                    transition: .3s;
+                    transform : rotate(180deg);
+                  }
+                }
+              }
+            }
+            .__des {
+              width: 100%;
+              min-height: 17vh;
+              padding-top: 20px;
+              padding-bottom: 20px;
+              font-size: 19px;
+              font-weight: 600;
+              color: #000;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              word-break: break-word;
+              display: -webkit-box;
+              -webkit-line-clamp: 5; // 원하는 라인수
+              -webkit-box-orient: vertical;
+            }
+            .detail__video {
+              display: none !important;
+              padding-top: 56.25%;
+              position: relative;
+              iframe {
+                border-radius: 10px;
+                background: black;
+                position: absolute;
+                top:0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+              }
+            }
+          }
+        }
+      }
+    }
+  } 
 }
+  .mv__img {
+    height: 100vh;
+    background-image: url('https://www.justwatch.com/appassets/img/home/bg-tiles/bg-tiles.webp');
+    background-repeat: no-repeat;
+    background-position: center;
+    // background-size: 100%;
+    img {
+      width: 100%;
+    }
+  }
   .mv__container {
     width: 90vw;
     margin: auto;
@@ -562,7 +1305,7 @@ export default {
               left: 50%;
               transform: translate(-50%, -50%);
               font-size: 5em;
-              color: #fff;
+              color: #d50000;
             }
           }
         }
@@ -632,9 +1375,33 @@ export default {
         }
         .detail__info {
           display: flex;
-          .detail__poster {
-            width: 25vw;
-            border-radius: 10px;
+          .detail__box {
+            position: relative;
+            .detail__poster {
+              width: 25vw;
+              height: 100%;
+              border-radius: 10px;
+            }
+            .detail__btn {
+              position: absolute;
+              right: 10px;
+              bottom: 10px;
+              width: 6rem;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 2rem;
+              border-radius: 5px;
+              background-image: linear-gradient(to right, #434343 0%, black 100%);
+              color: #fff;
+              font-weight: bold;
+              cursor: pointer;
+              transition: .2s;
+              &:hover {
+                transition: .2s;
+                transform: scale(1.1);
+              }
+            }
           }
           .detail__text {
             width: 100%;
@@ -659,6 +1426,34 @@ export default {
                     transition: .3s;
                     transform : rotate(180deg);
                   }
+                }
+              }
+            }
+            .detail__box {
+              position: relative;
+              .detail__poster {
+                width: 25vw;
+                height: 100%;
+                border-radius: 10px;
+              }
+              .detail__btn {
+                position: absolute;
+                right: 10px;
+                bottom: 10px;
+                width: 6rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 2rem;
+                border-radius: 5px;
+                background-image: linear-gradient(to right, #434343 0%, black 100%);
+                color: #fff;
+                font-weight: bold;
+                cursor: pointer;
+                transition: .2s;
+                &:hover {
+                  transition: .2s;
+                  transform: scale(1.1);
                 }
               }
             }
@@ -711,9 +1506,33 @@ export default {
         }
         .detail__info {
           display: flex;
-          .detail__poster {
-            width: 25vw;
-            border-radius: 10px;
+          .detail__box {
+            position: relative;
+            .detail__poster {
+              width: 25vw;
+              height: 100%;
+              border-radius: 10px;
+            }
+            .detail__btn {
+              position: absolute;
+              right: 10px;
+              bottom: 10px;
+              width: 6rem;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 2rem;
+              border-radius: 5px;
+              background-image: linear-gradient(to right, #434343 0%, black 100%);
+              color: #fff;
+              font-weight: bold;
+              cursor: pointer;
+              transition: .2s;
+              &:hover {
+                transition: .2s;
+                transform: scale(1.1);
+              }
+            }
           }
           .detail__text {
             width: 100%;
@@ -738,6 +1557,34 @@ export default {
                     transition: .3s;
                     transform : rotate(180deg);
                   }
+                }
+              }
+            }
+            .detail__box {
+              position: relative;
+              .detail__poster {
+                width: 25vw;
+                height: 100%;
+                border-radius: 10px;
+              }
+              .detail__btn {
+                position: absolute;
+                right: 10px;
+                bottom: 10px;
+                width: 6rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 2rem;
+                border-radius: 5px;
+                background-image: linear-gradient(to right, #434343 0%, black 100%);
+                color: #fff;
+                font-weight: bold;
+                cursor: pointer;
+                transition: .2s;
+                &:hover {
+                  transition: .2s;
+                  transform: scale(1.1);
                 }
               }
             }
@@ -845,9 +1692,33 @@ export default {
         }
         .detail__info {
           display: flex;
-          .detail__poster {
-            width: 25vw;
-            border-radius: 10px;
+          .detail__box {
+            position: relative;
+            .detail__poster {
+              width: 25vw;
+              height: 100%;
+              border-radius: 10px;
+            }
+            .detail__btn {
+              position: absolute;
+              right: 10px;
+              bottom: 10px;
+              width: 6rem;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 2rem;
+              border-radius: 5px;
+              background-image: linear-gradient(to right, #434343 0%, black 100%);
+              color: #fff;
+              font-weight: bold;
+              cursor: pointer;
+              transition: .2s;
+              &:hover {
+                transition: .2s;
+                transform: scale(1.1);
+              }
+            }
           }
           .detail__text {
             width: 100%;
@@ -873,6 +1744,34 @@ export default {
                     transition: .3s;
                     transform : rotate(180deg);
                   }
+                }
+              }
+            }
+            .detail__box {
+              position: relative;
+              .detail__poster {
+                width: 25vw;
+                height: 100%;
+                border-radius: 10px;
+              }
+              .detail__btn {
+                position: absolute;
+                right: 10px;
+                bottom: 10px;
+                width: 6rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 2rem;
+                border-radius: 5px;
+                background-image: linear-gradient(to right, #434343 0%, black 100%);
+                color: #fff;
+                font-weight: bold;
+                cursor: pointer;
+                transition: .2s;
+                &:hover {
+                  transition: .2s;
+                  transform: scale(1.1);
                 }
               }
             }

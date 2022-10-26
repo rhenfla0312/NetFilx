@@ -1,9 +1,15 @@
 <script>
+import axios from 'axios';
 export default {
   data() {
     return {
+      SEARCH_URL : 'https://api.themoviedb.org/3/search/movie',
+
+      API_KEY : 'e95aab0b32ea685f4064a7364dec77f4',
+
       searchData : false,
       searchItem : '',
+      searchs : '',
 
       mobile__check : false,
       mobile__movie__check : false,
@@ -13,11 +19,16 @@ export default {
     }
   },
   methods: {
-    search() {
+    searchText() {
       this.searchData = true;
-      if(this.searchItem) {
-        // 검색 API 요청
-      }
+    },
+    async search() {
+      await axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.searchs}`)
+        .then((res) => {
+          console.log(res)
+        }).catch((error) => {
+          console.log(error)
+        })
     },
     loginCheck() {
       // 조건으로 로그인 인증 로직 구현
@@ -43,8 +54,8 @@ export default {
       <div class="__movie">영화</div>
       <div class="__tv">TV프로그램</div>
       <div class="__searchBox">
-        <input type="text" class="__searchText" :class="{ searchData }" />
-        <div class="__search" :class="{ searchData }"><span @click="search()" class="material-symbols-outlined">search</span></div>
+        <input type="text" class="__searchText" :class="{ searchData }" v-model="searchs" @keydown.enter="search()" />
+        <div class="__search" :class="{ searchData }"><span @click="searchText()" class="material-symbols-outlined">search</span></div>
       </div>
       <div v-if="login_check" class="__myInfo">Y</div>
       <div v-else class="__myInfo __login">로그인</div>
@@ -67,9 +78,6 @@ export default {
           <div class="item tv__trand">실시간 급상승</div>
         </div>
       </div>
-    </div>
-    <div class="mv__img">
-      <img src="https://www.justwatch.com/appassets/img/home/tv/tv.webp" alt="">
     </div>
   </div>
 </template>
@@ -107,13 +115,6 @@ export default {
       .__login {
         border-radius: 5px !important;
         width: 8vw !important;
-      }
-    }
-    .mv__img {
-      height: 70vh !important;
-      img {
-        // padding-top: 2rem !important;
-        width: 100% !important;
       }
     }
   }
@@ -184,13 +185,6 @@ export default {
         cursor: pointer;
       }
     }
-    .mv__img {
-      height: 50vh !important;
-      img {
-        padding-top: 5rem !important;
-        width: 100% !important;
-      }
-    }
   }
 }
 
@@ -206,12 +200,12 @@ a {
   .mv__menu {
     width: 100vw;
     height: 10vh;
-    border-bottom: 1px solid rgba(0,0,0,.35);
-    background-color: rgba(0,0,0,.35);
+    border-bottom: 1px solid rgba(0.8, 0.8, 0.8, 0.8);
+    background-color: rgba(0.8, 0.8, 0.8, 0.8);
     display: flex;
     align-items: center;
     position: fixed;
-    z-index: 100;
+    z-index: 10000;
     color: #fff;
     font-size: 2vw;
     text-align: center;
@@ -269,6 +263,7 @@ a {
         border: none;
         font-size: 20px;
         padding: 5px;
+        padding-left: 15px;
         opacity: 1;
         transition: .4s;
         margin-right: 2vw;
@@ -349,16 +344,6 @@ a {
           }
         }
       }
-    }
-  }
-  .mv__img {
-    height: 100vh;
-    background-image: url('https://www.justwatch.com/appassets/img/home/bg-tiles/bg-tiles.webp');
-    background-repeat: no-repeat;
-    background-position: center;
-    // background-size: 100%;
-    img {
-      width: 100%;
     }
   }
 }
