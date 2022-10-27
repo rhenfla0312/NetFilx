@@ -10,6 +10,7 @@ export default {
       searchData : false,
       searchItem : '',
       searchs : '',
+      searchFile : [],
 
       mobile__check : false,
       mobile__movie__check : false,
@@ -26,6 +27,15 @@ export default {
       await axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.searchs}`)
         .then((res) => {
           console.log(res)
+          this.searchFile = res.data.results;
+
+          this.$router.push({
+            name: "Search",
+            params: {
+              title : this.searchs,
+              searchFile : JSON.stringify(this.searchFile)
+            }
+          })
         }).catch((error) => {
           console.log(error)
         })
@@ -51,17 +61,17 @@ export default {
   <div class="mv__header">
     <div class="mv__menu">
       <RouterLink class="__title" to="/">SPMV</RouterLink>
-      <div class="__movie">영화</div>
-      <div class="__tv">TV프로그램</div>
+      <RouterLink to="/new" class="__movie">신규</RouterLink>
+      <RouterLink to="/popular" class="__tv">인기</RouterLink>
       <div class="__searchBox">
         <input type="text" class="__searchText" :class="{ searchData }" v-model="searchs" @keydown.enter="search()" />
-        <div class="__search" :class="{ searchData }"><span @click="searchText()" class="material-symbols-outlined">search</span></div>
+        <div class="__search" :class="{ searchData }"><span @click="searchText(), search()" class="material-symbols-outlined">search</span></div>
       </div>
       <div v-if="login_check" class="__myInfo">Y</div>
       <div v-else class="__myInfo __login">로그인</div>
       <!-- mobile -->
       <div class="mobileMenu"><span @click="mobileBtn()" class="material-symbols-outlined">menu</span></div>
-      <div class="mobile__list" :class="{ mobile__check }">
+      <!-- <div class="mobile__list" :class="{ mobile__check }">
         <div class="mobile__myInfo">내정보</div>
         <div class="mobile__movie">
           <div class="big__mobile__movie" @click="mobileMovieBtn()">영화</div>
@@ -77,7 +87,7 @@ export default {
           <div class="item tv__popular">인기</div>
           <div class="item tv__trand">실시간 급상승</div>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -92,7 +102,7 @@ export default {
   .mv__header {
     .mv__menu {
       font-size: 3vw !important;
-      height: 9vh !important;
+      height: 7vh !important;
       .__title {
 
       }
@@ -102,9 +112,15 @@ export default {
       .__tv {
         font-size: 2vw !important;
       }
-      .__search {
-        span {
-          font-size: 4vw !important;
+      .__searchBox {
+          height: 3vh !important;
+        .__search {
+          span {
+            font-size: 3.4vw !important;
+          }
+        }
+        .__searchText.searchData {
+          width: 60% !important;
         }
       }
       .__myInfo {
@@ -124,8 +140,8 @@ export default {
   .mv__header {
     // height: 10vh !impo/rtant;
     .mv__menu {
-      font-size: 6vw !important;
-      height: 8vh !important;
+      font-size: 5vw !important;
+      height: 5vh !important;
       .__title {
         margin-right: auto !important;
         margin-left: 7vw !important;
@@ -139,12 +155,13 @@ export default {
       .__searchBox {
         height: 50%;
         .__search {
+
           span {
-            font-size: 6vw !important;
+            font-size: 5vw !important;
           }
         }
         .__searchText.searchData {
-          width: 70% !important;
+          width: 55% !important;
         }
       }
       .__myInfo {
@@ -199,7 +216,7 @@ a {
   // height: 10vh;
   .mv__menu {
     width: 100vw;
-    height: 10vh;
+    height: 7vh;
     border-bottom: 1px solid rgba(0.8, 0.8, 0.8, 0.8);
     background-color: rgba(0.8, 0.8, 0.8, 0.8);
     display: flex;
@@ -217,7 +234,7 @@ a {
     .__movie {
       margin-right: 3vw;
       font-size: 1vw;
-      margin-top: 0.2vw;
+      // margin-top: 0.2vw;
       cursor: pointer;
 
     }
@@ -285,6 +302,11 @@ a {
     .__login {
       border-radius: 5px;
       width: 6rem;
+      transition: .2s;
+      &:hover {
+        transform: scale(1.1);
+        transition: .2s;
+      }
     }
     .mobileMenu {
       display: none;

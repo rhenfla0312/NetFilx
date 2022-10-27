@@ -64,6 +64,8 @@ export default {
       movie_info_popular_id : '',
       movie_info_video_id : '',
       movie_info_trand_id : '',
+
+      CHECK_DATA : "movie"
     }
   },
   computed: {
@@ -91,7 +93,8 @@ export default {
       this.$router.push({
         name: "DetailInfo",
         params: {
-          id: id
+          id: id,
+          CHECK_DATA : this.CHECK_DATA
         }
       })
     },
@@ -130,6 +133,7 @@ export default {
       }).catch((error) => {
         console.log(error)
       }) 
+
     },
     new_movieInfo_close() {
       this.movie_info_new = false;
@@ -348,10 +352,12 @@ export default {
     <div class="mv__first">
       <div class="first">개봉예정</div>
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in new_movies" :key="movie" @click="new_movieInfo(movie.id, movie.backdrop_path)">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
+        <swiper-slide v-for="movie in new_movies" :key="movie">
+          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" @click="new_movieInfo(movie.id, movie.backdrop_path)">
         </swiper-slide>
-        <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
+        <swiper-slide class="mv__next">
+          <RouterLink to="/new"><span class="material-symbols-outlined">arrow_circle_right</span></RouterLink>
+        </swiper-slide>
       </swiper>
       <!-- mv__detail__info -->
       <div class="mv__detail__info" :class="{ movie_info_new }" ref="detail_new_bg">
@@ -376,23 +382,24 @@ export default {
             </div>
           </div>
         </div>
-        <div class="detail__similar__info"></div>
       </div>  
     </div>
     <!-- 2 swiper -> popular -->
     <div class="mv__first">
       <div class="first">인기</div>
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in popular_moviles" :key="movie" @click="popular_movieInfo(movie.id, movie.backdrop_path)">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
+        <swiper-slide v-for="movie in popular_moviles" :key="movie">
+          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" onerror="this.src='/public/no_image.png'"  @click="popular_movieInfo(movie.id, movie.backdrop_path)" />
         </swiper-slide>
-        <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
+        <swiper-slide class="mv__next">
+          <RouterLink to="/popular"><span class="material-symbols-outlined">arrow_circle_right</span></RouterLink>
+        </swiper-slide>
       </swiper>
       <!-- mv__detail__info -->
       <div class="mv__detail__info" :class="{ movie_info_popular }" ref="detail_popular_bg">
         <div class="detail__info">
           <div class="detail__box" v-if="displaySize > 768">
-            <img :src="`${this.MOVIE_IMG}/${movie_info_popular_data.poster_path}`" class="detail__poster" />
+            <img :src="`${this.MOVIE_IMG}/${movie_info_popular_data.poster_path}`" class="detail__poster" onerror="this.src='/public/no_image.png'" />
             <div class="detail__btn" @click="detail(movie_info_popular_data.id)">상세보기</div>
           </div>
           <div class="detail__text">
@@ -401,7 +408,7 @@ export default {
               <div class="__close"><span class="material-symbols-outlined" @click="popular_movieInfo_close()">close</span></div>
             </div>
             <div class="detail__box" v-if="displaySize < 768">
-              <img :src="`${this.MOVIE_IMG}/${movie_info_popular_data.backdrop_path}`" class="detail__poster" />
+              <img :src="`${this.MOVIE_IMG}/${movie_info_popular_data.backdrop_path}`" class="detail__poster" onerror="this.src='/public/no_image.png'" />
               <div class="detail__btn" @click="detail(movie_info_popular_data.id)">상세보기</div>
             </div>
             <div class="__des">{{ movie_info_popular_data.overview !== "" ? movie_info_popular_data.overview : "상세설명이 없습니다" }}</div>
@@ -410,7 +417,6 @@ export default {
             </div>
           </div>
         </div>
-        <div class="detail__similar__info"></div>
       </div>
     </div>
     <!-- 3 swiper -> video -->
@@ -420,7 +426,7 @@ export default {
         <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 4 : (displaySize > 768) ? 3 : 2" :space-between="30" :modules="modules" Navigation="false">
           <swiper-slide class="mv__video" v-for="movie in new_video_infos" :key="movie" @click="video_movieInfo(movie.id, movie.backdrop_path)">
             <div class="mv__box">
-              <img class="mv__video__poster" :src="`${this.MOVIE_IMG}/${movie.backdrop_path}`" @mouseover="mvBack(movie.backdrop_path)" />
+              <img class="mv__video__poster" :src="`${this.MOVIE_IMG}/${movie.backdrop_path}`" @mouseover="mvBack(movie.backdrop_path)" onerror="this.src='/public/no_image.png'" />
               <div class="mv__video__title">{{ movie.title == "아바타" ? "[리마스터링] " + movie.title : movie.title  }}</div>
               <span class="material-symbols-outlined mv__play">youtube_activity</span>
             </div>
@@ -441,8 +447,8 @@ export default {
     <div class="mv__first">
       <div class="first">실시간 급상승</div>
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
-        <swiper-slide v-for="movie in trand_movies" :key="movie" @click="trand_movieInfo(movie.id, movie.backdrop_path)">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
+        <swiper-slide v-for="movie in trand_movies" :key="movie">
+          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" onerror="this.src='/public/no_image.png'" @click="trand_movieInfo(movie.id, movie.backdrop_path)" />
         </swiper-slide>
         <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
       </swiper>
@@ -450,7 +456,7 @@ export default {
       <div class="mv__detail__info" :class="{ movie_info_trand }"  ref="detail_trand_bg">
         <div class="detail__info">
           <div class="detail__box" v-if="displaySize > 768">
-            <img :src="`${this.MOVIE_IMG}/${movie_info_trand_data.poster_path}`" class="detail__poster" />
+            <img :src="`${this.MOVIE_IMG}/${movie_info_trand_data.poster_path}`" class="detail__poster" onerror="this.src='/public/no_image.png'" />
             <div class="detail__btn" @click="detail(movie_info_trand_data.id)">상세보기</div>
           </div>
           <div class="detail__text">
@@ -459,7 +465,7 @@ export default {
               <div class="__close"><span class="material-symbols-outlined" @click="trand_movieInfo_close()">close</span></div>
             </div>
             <div class="detail__box" v-if="displaySize < 768">
-              <img :src="`${this.MOVIE_IMG}/${movie_info_trand_data.backdrop_path}`" class="detail__poster" />
+              <img :src="`${this.MOVIE_IMG}/${movie_info_trand_data.backdrop_path}`" class="detail__poster" onerror="this.src='/public/no_image.png'" />
               <div class="detail__btn" @click="detail(movie_info_trand_data.id)">상세보기</div>
             </div>
             <div class="__des">{{ movie_info_trand_data.overview !== "" ? movie_info_trand_data.overview : "상세설명이 없습니다" }}</div>
@@ -468,7 +474,6 @@ export default {
             </div>
           </div>
         </div>
-        <div class="detail__similar__info"></div>
       </div>
     </div>
   </div>

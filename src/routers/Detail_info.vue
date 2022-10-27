@@ -6,6 +6,7 @@ import { Swiper, SwiperSlide } from 'swiper/vue'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import 'swiper/css/navigation'
+import { VirtualTimeScheduler } from 'rxjs';
 
 export default {
   components: {
@@ -24,6 +25,8 @@ export default {
       // URL
       MOVIE_INFO_URL : 'https://api.themoviedb.org/3/movie',
 
+      TV_INFO_URL : 'https://api.themoviedb.org/3/tv',
+
       // KEY -> env로 관리하기
       API_KEY : 'e95aab0b32ea685f4064a7364dec77f4',
 
@@ -31,8 +34,11 @@ export default {
       MOVIE_IMG : 'https://image.tmdb.org/t/p/original',
 
       ID : this.$route.params.id,
+      CHECK_DATA : this.$route.params.CHECK_DATA,
+
       detail_data: {},
       detail_similar_Data : [],
+      detail_cast : [],
       detail_video: "",
       detail_data_genres : "",
 
@@ -62,7 +68,8 @@ export default {
       this.$router.push({
         name: "DetailInfo",
         params: {
-          id: id
+          id: id,
+          CHECK_DATA : this.CHECK_DATA
         }
       })
       setTimeout(() => {
@@ -70,39 +77,95 @@ export default {
       },10) 
     },
   },
-  async mounted() {
+  async mounted() { 
     this.displaySize = window.innerWidth;
 
     try {
-      // id에 맞는 정보 가져오기
-      await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}?api_key=${this.API_KEY}&language=ko`)
-      .then((res) => {
-        console.log(res)
-        this.detail_data = res.data
-        this.detail_data_genres = res.data.genres[0].name
-      }).catch((error) => {
-        console.log(error)
-      })
+      if(this.CHECK_DATA == "movie") {
+        // movie
+        // id에 맞는 정보 가져오기
+        await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}?api_key=${this.API_KEY}&language=ko`)
+        .then((res) => {
+          console.log(res)
+          this.detail_data = res.data
+          this.detail_data_genres = res.data.genres[0].name
+        }).catch((error) => {
+          console.log(error)
+        })
+    
+        // id에 맞는 영상 가져오기
+        await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/videos?api_key=${this.API_KEY}&language=ko`)
+        .then((res) => {
+          console.log(res)
+          if(res.data.results.length > 0) {
+            this.detail_video = res.data.results[0].key
+          } 
+        }).catch((error) => {
+          console.log(error)
+        })
   
-      // id에 맞는 영상 가져오기
-      await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/videos?api_key=${this.API_KEY}&language=ko`)
-      .then((res) => {
-        console.log(res)
-        if(res.data.results.length > 0) {
-          this.detail_video = res.data.results[0].key
-        } 
-      }).catch((error) => {
-        console.log(error)
-      })
+        // id에 맞는 비슷한 영상 가져오기
+        await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/recommendations?api_key=${this.API_KEY}&language=ko`)
+        .then((res) => {
+          console.log(res)
+          if(res.data.results.length > 0) {
+            this.detail_similar_Data = res.data.results
+          }
+        }).catch((error) => {
+          console.log(error)
+        })
 
-      // id에 맞는 비슷한 영상 가져오기
-      await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/recommendations?api_key=${this.API_KEY}&language=ko`)
-      .then((res) => {
-        console.log(res)
-        this.detail_similar_Data = res.data.results
-      }).catch((error) => {
-        console.log(error)
-      })
+        // id에 맞는 출연진
+        await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/credits?api_key=${this.API_KEY}&language=ko`)
+        .then((res) => {
+          console.log(res);
+          this.detail_cast = res.data.cast
+        }).catch((error) => {
+          console.log(error)
+        })
+      } else {
+        // tv
+        // id에 맞는 정보 가져오기
+        await axios.get(`${this.TV_INFO_URL}/${this.ID}?api_key=${this.API_KEY}&language=ko`)
+        .then((res) => {
+          console.log(res)
+          this.detail_data = res.data
+          this.detail_data_genres = res.data.genres[0].name
+        }).catch((error) => {
+          console.log(error)
+        })
+    
+        // id에 맞는 영상 가져오기
+        await axios.get(`${this.TV_INFO_URL}/${this.ID}/videos?api_key=${this.API_KEY}&language=ko`)
+        .then((res) => {
+          console.log(res)
+          if(res.data.results.length > 0) {
+            this.detail_video = res.data.results[0].key
+          } 
+        }).catch((error) => {
+          console.log(error)
+        })
+  
+        // id에 맞는 비슷한 영상 가져오기
+        await axios.get(`${this.TV_INFO_URL}/${this.ID}/recommendations?api_key=${this.API_KEY}&language=ko`)
+        .then((res) => {
+          console.log(res)
+          if(res.data.results.length > 0) {
+            this.detail_similar_Data = res.data.results
+          }
+        }).catch((error) => {
+          console.log(error)
+        })
+
+        // id에 맞는 출연진
+        await axios.get(`${this.TV_INFO_URL}/${this.ID}/aggregate_credits?api_key=${this.API_KEY}&language=ko`)
+        .then((res) => {
+          console.log(res);
+          this.detail_cast = res.data.cast
+        }).catch((error) => {
+          console.log(error)
+        })
+      }
 
     } catch(e) {
       console.error(e);
@@ -124,10 +187,10 @@ export default {
         <div class="__info">
           <div class="__first">
             <div class="__poster">
-              <img :src="`${MOVIE_IMG}/${detail_data.poster_path}`" alt="">
+              <img :src="`${MOVIE_IMG}/${detail_data.poster_path}`" onerror="this.src='/public/no_image.png'">
             </div>
             <div class="__text">
-              <div class="__title">{{detail_data.title }}</div>
+              <div class="__title">{{ CHECK_DATA == "movie" ? detail_data.title : detail_data.name }}</div>
               <div class="__des">{{ detail_data.overview}}</div>
             </div>
           </div>
@@ -137,7 +200,7 @@ export default {
               <hr />
               <div class="date">
                 <div class="date__text">개봉일 : </div>
-                <div class="date__item">{{ detail_data.release_date }}</div>
+                <div class="date__item">{{ CHECK_DATA == "movie" ? detail_data.release_date : detail_data.first_air_date }}</div>
               </div>
               <div class="genres">
                 <div class="genres__text">장르 : </div>
@@ -145,7 +208,7 @@ export default {
               </div>
               <div class="runtime">
                 <div class="runtime__text">시간 : </div>
-                <div class="runtime__item">{{ detail_data.runtime }}</div>
+                <div class="runtime__item">{{ CHECK_DATA == "movie" ? detail_data.runtime : "24" }}</div>
               </div>
               <div class="like">
                 <div class="like__text">평점 : </div>
@@ -153,12 +216,30 @@ export default {
               </div>
             </div>
             <div class="__right">
-              <div class="detail__title">관련영화</div>
-              <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 4.2 : 3.2" :space-between="30" :modules="modules" Navigation="false">
-                <swiper-slide v-for="movie in detail_similar_Data" :key="movie" @click="detail(movie.id)">
-                  <img class="detail__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`">
-                </swiper-slide>
-              </swiper>
+              <div class="detail__title">관련영상</div>
+              <div class="detail__true" v-if="this.detail_similar_Data.length > 0">
+                <swiper class="first__swiper swiper-slide" :slides-per-view="(displaySize > 1024) ? 4.2 : 3.2" :space-between="30" :modules="modules" Navigation="false">
+                  <swiper-slide v-for="movie in detail_similar_Data" :key="movie" @click="detail(movie.id)">
+                    <div class="detail__info__box">
+                      <img class="detail__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" onerror="this.src='/public/no_image.png'" />
+                      <div class="detail__name">{{ movie.title }}</div>
+                    </div>
+                  </swiper-slide>
+                </swiper>
+              </div>
+              <div v-else class="detail__false">관련 영상이 없습니다</div>
+              <div class="detail__cast__title">출연진</div>
+              <div class="detail__cast__true" v-if="this.detail_similar_Data.length > 0">
+                <swiper class="first__swiper swiper-slide" :slides-per-view="(displaySize > 1024) ? 4.2 : 3.2" :space-between="30" :modules="modules" Navigation="false">
+                  <swiper-slide v-for="cast in detail_cast" :key="cast">
+                    <div class="detail__cast__info__box">
+                      <img class="detail__cast__poster" :src="`${this.MOVIE_IMG}/${cast.profile_path}`" onerror="this.src='/public/no_image.png'">
+                      <div class="detail__cast__name">{{ cast.name }}</div>
+                    </div>
+                  </swiper-slide>
+                </swiper>
+              </div>
+              <div v-else class="detail__cast__false">관련 출연진이 없습니다</div>
             </div>
           </div>
         </div>
@@ -170,7 +251,7 @@ export default {
 
 <style lang="scss" scoped>
   .mv__detail {
-    padding-top: 5.9rem;
+    padding-top: 4.1rem;
     .detail__box {
       position: relative;
       .detail__bg {
@@ -313,16 +394,79 @@ export default {
               .swiper-slide {
                 padding-top: 1rem;
                 padding-bottom: 1rem;
-                .detail__poster {
+                .detail__info__box {
                   width: 10vw;
-                  border-radius: 10px;
-                  cursor: pointer;
-                  transition: .2s;
-                  &:hover {
-                    transform: scale(1.1);
+                  height: 31vh;
+                  .detail__poster {
+                    width: 10vw;
+                    height: 31vh;
+                    border-radius: 10px;
+                    cursor: pointer;
                     transition: .2s;
+                    &:hover {
+                      transform: scale(1.1);
+                      transition: .2s;
+                    }
+                  }
+                  .detail__name {
+                    color: #fff;
+                    font-size: 15px;
+                    padding-top: 0.5rem;
+                    text-align: center;
                   }
                 }
+              }
+              .detail__cast__title {
+                padding-top: 1rem;
+                font-size: 30px;
+                color: #fff;
+              }
+              .swiper-slide {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+                .detail__cast__info__box {
+                  width: 10vw;
+                  height: 31vh;
+                  .detail__cast__poster {
+                    width: 10vw;
+                    height: 31vh;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    transition: .2s;
+                    &:hover {
+                      transform: scale(1.1);
+                      transition: .2s;
+                    }
+                  }
+                  .detail__cast__name {
+                    color: #fff;
+                    font-size: 15px;
+                    text-align: center;
+                    padding-top: 0.5rem
+                  }
+                }
+              }
+              .detail__cast__false {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 1rem;
+                height: 30vh;
+                background: rgba(0.8, 0.8, 0.8, 0.8);
+                border-radius: 10px;
+                color: #fff;
+                font-size: 25px;
+              }
+              .detail__false {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 1rem;
+                height: 30vh;
+                background: rgba(0.8, 0.8, 0.8, 0.8);
+                border-radius: 10px;
+                color: #fff;
+                font-size: 25px;
               }
             }
           }
@@ -335,7 +479,7 @@ export default {
 
   @media screen and (max-width: 768px) {
     .mv__detail {
-      padding-top: 4.7rem;
+      padding-top: 2.9rem !important;
       .detail__box {
         .detail__bg {
           height: 30vh;
@@ -413,7 +557,7 @@ export default {
               }
             }
             .__second {
-              padding-top: 1rem;
+              padding-top: 3rem !important;
               display: block;
               width: 100%;
               .__left {
@@ -478,16 +622,67 @@ export default {
                 .swiper-slide {
                   padding-top: 1rem;
                   padding-bottom: 1rem;
-                  .detail__poster {
+                  .detail__info__box {
                     width: 24vw !important;
-                    border-radius: 10px;
-                    cursor: pointer;
-                    transition: .2s;
-                    &:hover {
-                      transform: scale(1.1);
+                    height: 25vh !important;
+                    .detail__poster {
+                      width: 24vw !important;
+                      height: 25vh !important;
+                      border-radius: 10px;
+                      cursor: pointer;
                       transition: .2s;
+                      &:hover {
+                        transform: scale(1.1);
+                        transition: .2s;
+                      }
                     }
                   }
+                }
+                .detail__cast__title {
+                  padding-top: 1rem;
+                  font-size: 30px;
+                  color: #fff;
+                }
+                .swiper-slide {
+                  padding-top: 1rem;
+                  padding-bottom: 1rem;
+                  .detail__cast__info__box {
+                    width: 24vw !important;
+                    height: 25vh !important;
+                    .detail__cast__poster {
+                      width: 24vw !important;
+                      height: 25vh !important;
+                      border-radius: 10px;
+                      cursor: pointer;
+                      transition: .2s;
+                      &:hover {
+                        transform: scale(1.1);
+                        transition: .2s;
+                      }
+                    }
+                  }
+                }
+                .detail__cast__false {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  margin-top: 1rem;
+                  height: 30vh;
+                  background: rgba(0.8, 0.8, 0.8, 0.8);
+                  border-radius: 10px;
+                  color: #fff;
+                  font-size: 25px;
+                }
+                .detail__false {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  margin-top: 1rem;
+                  height: 30vh;
+                  background: rgba(0.8, 0.8, 0.8, 0.8);
+                  border-radius: 10px;
+                  color: #fff;
+                  font-size: 20px;
                 }
               }
             }
