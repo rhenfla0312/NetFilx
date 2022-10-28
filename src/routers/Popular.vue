@@ -19,13 +19,19 @@ export default {
       // DATA
       POPULAR_DATA : [],
       CHECK_DATA : "movie",
+
+      skeleton : true,
+      page_skeleton : false
+
     }
   },
   methods: {
     async movie() {
+      this.skeleton = true;
       await axios.get(`${this.POPULAR_MOVIE_URL}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         console.log(res);
+        this.skeleton = false;
         this.POPULAR_DATA = res.data.results;
       }).catch((error) => {
         console.log(error)
@@ -33,9 +39,11 @@ export default {
       this.CHECK_DATA = "tv";
     },
     async tv() {
+      this.skeleton = true;
       await axios.get(`${this.POPULAR_TV_URL}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         console.log(res);
+        this.skeleton = false;
         this.POPULAR_DATA = res.data.results;
       }).catch((error) => {
         console.log(error)
@@ -59,6 +67,7 @@ export default {
       await axios.get(`${this.POPULAR_MOVIE_URL}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         // console.log(res)
+        this.skeleton = false;
         this.POPULAR_DATA = res.data.results;
       }).catch((error) => {
         console.log(error)
@@ -74,16 +83,20 @@ export default {
         if (entry.isIntersecting) { // 감지대상이 교차영역에 진입 할 경우
           // axios
           if(this.CHECK_DATA == "movie") {
+            this.page_skeleton = true;
             axios.get(`${this.POPULAR_MOVIE_URL}?api_key=${this.API_KEY}&language=ko&page=2`)
             .then((res) => {
+              this.page_skeleton = false;
               this.POPULAR_DATA = this.POPULAR_DATA.concat(res.data.results)
               // console.log(this.new_data)
             }).catch((error) => {
               console.log(error)
             })
           } else {
+            this.page_skeleton = true;
             axios.get(`${this.POPULAR_TV_URL}?api_key=${this.API_KEY}&language=ko&page=2`)
             .then((res) => {
+              this.page_skeleton = false;
               this.POPULAR_DATA = this.POPULAR_DATA.concat(res.data.results)
               // console.log(this.new_data)
             }).catch((error) => {
@@ -113,7 +126,8 @@ export default {
       </div>
       <div class="popular__item">
         <div class="__item" v-for="item in POPULAR_DATA" :key="item" @click="detail(item.id)">
-          <img :src="`${POPULAR_IMG}/${item.poster_path}`" onerror="this.src='/public/no_image.png'" />
+          <div v-if="skeleton" :class="{ page_skeleton }" class="__skeleton"></div>
+          <img v-else :src="`${POPULAR_IMG}/${item.poster_path}`" onerror="this.src='/public/no_image.png'" />
         </div>
         <div class="popular__item__plus"></div>
       </div>
@@ -163,6 +177,42 @@ export default {
         grid-template-columns: repeat(6, 1fr);
         justify-items: center;
         .__item {
+          .__skeleton {
+            width: 11vw;
+            height: 14vw;
+            border-radius: 10px;
+            background-color: #ddd;
+            animation: pulse-bg 1s infinite;
+            @keyframes pulse-bg {
+              0% {
+                background-color: #ddd;
+              }
+              50% {
+                background-color: #d0d0d0;
+              }
+              100% {
+                background-color: #ddd;
+              }
+            }
+          }
+          .__skeleton.page_skeleton {
+            width: 11vw;
+            height: 14vw;
+            border-radius: 10px;
+            background-color: #ddd;
+            animation: pulse-bg 1s infinite;
+            @keyframes pulse-bg {
+              0% {
+                background-color: #ddd;
+              }
+              50% {
+                background-color: #d0d0d0;
+              }
+              100% {
+                background-color: #ddd;
+              }
+            }
+          }
           img {
             width: 11vw;
             height: 14vw;
@@ -190,9 +240,17 @@ export default {
           grid-template-columns: repeat(3, 1fr);
           justify-items: center;
           .__item {
+            .__skeleton {
+              width: 28vw !important;
+              height: 35vw !important;
+            }
+            .__skeleton.page_skeleton {
+              width: 28vw !important;
+              height: 35vw !important;
+            }
             img {
-              width: 28vw;
-              height: 35vw;
+              width: 28vw !important;
+              height: 35vw !important;
               border-radius: 10px;
               transition: .2s;
               &:hover {

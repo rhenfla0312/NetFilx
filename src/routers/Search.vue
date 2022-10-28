@@ -1,5 +1,4 @@
 <script>
-import axios from 'axios';
 export default {
   data() {
     return {
@@ -20,7 +19,10 @@ export default {
       SEARCH_TITLE : this.$route.params.title,
       SEARCH_DATA : JSON.parse(this.$route.params.searchFile),
 
-      CHECK_DATA : "movie",
+      CHECK_DATA : this.$route.params.CHECK_DATA,
+
+      page_skeleton : false
+
     }
   },
   methods: {
@@ -35,41 +37,24 @@ export default {
       })
     },
   },
-  mounted() {
-    console.log(this.SEARCH_DATA);
-    console.log(this.SEARCH_TITLE);
-  },
   updated() {
-    // search는 무한스크롤 잠시 대기 -> 객체에 영화, tv 구분자가 있는지 찾아본다
-    // 문제 - 상세정보 들어갔다가 뒤로가기하면 초기화 -> store에 상태 저장하기
-    // const io = new IntersectionObserver((entries, observer) => {
-    //   entries.forEach(entry => {
-    //     if (entry.isIntersecting) { // 감지대상이 교차영역에 진입 할 경우
-    //       // axios
-    //       if(this.CHECK_DATA == "movie") {
-    //         axios.get(`${this.SEARCH_MOVIE_URL}?api_key=${this.API_KEY}&language=ko&page=2`)
-    //         .then((res) => {
-    //           this.SEARCH_DATA = this.SEARCH_DATA.concat(res.data.results)
-    //           // console.log(this.new_data)
-    //         }).catch((error) => {
-    //           console.log(error)
-    //         })
-    //       } else {
-    //         axios.get(`${this.SEARCH_TV_URL}?api_key=${this.API_KEY}&language=ko&page=2`)
-    //         .then((res) => {
-    //           this.SEARCH_DATA = this.SEARCH_DATA.concat(res.data.results)
-    //           // console.log(this.new_data)
-    //         }).catch((error) => {
-    //           console.log(error)
-    //         })
+    // if(this.PAGE_SEARCH_DATA !== "") {
+      //   // search는 무한스크롤 잠시 대기 -> 객체에 영화, tv 구분자가 있는지 찾아본다
+      //   // 문제 - 상세정보 들어갔다가 뒤로가기하면 초기화 -> store에 상태 저장하기
+      //   const io = new IntersectionObserver((entries, observer) => {
+        //     entries.forEach(entry => {
+          //       if (entry.isIntersecting) { // 감지대상이 교차영역에 진입 할 경우
+            // this.page_skeleton = true;
+            //         this.SEARCH_DATA = this.SEARCH_DATA.concat(this.PAGE_SEARCH_DATA)
+            // this.page_skeleton = false;
+    //         observer.unobserve(entry.target); // 이미지 로딩 이후론 관찰할 필요 x
     //       }
-    //       observer.unobserve(entry.target); // 이미지 로딩 이후론 관찰할 필요 x
-    //     }
+    //     })
     //   })
-    // })
-
-    // const images = document.querySelector('.search__item__plus');
-    // io.observe(images)
+  
+    //   const search = document.querySelector('.search__item__plus');
+    //   io.observe(search)
+    // }
   }
 }
 </script>
@@ -80,7 +65,8 @@ export default {
     <div class="search__list">
       <div class="search__item">
         <div class="__item" v-for="item in SEARCH_DATA" :key="item" @click="detail(item.id)">
-          <img :src="`${SEARCHR_IMG}/${item.poster_path}`" onerror="this.src='/public/no_image.png'" />
+          <div v-if="SEARCH_TITLE" :class="{ page_skeleton }" class="__skeleton"></div>
+          <img v-else :src="`${SEARCHR_IMG}/${item.poster_path}`" onerror="this.src='/public/no_image.png'" />
         </div>
         <div class="search__item__plus"></div>
       </div>
@@ -95,6 +81,7 @@ export default {
     background: #060d17;
     min-height: 100vh;
     .search__list {
+      padding-top: 10vh;
       width: 70vw;
       margin: auto;
       .__header {
@@ -131,6 +118,42 @@ export default {
         grid-template-columns: repeat(6, 1fr);
         justify-items: center;
         .__item {
+          .__skeleton {
+            width: 11vw;
+            height: 14vw;
+            border-radius: 10px;
+            background-color: #ddd;
+            animation: pulse-bg 1s infinite;
+            @keyframes pulse-bg {
+              0% {
+                background-color: #ddd;
+              }
+              50% {
+                background-color: #d0d0d0;
+              }
+              100% {
+                background-color: #ddd;
+              }
+            }
+          }
+          .__skeleton.page_skeleton {
+            width: 11vw;
+            height: 14vw;
+            border-radius: 10px;
+            background-color: #ddd;
+            animation: pulse-bg 1s infinite;
+            @keyframes pulse-bg {
+              0% {
+                background-color: #ddd;
+              }
+              50% {
+                background-color: #d0d0d0;
+              }
+              100% {
+                background-color: #ddd;
+              }
+            }
+          }
           img {
             width: 11vw;
             height: 14vw;
@@ -158,9 +181,17 @@ export default {
           grid-template-columns: repeat(3, 1fr);
           justify-items: center;
           .__item {
+            .__skeleton {
+              width: 28vw !important;
+              height: 35vw !important;
+            }
+            .__skeleton.page_skeleton {
+              width: 28vw !important;
+              height: 35vw !important;
+            }
             img {
-              width: 28vw;
-              height: 35vw;
+              width: 28vw !important;
+              height: 35vw !important;
               border-radius: 10px;
               transition: .2s;
               &:hover {

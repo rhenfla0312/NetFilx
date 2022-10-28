@@ -85,7 +85,7 @@ export default {
         // id에 맞는 정보 가져오기
         await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
-          console.log(res)
+          // console.log(res)
           this.detail_data = res.data
           this.detail_data_genres = res.data.genres[0].name
         }).catch((error) => {
@@ -95,7 +95,7 @@ export default {
         // id에 맞는 영상 가져오기
         await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/videos?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
-          console.log(res)
+          // console.log(res)
           if(res.data.results.length > 0) {
             this.detail_video = res.data.results[0].key
           } 
@@ -106,7 +106,7 @@ export default {
         // id에 맞는 비슷한 영상 가져오기
         await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/recommendations?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
-          console.log(res)
+          // console.log(res)
           if(res.data.results.length > 0) {
             this.detail_similar_Data = res.data.results
           }
@@ -117,7 +117,7 @@ export default {
         // id에 맞는 출연진
         await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/credits?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           this.detail_cast = res.data.cast
         }).catch((error) => {
           console.log(error)
@@ -127,7 +127,7 @@ export default {
         // id에 맞는 정보 가져오기
         await axios.get(`${this.TV_INFO_URL}/${this.ID}?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
-          console.log(res)
+          // console.log(res)
           this.detail_data = res.data
           this.detail_data_genres = res.data.genres[0].name
         }).catch((error) => {
@@ -137,7 +137,7 @@ export default {
         // id에 맞는 영상 가져오기
         await axios.get(`${this.TV_INFO_URL}/${this.ID}/videos?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
-          console.log(res)
+          // console.log(res)
           if(res.data.results.length > 0) {
             this.detail_video = res.data.results[0].key
           } 
@@ -148,7 +148,7 @@ export default {
         // id에 맞는 비슷한 영상 가져오기
         await axios.get(`${this.TV_INFO_URL}/${this.ID}/recommendations?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
-          console.log(res)
+          // console.log(res)
           if(res.data.results.length > 0) {
             this.detail_similar_Data = res.data.results
           }
@@ -159,7 +159,7 @@ export default {
         // id에 맞는 출연진
         await axios.get(`${this.TV_INFO_URL}/${this.ID}/aggregate_credits?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           this.detail_cast = res.data.cast
         }).catch((error) => {
           console.log(error)

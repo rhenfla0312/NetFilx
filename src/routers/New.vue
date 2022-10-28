@@ -19,13 +19,18 @@ export default {
       // DATA
       NEW_DATA : [],
       CHECK_DATA : "movie",
+
+      skeleton : true,
+      page_skeleton : false
     }
   },
   methods: {
     async movie() {
+      this.skeleton = true;
       await axios.get(`${this.NEW_MOVIE_URL}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         console.log(res);
+        this.skeleton = false;
         this.NEW_DATA = res.data.results;
       }).catch((error) => {
         console.log(error)
@@ -33,9 +38,11 @@ export default {
       this.CHECK_DATA = "tv";
     },
     async tv() {
+      this.skeleton = true;
       await axios.get(`${this.NEW_TV_URL}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         console.log(res);
+        this.skeleton = false;
         this.NEW_DATA = res.data.results;
       }).catch((error) => {
         console.log(error)
@@ -59,6 +66,7 @@ export default {
       await axios.get(`${this.NEW_MOVIE_URL}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         // console.log(res)
+        this.skeleton = false;
         this.NEW_DATA = res.data.results;
       }).catch((error) => {
         console.log(error)
@@ -74,16 +82,20 @@ export default {
         if (entry.isIntersecting) { // 감지대상이 교차영역에 진입 할 경우
           // axios
           if(this.CHECK_DATA == "movie") {
+            this.page_skeleton = true;
             axios.get(`${this.NEW_MOVIE_URL}?api_key=${this.API_KEY}&language=ko&page=2`)
             .then((res) => {
+              this.page_skeleton = false;
               this.NEW_DATA = this.NEW_DATA.concat(res.data.results)
               // console.log(this.new_data)
             }).catch((error) => {
               console.log(error)
             })
           } else {
+            this.page_skeleton = true;
             axios.get(`${this.NEW_TV_URL}?api_key=${this.API_KEY}&language=ko&page=2`)
             .then((res) => {
+              this.page_skeleton = false;
               this.NEW_DATA = this.NEW_DATA.concat(res.data.results)
               // console.log(this.new_data)
             }).catch((error) => {
@@ -113,7 +125,8 @@ export default {
       </div>
       <div class="new__item">
         <div class="__item" v-for="item in NEW_DATA" :key="item" @click="detail(item.id)">
-          <img :src="`${NEW_IMG}/${item.poster_path}`" onerror="this.src='/public/no_image.png'" />
+          <div v-if="skeleton" :class="{ page_skeleton }" class="__skeleton"></div>
+          <img v-else :src="`${NEW_IMG}/${item.poster_path}`" onerror="this.src='/public/no_image.png'" />
         </div>
         <div class="new__item__plus"></div>
       </div>
@@ -174,6 +187,42 @@ export default {
               transition: .2s;
             }
           }
+          .__skeleton {
+            width: 11vw;
+            height: 14vw;
+            border-radius: 10px;
+            background-color: #ddd;
+            animation: pulse-bg 1s infinite;
+            @keyframes pulse-bg {
+              0% {
+                background-color: #ddd;
+              }
+              50% {
+                background-color: #d0d0d0;
+              }
+              100% {
+                background-color: #ddd;
+              }
+            }
+          }
+          .__skeleton.page_skeleton {
+            width: 11vw;
+            height: 14vw;
+            border-radius: 10px;
+            background-color: #ddd;
+            animation: pulse-bg 1s infinite;
+            @keyframes pulse-bg {
+              0% {
+                background-color: #ddd;
+              }
+              50% {
+                background-color: #d0d0d0;
+              }
+              100% {
+                background-color: #ddd;
+              }
+            }
+          }
         }
       }
     }
@@ -200,6 +249,14 @@ export default {
                 transform: scale(1.1);
                 transition: .2s;
               }
+            }
+            .__skeleton {
+              width: 28vw !important;
+              height: 35vw !important;
+            }
+            .__skeleton.page_skeleton {
+              width: 28vw !important;
+              height: 35vw !important;
             }
           }
         }

@@ -65,7 +65,12 @@ export default {
       movie_info_video_id : '',
       movie_info_trand_id : '',
 
-      CHECK_DATA : "movie"
+      CHECK_DATA : "movie",
+
+      skeleton_new : true,
+      skeleton_popular : true,
+      skeleton_video : true,
+      skeleton_trand : true,
     }
   },
   computed: {
@@ -105,7 +110,7 @@ export default {
 
       this.movie_info_new = true;
       this.movie_info_popular = false;
-      this.movie_info_video = false;
+      // this.movie_info_video = false;
       this.movie_info_trand = false;
 
       this.$refs.detail_new_bg.style.backgroundImage = `url(${this.MOVIE_IMG}/${bg})`;
@@ -277,11 +282,11 @@ export default {
         console.log(error)
       })
   
-  
       // 개봉예정 영화 목록
       await axios.get(`${this.NEW_URL}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         // console.log(res);
+        this.skeleton_new = false;
         this.new_movies = res.data.results
       }).catch((error) => {
         console.log(error)
@@ -291,6 +296,7 @@ export default {
       await axios.get(`${this.POPULAR_URL}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         // console.log(res)
+        this.skeleton_popular = false;
         this.popular_moviles = res.data.results
       }).catch((error) => {
         console.log(error)
@@ -300,6 +306,7 @@ export default {
       await axios.get(`${this.TRAND_URL}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         // console.log(res)
+        this.skeleton_trand = false;
         this.trand_movies = res.data.results
       }).catch((error) => {
         console.log(error)
@@ -345,7 +352,7 @@ export default {
 
 <template>
   <div class="mv__img">
-    <img src="https://www.justwatch.com/appassets/img/home/tv/tv.webp" alt="">
+    <!-- <img src="https://www.justwatch.com/appassets/img/home/tv/tv.webp" alt=""> -->
   </div>
   <div class="mv__container">
     <!-- 1 swiper -> new -->
@@ -353,7 +360,8 @@ export default {
       <div class="first">개봉예정</div>
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in new_movies" :key="movie">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" @click="new_movieInfo(movie.id, movie.backdrop_path)">
+          <div v-if="skeleton_new" class="skeleton__poster"></div>
+          <img v-else class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" @click="new_movieInfo(movie.id, movie.backdrop_path)">
         </swiper-slide>
         <swiper-slide class="mv__next">
           <RouterLink to="/new"><span class="material-symbols-outlined">arrow_circle_right</span></RouterLink>
@@ -389,7 +397,8 @@ export default {
       <div class="first">인기</div>
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in popular_moviles" :key="movie">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" onerror="this.src='/public/no_image.png'"  @click="popular_movieInfo(movie.id, movie.backdrop_path)" />
+          <div v-if="skeleton_popular" class="skeleton__poster"></div>
+          <img v-else class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" onerror="this.src='/public/no_image.png'"  @click="popular_movieInfo(movie.id, movie.backdrop_path)" />
         </swiper-slide>
         <swiper-slide class="mv__next">
           <RouterLink to="/popular"><span class="material-symbols-outlined">arrow_circle_right</span></RouterLink>
@@ -448,7 +457,8 @@ export default {
       <div class="first">실시간 급상승</div>
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in trand_movies" :key="movie">
-          <img class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" onerror="this.src='/public/no_image.png'" @click="trand_movieInfo(movie.id, movie.backdrop_path)" />
+          <div v-if="skeleton_trand" class="skeleton__poster"></div>
+          <img v-else class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" onerror="this.src='/public/no_image.png'" @click="trand_movieInfo(movie.id, movie.backdrop_path)" />
         </swiper-slide>
         <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
       </swiper>
@@ -484,7 +494,7 @@ export default {
 
 @media screen and (max-width: 1024px) {
   .mv__img {
-    height: 70vh !important;
+    height: 40vh !important;
     img {
       // padding-top: 2rem !important;
       width: 100% !important;
@@ -497,6 +507,10 @@ export default {
       }
       .first__swiper {
         .mv__poster {
+          width: 15vw !important;
+          height: 25vh !important;
+        }
+        .skeleton__poster {
           width: 15vw !important;
           height: 25vh !important;
         }
@@ -863,7 +877,7 @@ export default {
 
 @media screen and (max-width: 768px) {
   .mv__img {
-    height: 50vh !important;
+    height: 30vh !important;
     img {
       padding-top: 5rem !important;
       width: 100% !important;
@@ -876,6 +890,10 @@ export default {
       }
       .first__swiper {
         .mv__poster {
+          width: 25vw !important;
+          height: 25vh !important;
+        }
+        .skeleton__poster {
           width: 25vw !important;
           height: 25vh !important;
         }
@@ -1240,7 +1258,7 @@ export default {
   } 
 }
   .mv__img {
-    height: 100vh;
+    height: 50vh;
     background-image: url('https://www.justwatch.com/appassets/img/home/bg-tiles/bg-tiles.webp');
     background-repeat: no-repeat;
     background-position: center;
@@ -1257,7 +1275,7 @@ export default {
       padding-top: 30px;
       .first {
         padding-left: 20px;
-        padding-top: 30px;
+        // padding-top: 30px;
         font-size: 2vw;
         color: #fff;
       }  
@@ -1275,6 +1293,24 @@ export default {
             transition: all 0.3s ease;
             z-index: 100;
             cursor: pointer;
+          }
+        }
+        .skeleton__poster {
+          width: 10vw;
+          height: 30vh;
+          border-radius: 5px;
+          background-color: #ddd;
+          animation: pulse-bg 1s infinite;
+          @keyframes pulse-bg {
+            0% {
+              background-color: #ddd;
+            }
+            50% {
+              background-color: #d0d0d0;
+            }
+            100% {
+              background-color: #ddd;
+            }
           }
         }
         .mv__video {

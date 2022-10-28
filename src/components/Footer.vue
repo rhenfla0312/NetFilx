@@ -6,13 +6,37 @@ export default {
 
 
 <template>
-  <div class="footer"></div>
+  <div class="footer">
+    <div class="text">© 2022 SPMV - 영화 및 TV프로그램 정보 - - Welcome this is a speed movie.</div>
+  </div>
 </template>
 
 
 <style lang="scss" scoped>
   .footer {
-    height: 30vh;
-    background: rgba(0,0,0,.35);
+    width: 100%;
+    height: 20vh;
+    border-top: 1px solid rgb(0, 0, 0, 0.90);
+    background: #060d17;
+    padding: 0 25rem;
+    font-size: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .footer {
+      padding: 0 10rem !important;
+      font-size: 14px !important;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .footer {
+      padding: 0 !important;
+      font-size: 12px !important;
+    }
   }
 </style>

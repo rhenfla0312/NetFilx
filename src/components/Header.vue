@@ -3,7 +3,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      SEARCH_URL : 'https://api.themoviedb.org/3/search/movie',
+      SEARCH_URL : 'https://api.themoviedb.org/3/search/multi',
 
       API_KEY : 'e95aab0b32ea685f4064a7364dec77f4',
 
@@ -11,29 +11,46 @@ export default {
       searchItem : '',
       searchs : '',
       searchFile : [],
+      page_searchFile : [],
 
       mobile__check : false,
       mobile__movie__check : false,
       mobile__tv__check : false,
 
-      login_check : false
+      login_check : false,
+
+      CHECK_DATA : ""
     }
   },
   methods: {
     searchText() {
       this.searchData = true;
     },
+    login() {
+      alert("준비중");
+    },
     async search() {
       await axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.searchs}`)
         .then((res) => {
           console.log(res)
           this.searchFile = res.data.results;
-
+          // if(res.data.total_pages > 1) {
+          //   // 불러는 와지는데 다 불러와지기전에 데이터가 router로 넘어간다 -> 순서보장 반복문으로 처리하기전까진 검색데이터 페이지네이션 중지
+          //   for(let i = 2; i <= res.data.total_pages; i++) {
+          //     axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.searchs}&page=${i}`)
+          //     .then((res) => {
+          //       this.searchFile = this.searchFile.concat(res.data.results)
+          //     }).catch((error) => {
+          //       console.log(error)
+          //     })
+          //   }
+          // }
           this.$router.push({
             name: "Search",
             params: {
               title : this.searchs,
-              searchFile : JSON.stringify(this.searchFile)
+              searchFile : JSON.stringify(this.searchFile),
+              CHECK_DATA : this.searchFile[0].media_type
             }
           })
         }).catch((error) => {
@@ -63,12 +80,12 @@ export default {
       <RouterLink class="__title" to="/">SPMV</RouterLink>
       <RouterLink to="/new" class="__movie">신규</RouterLink>
       <RouterLink to="/popular" class="__tv">인기</RouterLink>
-      <div class="__searchBox">
-        <input type="text" class="__searchText" :class="{ searchData }" v-model="searchs" @keydown.enter="search()" />
-        <div class="__search" :class="{ searchData }"><span @click="searchText(), search()" class="material-symbols-outlined">search</span></div>
+      <div class="__searchBox" :class="{ searchData }">
+        <input type="text" class="__searchText" :class="{ searchData }" v-model="searchs" @keydown.enter="search()" @click="searchText()" />
+        <div class="__search"><span @click="search()" class="material-symbols-outlined">search</span></div>
       </div>
       <div v-if="login_check" class="__myInfo">Y</div>
-      <div v-else class="__myInfo __login">로그인</div>
+      <div v-else class="__myInfo __login" @click="login()">로그인</div>
       <!-- mobile -->
       <div class="mobileMenu"><span @click="mobileBtn()" class="material-symbols-outlined">menu</span></div>
       <!-- <div class="mobile__list" :class="{ mobile__check }">
@@ -103,9 +120,6 @@ export default {
     .mv__menu {
       font-size: 3vw !important;
       height: 7vh !important;
-      .__title {
-
-      }
       .__movie {
         font-size: 2vw !important;
       }
@@ -113,15 +127,51 @@ export default {
         font-size: 2vw !important;
       }
       .__searchBox {
-          height: 3vh !important;
+        height: 3.3vh !important;
+        position: relative;
+        display: flex;
+        margin-left: auto;
+        outline: none;
+        border: none;
+        margin-right: 2vw !important;
+        margin-left: 10vw !important;
         .__search {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          // margin-left: auto;
+          margin-top: 0.1vw;
+          position: absolute;
+          right: 1vw;
+          z-index: 200;
+          color: #000;
+          top: 0;
+          bottom: 0;
+          margin: auto;
           span {
+            cursor: pointer;
             font-size: 3.4vw !important;
           }
         }
-        .__searchText.searchData {
-          width: 60% !important;
+        .__searchText {
+          width: 50%;
+          height: 3.3vh !important;
+          border-radius: 5px;
+          margin-left: auto;
+          opacity: 1;
+          transition: .4s;
+          outline: none;
+          border: none;
+          color: #eeeeee;
+          background: #fff;
+          // background: #10161d;
         }
+        .__searchText.searchData {
+          width: 100% !important;
+        }
+      }
+      .__searchBox.searchData {
+        width: 30% !important;
       }
       .__myInfo {
         width: 3vw !important;
@@ -153,16 +203,51 @@ export default {
         display: none;
       }
       .__searchBox {
-        height: 50%;
+        height: 2.5vh !important;
+        position: relative;
+        display: flex;
+        margin-left: auto;
+        outline: none;
+        border: none;
+        margin-right: 5vw !important;
+        margin-left: 10vw !important;
         .__search {
-
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          // margin-left: auto;
+          margin-top: 0.1vw;
+          position: absolute;
+          right: 1vw;
+          z-index: 200;
+          color: #000;
+          top: 0;
+          bottom: 0;
+          margin: auto;
           span {
+            cursor: pointer;
             font-size: 5vw !important;
           }
         }
-        .__searchText.searchData {
-          width: 55% !important;
+        .__searchText {
+          width: 50%;
+          height: 2.5vh !important;
+          border-radius: 5px;
+          margin-left: auto;
+          opacity: 1;
+          transition: .4s;
+          outline: none;
+          border: none;
+          color: #eeeeee;
+          background: #fff;
+          // background: #10161d;
         }
+        .__searchText.searchData {
+          width: 100% !important;
+        }
+      }
+      .__searchBox.searchData {
+        width: 50% !important;
       }
       .__myInfo {
         display: none !important;
@@ -217,8 +302,8 @@ a {
   .mv__menu {
     width: 100vw;
     height: 7vh;
-    border-bottom: 1px solid rgba(0.8, 0.8, 0.8, 0.8);
-    background-color: rgba(0.8, 0.8, 0.8, 0.8);
+    border-bottom: 1px solid #060d17;
+    background-color: #060d17;
     display: flex;
     align-items: center;
     position: fixed;
@@ -243,48 +328,50 @@ a {
       cursor: pointer;
     }
     .__searchBox {
+      height: 4.2vh;
       position: relative;
       display: flex;
       margin-left: auto;
+      outline: none;
+      border: none;
+      margin-right: 2vw;
       .__search {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-left: auto;
-        margin-right: 2vw;
+        // margin-left: auto;
         margin-top: 0.1vw;
+        position: absolute;
+        right: 1vw;
+        z-index: 200;
+        color: #797a7b;
+        top: 0;
+        bottom: 0;
+        margin: auto;
         span {
           cursor: pointer;
           font-size: 2vw;
         }
       }
-      .__search.searchData {
-        position: absolute;
-        right: 3vw;
-        z-index: 200;
-        color: #000;
-        top: 0;
-        bottom: 0;
-        margin: auto;
-      }
       .__searchText {
-        width: 0;
-        opacity: 0;
-        transition: .4s;
-      }
-      .__searchText.searchData {
+        width: 50%;
+        border-radius: 5px;
         margin-left: auto;
-        width: 100%;
-        border-radius: 20px;
-        outline: none;
-        border: none;
-        font-size: 20px;
-        padding: 5px;
-        padding-left: 15px;
         opacity: 1;
         transition: .4s;
-        margin-right: 2vw;
+        font-size: 25px;
+        outline: none;
+        border: none;
+        color: #797a7b;
+        // background: #fff;
+        background: #10161d;
       }
+      .__searchText.searchData {
+        width: 100% !important;
+      }
+    }
+    .__searchBox.searchData {
+      width: 50% !important;
     }
     .__myInfo {
       margin-right: 6vw;
