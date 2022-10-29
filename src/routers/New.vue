@@ -21,7 +21,9 @@ export default {
       CHECK_DATA : "movie",
 
       skeleton : true,
-      page_skeleton : false
+      page_skeleton : false,
+      movie_page : 2,
+      tv_page : 2,
     }
   },
   methods: {
@@ -35,7 +37,7 @@ export default {
       }).catch((error) => {
         console.log(error)
       })
-      this.CHECK_DATA = "tv";
+      this.CHECK_DATA = "movie";
     },
     async tv() {
       this.skeleton = true;
@@ -78,29 +80,30 @@ export default {
   updated() {
     // 문제 - 상세정보 들어갔다가 뒤로가기하면 초기화 -> store에 상태 저장하기
     const io = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
+      entries.forEach(entry=> {
         if (entry.isIntersecting) { // 감지대상이 교차영역에 진입 할 경우
           // axios
           if(this.CHECK_DATA == "movie") {
-            this.page_skeleton = true;
-            axios.get(`${this.NEW_MOVIE_URL}?api_key=${this.API_KEY}&language=ko&page=2`)
-            .then((res) => {
-              this.page_skeleton = false;
-              this.NEW_DATA = this.NEW_DATA.concat(res.data.results)
-              // console.log(this.new_data)
-            }).catch((error) => {
-              console.log(error)
-            })
+              this.page_skeleton = true;
+              axios.get(`${this.NEW_MOVIE_URL}?api_key=${this.API_KEY}&language=ko&page=${this.movie_page}`)
+              .then((res) => {
+                console.log(res);
+                this.page_skeleton = false;
+                this.NEW_DATA = this.NEW_DATA.concat(res.data.results)
+              }).catch((error) => {
+                console.log(error)
+              })
+              this.movie_page++;
           } else {
             this.page_skeleton = true;
-            axios.get(`${this.NEW_TV_URL}?api_key=${this.API_KEY}&language=ko&page=2`)
+            axios.get(`${this.NEW_TV_URL}?api_key=${this.API_KEY}&language=ko&page=${this.tv_page}`)
             .then((res) => {
               this.page_skeleton = false;
               this.NEW_DATA = this.NEW_DATA.concat(res.data.results)
-              // console.log(this.new_data)
             }).catch((error) => {
               console.log(error)
             })
+            this.tv_page++;
           }
           observer.unobserve(entry.target); // 이미지 로딩 이후론 관찰할 필요 x
         }

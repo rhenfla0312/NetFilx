@@ -21,7 +21,10 @@ export default {
       CHECK_DATA : "movie",
 
       skeleton : true,
-      page_skeleton : false
+      page_skeleton : false,
+      
+      movie_page : 2,
+      tv_page : 2,
 
     }
   },
@@ -36,7 +39,7 @@ export default {
       }).catch((error) => {
         console.log(error)
       })
-      this.CHECK_DATA = "tv";
+      this.CHECK_DATA = "movie";
     },
     async tv() {
       this.skeleton = true;
@@ -84,7 +87,7 @@ export default {
           // axios
           if(this.CHECK_DATA == "movie") {
             this.page_skeleton = true;
-            axios.get(`${this.POPULAR_MOVIE_URL}?api_key=${this.API_KEY}&language=ko&page=2`)
+            axios.get(`${this.POPULAR_MOVIE_URL}?api_key=${this.API_KEY}&language=ko&page=${this.movie_page}`)
             .then((res) => {
               this.page_skeleton = false;
               this.POPULAR_DATA = this.POPULAR_DATA.concat(res.data.results)
@@ -92,16 +95,18 @@ export default {
             }).catch((error) => {
               console.log(error)
             })
+            this.movie_page++;
           } else {
             this.page_skeleton = true;
-            axios.get(`${this.POPULAR_TV_URL}?api_key=${this.API_KEY}&language=ko&page=2`)
+            axios.get(`${this.POPULAR_TV_URL}?api_key=${this.API_KEY}&language=ko&page=${this.tv_page}`)
             .then((res) => {
               this.page_skeleton = false;
               this.POPULAR_DATA = this.POPULAR_DATA.concat(res.data.results)
               // console.log(this.new_data)
             }).catch((error) => {
-              console.log(error)
+              console.log(error);
             })
+            this.tv_page++;
           }
           observer.unobserve(entry.target); // 이미지 로딩 이후론 관찰할 필요 x
         }

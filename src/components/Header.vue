@@ -3,6 +3,8 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      SEARCH_URL : 'https://api.themoviedb.org/3/search/multi',
+
       API_KEY : 'e95aab0b32ea685f4064a7364dec77f4',
 
       searchData : false,
@@ -10,6 +12,7 @@ export default {
       searchs : '',
       searchFile : [],
       page_searchFile : [],
+      total_page : 0,
 
       mobile__check : false,
       mobile__movie__check : false,
@@ -28,10 +31,19 @@ export default {
       alert("준비중");
     },
     async search() {
+      // 총 페이지 개수마 넘겨주는 용도
+      await axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.searchs}`)
+        .then((res) => {
+          // console.log(res);
+          this.total_page = res.data.total_pages;
+        }).catch((error) => {
+          console.log(error)
+        })
       this.$router.push({
         name: "Search",
         params: {
-          title : this.searchs
+          title : this.searchs,
+          total_page : this.total_page
         }
       })
     },
