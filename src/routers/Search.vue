@@ -1,7 +1,9 @@
 <script>
+import axios from 'axios';
 export default {
   data() {
     return {
+      SEARCH_URL : 'https://api.themoviedb.org/3/search/multi',
       // 개봉예정 URL
       SEARCH_MOVIE_URL : 'https://api.themoviedb.org/3/movie/popular', 
       SEARCH_TV_URL : 'https://api.themoviedb.org/3/tv/popular',
@@ -17,9 +19,10 @@ export default {
 
       // DATA
       SEARCH_TITLE : this.$route.params.title,
-      SEARCH_DATA : JSON.parse(this.$route.params.searchFile),
 
-      CHECK_DATA : this.$route.params.CHECK_DATA,
+      SEARCH_FILE : [],
+
+      CHECK_DATA : "",
 
       skeleton : false
 
@@ -55,6 +58,27 @@ export default {
     //   const search = document.querySelector('.search__item__plus');
     //   io.observe(search)
     // }
+  },
+  async mounted() {
+    await axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.SEARCH_TITLE}`)
+      .then((res) => {
+        console.log(res)
+        this.SEARCH_FILE = res.data.results;
+        this.CHECK_DATA = res.data.results[0].media_type;
+        // if(res.data.total_pages > 1) {
+        //   // 불러는 와지는데 다 불러와지기전에 데이터가 router로 넘어간다 -> 순서보장 반복문으로 처리하기전까진 검색데이터 페이지네이션 중지
+        //   for(let i = 2; i <= res.data.total_pages; i++) {
+        //     axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.searchs}&page=${i}`)
+        //     .then((res) => {
+        //       this.searchFile = this.searchFile.concat(res.data.results)
+        //     }).catch((error) => {
+        //       console.log(error)
+        //     })
+        //   }
+        // }
+      }).catch((error) => {
+        console.log(error)
+      })
   }
 }
 </script>
@@ -64,7 +88,7 @@ export default {
   <div class="search">
     <div class="search__list">
       <div class="search__item">
-        <div class="__item" v-for="item in SEARCH_DATA" :key="item" @click="detail(item.id)">
+        <div class="__item" v-for="item in SEARCH_FILE" :key="item" @click="detail(item.id)">
           <img v-if="SEARCH_TITLE" :src="`${SEARCHR_IMG}/${item.poster_path}`" onerror="this.src='/public/no_image.png'" />
           <div v-else :class="{ page_skeleton }" class="__skeleton"></div>
         </div>

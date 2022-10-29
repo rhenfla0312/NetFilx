@@ -3,8 +3,6 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      SEARCH_URL : 'https://api.themoviedb.org/3/search/multi',
-
       API_KEY : 'e95aab0b32ea685f4064a7364dec77f4',
 
       searchData : false,
@@ -30,32 +28,12 @@ export default {
       alert("준비중");
     },
     async search() {
-      await axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.searchs}`)
-        .then((res) => {
-          console.log(res)
-          this.searchFile = res.data.results;
-          // if(res.data.total_pages > 1) {
-          //   // 불러는 와지는데 다 불러와지기전에 데이터가 router로 넘어간다 -> 순서보장 반복문으로 처리하기전까진 검색데이터 페이지네이션 중지
-          //   for(let i = 2; i <= res.data.total_pages; i++) {
-          //     axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.searchs}&page=${i}`)
-          //     .then((res) => {
-          //       this.searchFile = this.searchFile.concat(res.data.results)
-          //     }).catch((error) => {
-          //       console.log(error)
-          //     })
-          //   }
-          // }
-          this.$router.push({
-            name: "Search",
-            params: {
-              title : this.searchs,
-              searchFile : JSON.stringify(this.searchFile),
-              CHECK_DATA : this.searchFile[0].media_type
-            }
-          })
-        }).catch((error) => {
-          console.log(error)
-        })
+      this.$router.push({
+        name: "Search",
+        params: {
+          title : this.searchs
+        }
+      })
     },
     loginCheck() {
       // 조건으로 로그인 인증 로직 구현
@@ -101,23 +79,15 @@ export default {
       <div v-else class="__myInfo __login" @click="login()">로그인</div>
       <!-- mobile -->
       <div class="mobileMenu"><span @click="mobileBtn()" class="material-symbols-outlined">menu</span></div>
-      <!-- <div class="mobile__list" :class="{ mobile__check }">
-        <div class="mobile__myInfo">내정보</div>
+      <div class="mobile__list" :class="{ mobile__check }">
+        <!-- <div class="mobile__myInfo">내정보</div> -->
         <div class="mobile__movie">
-          <div class="big__mobile__movie" @click="mobileMovieBtn()">영화</div>
-          <div class="small__mobile__movie" :class="{ mobile__movie__check }">
-            <div class="item movie__upcoming">개봉예정</div>
-            <div class="item movie__popular">인기</div>
-            <div class="item movie__trand">실시간 급상승</div>
-          </div>
+          <RouterLink to="/new" class="big__mobile__movie">신규</RouterLink>
         </div>
-        <div class="big__mobile__tv" @click="mobileTvBtn()">TV프로그램</div>
-        <div class="small__mobile__tv" :class="{ mobile__tv__check }">
-          <div class="item tv__upcoming">개봉예정</div>
-          <div class="item tv__popular">인기</div>
-          <div class="item tv__trand">실시간 급상승</div>
+        <div class="mobile__movie">
+          <RouterLink to="/popular" class="big__mobile__tv">인기</RouterLink>
         </div>
-      </div> -->
+      </div>
     </div>
   </div>
 </template>
@@ -283,6 +253,7 @@ export default {
         }
       }
       .mobile__list.mobile__check {
+        top: 3.8vh !important;
         transition: .3s !important;
         width: 300px !important;
         opacity: 1 !important;
@@ -416,7 +387,7 @@ a {
     }
     .mobile__list {
       position: absolute;
-      top: 11.7vw;
+      top: 5vh;
       right: 0;
       width: 0;
       opacity: 0;
@@ -431,39 +402,13 @@ a {
         background: rgba(0, 0, 0, 0.90);
         }
       }
-      .big__mobile__movie {
+      .mobile__movie {
+        height: 5vh;
+        vertical-align: middle;
         cursor: pointer;
-        padding: 1em;
-        font-weight: bold;
-      }
-      .big__mobile__tv {
-        cursor: pointer;
-        // movie 요소로 가려지는 버그발생 -> z-index 부여
-        position: relative;
-        font-weight: bold;
-        padding: 1em;
-        z-index: 100;
-      }
-      .small__mobile__movie {
-        height: 0;
-        opacity: 0;
-        transition: .2s;
-        .item {
-          padding: 1em;
-          &:hover {
-            background: rgba(0, 0, 0, 0.90);
-          }
-        }
-      }
-      .small__mobile__tv {
-        height: 0;
-        opacity: 0;
-        transition: .2s;
-        .item {
-          padding: 1em;
-          &:hover {
-            background: rgba(0, 0, 0, 0.90);
-          }
+        line-height: 3;
+        &:hover {
+          background: rgb(0,0,0,.9);
         }
       }
     }
