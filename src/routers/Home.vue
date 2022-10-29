@@ -351,9 +351,7 @@ export default {
 
 
 <template>
-  <div class="mv__img">
-    <!-- <img src="https://www.justwatch.com/appassets/img/home/tv/tv.webp" alt=""> -->
-  </div>
+  <div class="mv__img"></div>
   <div class="mv__container">
     <!-- 1 swiper -> new -->
     <div class="mv__first">

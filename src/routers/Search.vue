@@ -21,7 +21,7 @@ export default {
 
       CHECK_DATA : this.$route.params.CHECK_DATA,
 
-      page_skeleton : false
+      skeleton : false
 
     }
   },
@@ -65,8 +65,8 @@ export default {
     <div class="search__list">
       <div class="search__item">
         <div class="__item" v-for="item in SEARCH_DATA" :key="item" @click="detail(item.id)">
-          <div v-if="SEARCH_TITLE" :class="{ page_skeleton }" class="__skeleton"></div>
-          <img v-else :src="`${SEARCHR_IMG}/${item.poster_path}`" onerror="this.src='/public/no_image.png'" />
+          <img v-if="SEARCH_TITLE" :src="`${SEARCHR_IMG}/${item.poster_path}`" onerror="this.src='/public/no_image.png'" />
+          <div v-else :class="{ page_skeleton }" class="__skeleton"></div>
         </div>
         <div class="search__item__plus"></div>
       </div>

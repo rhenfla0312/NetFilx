@@ -71,6 +71,19 @@ export default {
       this.mobile__tv__check = !this.mobile__tv__check;
     }
   },
+  updated() {
+    // window.addEventListener('click', (e) => {
+    //   if(this.$refs.searchText) {
+    //     // console.log('window-hover')
+    //     this.searchData = true;
+    //     console.log(this.searchData);
+    //   } else {
+    //     // console.log('window-blur');
+    //     this.searchData = false;
+    //     console.log(searchData);
+    //   }
+    // })
+  }
 }
 </script>
 
@@ -81,7 +94,7 @@ export default {
       <RouterLink to="/new" class="__movie">신규</RouterLink>
       <RouterLink to="/popular" class="__tv">인기</RouterLink>
       <div class="__searchBox" :class="{ searchData }">
-        <input type="text" class="__searchText" :class="{ searchData }" v-model="searchs" @keydown.enter="search()" @click="searchText()" />
+        <input type="text" class="__searchText" ref="searchText" :class="{ searchData }" v-model="searchs" @keydown.enter="search()" @click="searchText()" />
         <div class="__search"><span @click="search()" class="material-symbols-outlined">search</span></div>
       </div>
       <div v-if="login_check" class="__myInfo">Y</div>
