@@ -350,6 +350,7 @@ a {
         }
       }
       .__searchText {
+        padding-left: 1rem;
         width: 50%;
         border-radius: 5px;
         margin-left: auto;

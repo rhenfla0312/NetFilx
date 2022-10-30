@@ -26,7 +26,7 @@ export default {
 
       skeleton : false,
 
-      total_page  : this.$route.params.total_page,
+      total_page  : Number(this.$route.params.total_page),
       search_page : 2,
 
     }
@@ -42,6 +42,19 @@ export default {
         }
       })
     },
+  },
+  watch: {
+    // router data감시할땐 문자열로 감싸면서 함수로 만들어야 작동한다 -> 해당 라우터 데이터가 들어있는 변수로 함수선언할땐 왜 작동안하나?
+    async "$route.params.title"(value) {
+      await axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${value}`)
+      .then((res) => {
+        console.log(res)
+        this.SEARCH_FILE = res.data.results;
+        this.CHECK_DATA = res.data.results[0].media_type;
+      }).catch((error) => {
+        console.log(error)
+      })
+    }
   },
   updated() {
     const io = new IntersectionObserver((entries, observer) => {
