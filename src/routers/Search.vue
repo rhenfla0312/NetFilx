@@ -86,7 +86,7 @@ export default {
     <div class="search__list">
       <div class="search__item">
         <div class="__item" v-for="item in SEARCH_FILE" :key="item" @click="detail(item.id)">
-          <img v-if="SEARCH_TITLE" :src="`${SEARCHR_IMG}/${item.poster_path}`" onerror="this.src='/public/no_image.png'" />
+          <img v-if="SEARCH_TITLE" :src="`${SEARCHR_IMG}/${item.poster_path}`" onerror="this.src='../../public/no_image.png'" />
           <div v-else :class="{ page_skeleton }" class="__skeleton"></div>
         </div>
         <div class="search__item__plus"></div>
