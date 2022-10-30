@@ -129,7 +129,7 @@ export default {
       <div class="new__item">
         <div class="__item" v-for="item in NEW_DATA" :key="item" @click="detail(item.id)">
           <div v-if="skeleton" :class="{ page_skeleton }" class="__skeleton"></div>
-          <img v-else :src="`${NEW_IMG}/${item.poster_path}`" onerror="this.src='../../public/no_image.png'" />
+          <img v-else :src="`${NEW_IMG}/${item.poster_path}`" />
         </div>
         <div class="new__item__plus"></div>
       </div>

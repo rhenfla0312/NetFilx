@@ -186,7 +186,7 @@ export default {
         <div class="__info">
           <div class="__first">
             <div class="__poster">
-              <img :src="`${MOVIE_IMG}/${detail_data.poster_path}`" onerror="this.src='../../public/no_image.png'">
+              <img :src="`${MOVIE_IMG}/${detail_data.poster_path}`">
             </div>
             <div class="__text">
               <div class="__title">{{ CHECK_DATA == "movie" ? detail_data.title : detail_data.name }}</div>
@@ -220,7 +220,7 @@ export default {
                 <swiper class="first__swiper swiper-slide" :slides-per-view="(displaySize > 1024) ? 4.2 : 3.2" :space-between="30" :modules="modules" Navigation="false">
                   <swiper-slide v-for="movie in detail_similar_Data" :key="movie" @click="detail(movie.id)">
                     <div class="detail__info__box">
-                      <img class="detail__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" onerror="this.src='../../public/no_image.png'" />
+                      <img class="detail__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" />
                       <div class="detail__name">{{ movie.title }}</div>
                     </div>
                   </swiper-slide>
@@ -232,7 +232,7 @@ export default {
                 <swiper class="first__swiper swiper-slide" :slides-per-view="(displaySize > 1024) ? 4.2 : 3.2" :space-between="30" :modules="modules" Navigation="false">
                   <swiper-slide v-for="cast in detail_cast" :key="cast">
                     <div class="detail__cast__info__box">
-                      <img class="detail__cast__poster" :src="`${this.MOVIE_IMG}/${cast.profile_path}`" onerror="this.src='../../public/no_image.png'">
+                      <img class="detail__cast__poster" :src="`${this.MOVIE_IMG}/${cast.profile_path}`">
                       <div class="detail__cast__name">{{ cast.name }}</div>
                     </div>
                   </swiper-slide>

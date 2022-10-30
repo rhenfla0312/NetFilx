@@ -132,7 +132,7 @@ export default {
       <div class="popular__item">
         <div class="__item" v-for="item in POPULAR_DATA" :key="item" @click="detail(item.id)">
           <div v-if="skeleton" :class="{ page_skeleton }" class="__skeleton"></div>
-          <img v-else :src="`${POPULAR_IMG}/${item.poster_path}`" onerror="this.src='../../public/no_image.png'" />
+          <img v-else :src="`${POPULAR_IMG}/${item.poster_path}`" />
         </div>
         <div class="popular__item__plus"></div>
       </div>
