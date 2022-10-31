@@ -802,11 +802,11 @@ export default {
     .popular {
       padding-top: 2.9rem !important;
       .popular__list {
-        width: 90vw;
+        width: 100%;
         margin: auto;
         .__header {
           position: relative !important;
-          justify-content: center;
+          justify-content: center !important;
           .__genres {
             font-size: 20px;
             // static - 초기값으로 위치지정 하지않은거와 같기 때문에 사용할일이 없지만 미디어쿼리에서 무시하는걸로 사용할 수 있다
@@ -853,11 +853,11 @@ export default {
           justify-items: center;
           .__item {
             .__skeleton {
-              width: 28vw !important;
+              width: 30vw !important;
               height: 35vw !important;
             }
             img {
-              width: 28vw !important;
+              width: 30vw !important;
               height: 35vw !important;
               border-radius: 10px;
               transition: .2s;

@@ -285,11 +285,11 @@ export default {
           justify-items: center;
           .__item {
             .__skeleton {
-              width: 28vw !important;
+              width: 30vw !important;
               height: 35vw !important;
             }
             img {
-              width: 28vw !important;
+              width: 30vw !important;
               height: 35vw !important;
               border-radius: 10px;
               transition: .2s;

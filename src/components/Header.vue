@@ -92,7 +92,7 @@ export default {
       <!-- mobile -->
       <div class="mobileMenu"><span @click="mobileBtn()" class="material-symbols-outlined">menu</span></div>
       <div class="mobile__list" :class="{ mobile__check }">
-        <!-- <div class="mobile__myInfo">내정보</div> -->
+        <div class="mobile__close"><span @click="mobileBtn()" class="material-symbols-outlined">menu</span></div>
         <div class="mobile__movie">
           <RouterLink to="/new" class="big__mobile__movie">신규</RouterLink>
         </div>
@@ -267,10 +267,31 @@ export default {
         }
       }
       .mobile__list.mobile__check {
-        top: 3.8vh !important;
+        top: 0 !important;
         transition: .3s !important;
         width: 300px !important;
+        background: #060d17;
+        height: 100vh;
+        z-index: 300;
         opacity: 1 !important;
+      }
+      .mobile__close {
+        span {
+          margin-left: 11rem;
+          font-size: 6vw !important;
+          transition: 0.3s;
+          cursor: pointer;
+          transform: rotate(0);
+          &:hover {
+            transform: rotate(180deg);
+            transition: 0.3s;
+          }
+        }
+      }
+      .mobile__movie {
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
       .small__mobile__movie.mobile__movie__check {
         height: 20vh !important;
@@ -361,7 +382,8 @@ a {
         font-size: 25px;
         outline: none;
         border: none;
-        color: #797a7b;
+        // color: #797a7b;
+        color: #fff;
         // background: #fff;
         background: #10161d;
       }
@@ -402,23 +424,24 @@ a {
     }
     .mobile__list {
       position: absolute;
-      top: 5vh;
+      top: 0;
       right: 0;
       width: 0;
       opacity: 0;
       transition: .3s;
       font-size: 3vw;
-      background: rgba(0, 0, 0, 0.35);
+      background: #060d17;
       height: 100vh;
+      z-index: 400;
       .mobile__myInfo {
         padding: 2em;
         cursor: pointer;
         &:hover {
-        background: rgba(0, 0, 0, 0.90);
+          background: rgba(0, 0, 0, 0.90);
         }
       }
       .mobile__movie {
-        height: 5vh;
+        height: 8vh;
         vertical-align: middle;
         cursor: pointer;
         line-height: 3;

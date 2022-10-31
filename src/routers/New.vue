@@ -304,8 +304,40 @@ export default {
     .new {
       padding-top: 2.9rem !important;
       .new__list {
-        width: 90vw;
+        width: 100%;
         margin: auto;
+        .__header {
+          height: 10vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: #fff;
+          font-size: 22px;
+          .__title {
+            font-family: 'IBM Plex Sans KR', sans-serif;
+            display: flex;
+            .__movie {
+              font-size: 20px;
+              margin-left: 1rem;
+              transition: .2s;
+              cursor: pointer;
+              &:hover {
+                transform: scale(1.1);
+                transition: .2s;
+              }
+            }
+            .__tv {
+              font-size: 20px;
+              margin-left: 5rem;
+              transition: .2s;
+              cursor: pointer;
+              &:hover {
+                transform: scale(1.1);
+                transition: .2s;
+              }
+            }
+          }
+        }
         .new__item {
           display: grid;
           grid-gap: 10px;
@@ -313,7 +345,7 @@ export default {
           justify-items: center;
           .__item {
             img {
-              width: 28vw;
+              width: 30vw;
               height: 35vw;
               border-radius: 10px;
               transition: .2s;
@@ -324,7 +356,7 @@ export default {
               }
             }
             .__skeleton {
-              width: 28vw !important;
+              width: 30vw !important;
               height: 35vw !important;
             }
           }
