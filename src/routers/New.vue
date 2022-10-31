@@ -21,7 +21,6 @@ export default {
       CHECK_DATA : "movie",
 
       skeleton : true,
-      page_skeleton : false,
       movie_page : 2,
       tv_page : 2,
     }
@@ -68,8 +67,10 @@ export default {
       await axios.get(`${this.NEW_MOVIE_URL}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         // console.log(res)
-        this.skeleton = false;
         this.NEW_DATA = res.data.results;
+        setTimeout(() => {
+          this.skeleton = false;
+        },1000)
       }).catch((error) => {
         console.log(error)
       }) 
@@ -84,22 +85,26 @@ export default {
         if (entry.isIntersecting) { // 감지대상이 교차영역에 진입 할 경우
           // axios
           if(this.CHECK_DATA == "movie") {
-              this.page_skeleton = true;
+              this.skeleton = true;
               axios.get(`${this.NEW_MOVIE_URL}?api_key=${this.API_KEY}&language=ko&page=${this.movie_page}`)
               .then((res) => {
                 console.log(res);
-                this.page_skeleton = false;
                 this.NEW_DATA = this.NEW_DATA.concat(res.data.results)
+                setTimeout(() => {
+                  this.skeleton = false;
+                },1000)
               }).catch((error) => {
                 console.log(error)
               })
               this.movie_page++;
           } else {
-            this.page_skeleton = true;
+            this.skeleton = true;
             axios.get(`${this.NEW_TV_URL}?api_key=${this.API_KEY}&language=ko&page=${this.tv_page}`)
             .then((res) => {
-              this.page_skeleton = false;
               this.NEW_DATA = this.NEW_DATA.concat(res.data.results)
+              setTimeout(() => {
+                this.skeleton = false;
+              },1000)
             }).catch((error) => {
               console.log(error)
             })
@@ -128,7 +133,7 @@ export default {
       </div>
       <div class="new__item">
         <div class="__item" v-for="item in NEW_DATA" :key="item" @click="detail(item.id)">
-          <div v-if="skeleton" :class="{ page_skeleton }" class="__skeleton"></div>
+          <div v-if="skeleton" class="__skeleton"></div>
           <img v-else :src="`${NEW_IMG}/${item.poster_path}`" />
         </div>
         <div class="new__item__plus"></div>
@@ -138,6 +143,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@500&display=swap');
   .new {
     padding-top: 4.1rem;
     // height: 100vh;
@@ -152,6 +158,7 @@ export default {
         color: #fff;
         font-size: 22px;
         .__title {
+          font-family: 'IBM Plex Sans KR', sans-serif;
           display: flex;
           .__movie {
             margin-left: 1rem;
@@ -208,21 +215,83 @@ export default {
               }
             }
           }
-          .__skeleton.page_skeleton {
-            width: 11vw;
-            height: 14vw;
-            border-radius: 10px;
-            background-color: #ddd;
-            animation: pulse-bg 1s infinite;
-            @keyframes pulse-bg {
-              0% {
-                background-color: #ddd;
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    .new {
+      padding-top: 4.1rem;
+      // height: 100vh;
+      background: #060d17;
+      .new__list {
+        width: 70vw;
+        margin: auto;
+        .__header {
+          height: 10vh;
+          display: flex;
+          align-items: center;
+          color: #fff;
+          font-size: 22px;
+          .__title {
+            font-family: 'IBM Plex Sans KR', sans-serif;
+            display: flex;
+            .__movie {
+              font-size: 20px;
+              margin-left: 1rem;
+              transition: .2s;
+              cursor: pointer;
+              &:hover {
+                transform: scale(1.1);
+                transition: .2s;
               }
-              50% {
-                background-color: #d0d0d0;
+            }
+            .__tv {
+              font-size: 20px;
+              margin-left: 5rem;
+              transition: .2s;
+              cursor: pointer;
+              &:hover {
+                transform: scale(1.1);
+                transition: .2s;
               }
-              100% {
-                background-color: #ddd;
+            }
+          }
+        }
+        .new__item {
+          display: grid;
+          grid-gap: 10px;
+          grid-template-columns: repeat(4, 1fr);
+          justify-items: center;
+          .__item {
+            img {
+              width: 17vw;
+              height: 20vw;
+              border-radius: 10px;
+              transition: .2s;
+              &:hover {
+                cursor: pointer;
+                transform: scale(1.1);
+                transition: .2s;
+              }
+            }
+            .__skeleton {
+              width: 17vw;
+              height: 20vw;
+              border-radius: 10px;
+              background-color: #ddd;
+              animation: pulse-bg 1s infinite;
+              @keyframes pulse-bg {
+                0% {
+                  background-color: #ddd;
+                }
+                50% {
+                  background-color: #d0d0d0;
+                }
+                100% {
+                  background-color: #ddd;
+                }
               }
             }
           }
@@ -230,6 +299,7 @@ export default {
       }
     }
   }
+
   @media screen and (max-width: 768px) {
     .new {
       padding-top: 2.9rem !important;
@@ -254,10 +324,6 @@ export default {
               }
             }
             .__skeleton {
-              width: 28vw !important;
-              height: 35vw !important;
-            }
-            .__skeleton.page_skeleton {
               width: 28vw !important;
               height: 35vw !important;
             }

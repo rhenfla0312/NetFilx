@@ -379,6 +379,11 @@ export default {
                 }
                 .like__item {
                   width: 50%;
+                  &::after {
+                    content: "\2605";
+                    color: red;
+                    margin-left: 5px;
+                  }
                 }
               }
             }

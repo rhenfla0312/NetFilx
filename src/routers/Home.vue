@@ -29,6 +29,7 @@ export default {
       NEW_URL : 'https://api.themoviedb.org/3/movie/upcoming',
       POPULAR_URL : 'https://api.themoviedb.org/3/movie/popular', 
       TRAND_URL : 'https://api.themoviedb.org/3/trending/movie/day',
+      SEARCH_URL : 'https://api.themoviedb.org/3/search/multi',
 
       MOVIE_INFO_URL : 'https://api.themoviedb.org/3/movie',
 
@@ -47,6 +48,9 @@ export default {
       new_video_infos : [],
 
       displaySize : 0,
+      
+      searchs : '',
+      total_page : 0,
 
       // MOVIE_DETAIL_INFO_check
       movie_info_new : false,
@@ -91,6 +95,23 @@ export default {
       this.$refs.mv_bg.style.backgroundSize = '100%';
       this.$refs.mv_bg.style.backgroundRepeat = 'no-repeat';
     },
+    async search() {
+      // 총 페이지 개수마 넘겨주는 용도
+      await axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.searchs}`)
+        .then((res) => {
+          // console.log(res);
+          this.total_page = res.data.total_pages;
+        }).catch((error) => {
+          console.log(error)
+        })
+      this.$router.push({
+        name: "Search",
+        params: {
+          title : this.searchs,
+          total_page : this.total_page
+        }
+      })
+    },
 
     // detail page
     detail(id) {
@@ -124,7 +145,7 @@ export default {
       // id에 맞는 영화정보 불러오기
       await axios.get(`${this.MOVIE_INFO_URL}/${id}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
-        // console.log(res)
+        console.log(res)
         this.movie_info_new_data = res.data;
       }).catch((error) => {
         console.log(error)
@@ -273,20 +294,15 @@ export default {
     this.displaySize = window.innerWidth;
 
     try {
-      // 영화 장르 확인
-      await axios.get(`${this.BASE_URL}?api_key=${this.API_KEY}&language=ko`)
-      .then((res) => {
-        // console.log(res)
-      }).catch((error) => {
-        console.log(error)
-      })
   
       // 개봉예정 영화 목록
       await axios.get(`${this.NEW_URL}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         // console.log(res);
-        this.skeleton_new = false;
         this.new_movies = res.data.results
+        setTimeout(() => {
+          this.skeleton_new = false;
+        },1000)
       }).catch((error) => {
         console.log(error)
       })
@@ -295,8 +311,10 @@ export default {
       await axios.get(`${this.POPULAR_URL}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         // console.log(res)
-        this.skeleton_popular = false;
         this.popular_moviles = res.data.results
+        setTimeout(() => {
+          this.skeleton_popular = false;
+        },1000)
       }).catch((error) => {
         console.log(error)
       })
@@ -305,8 +323,10 @@ export default {
       await axios.get(`${this.TRAND_URL}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
         // console.log(res)
-        this.skeleton_trand = false;
         this.trand_movies = res.data.results
+        setTimeout(() => {
+          this.skeleton_trand = false;
+        },1000)
       }).catch((error) => {
         console.log(error)
       })
@@ -351,7 +371,12 @@ export default {
 
 <template>
   <div class="mv__container">
-  <div class="mv__img"></div>
+  <div class="mv__img">
+    <div class="mv__searchBox">
+      <span class="material-symbols-outlined">search</span>
+      <input type="text" v-model="searchs" @keydown.enter="search()" placeholder="영화 및 TV프로그램을 검색하세요">
+    </div>
+  </div>
     <div class="__container">
     <!-- 1 swiper -> new -->
     <div class="mv__first">
@@ -359,7 +384,7 @@ export default {
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in new_movies" :key="movie">
           <div v-if="skeleton_new" class="skeleton__poster"></div>
-          <img v-else class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" @click="new_movieInfo(movie.id, movie.backdrop_path)">
+          <img v-else class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="new_movieInfo(movie.id, movie.backdrop_path)">
         </swiper-slide>
         <swiper-slide class="mv__next">
           <RouterLink to="/new"><span class="material-symbols-outlined">arrow_circle_right</span></RouterLink>
@@ -370,7 +395,7 @@ export default {
         <div class="detail__info">
           <!-- <img :src="(displaySize > 768) ? `${this.MOVIE_IMG}/${movie_info_new_data.poster_path}` : `${this.MOVIE_IMG}/${movie_info_new_data.backdrop_path}`" alt="" class="detail__poster" /> -->
           <div class="detail__box" v-if="displaySize > 768">
-            <img :src="`${this.MOVIE_IMG}/${movie_info_new_data.poster_path}`" class="detail__poster" />
+            <img :src="`${MOVIE_IMG}/${movie_info_new_data.poster_path}`" class="detail__poster" />
             <div class="detail__btn" @click="detail(movie_info_new_data.id)">상세보기</div>
           </div>
           <div class="detail__text">
@@ -379,7 +404,7 @@ export default {
               <div class="__close"><span class="material-symbols-outlined" @click="new_movieInfo_close()">close</span></div>
             </div>
             <div class="detail__box" v-if="displaySize < 768">
-              <img :src="`${this.MOVIE_IMG}/${movie_info_new_data.backdrop_path}`" class="detail__poster" />
+              <img :src="`${MOVIE_IMG}/${movie_info_new_data.backdrop_path}`" class="detail__poster" />
               <div class="detail__btn" @click="detail(movie_info_new_data.id)">상세보기</div>
             </div>
             <div class="__des">{{ movie_info_new_data.overview !== "" ? movie_info_new_data.overview : "상세설명이 없습니다" }}</div>
@@ -396,7 +421,7 @@ export default {
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in popular_moviles" :key="movie">
           <div v-if="skeleton_popular" class="skeleton__poster"></div>
-          <img v-else class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`"  @click="popular_movieInfo(movie.id, movie.backdrop_path)" />
+          <img v-else class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`"  @click="popular_movieInfo(movie.id, movie.backdrop_path)" />
         </swiper-slide>
         <swiper-slide class="mv__next">
           <RouterLink to="/popular"><span class="material-symbols-outlined">arrow_circle_right</span></RouterLink>
@@ -406,7 +431,7 @@ export default {
       <div class="mv__detail__info" :class="{ movie_info_popular }" ref="detail_popular_bg">
         <div class="detail__info">
           <div class="detail__box" v-if="displaySize > 768">
-            <img :src="`${this.MOVIE_IMG}/${movie_info_popular_data.poster_path}`" class="detail__poster" />
+            <img :src="`${MOVIE_IMG}/${movie_info_popular_data.poster_path}`" class="detail__poster" />
             <div class="detail__btn" @click="detail(movie_info_popular_data.id)">상세보기</div>
           </div>
           <div class="detail__text">
@@ -415,7 +440,7 @@ export default {
               <div class="__close"><span class="material-symbols-outlined" @click="popular_movieInfo_close()">close</span></div>
             </div>
             <div class="detail__box" v-if="displaySize < 768">
-              <img :src="`${this.MOVIE_IMG}/${movie_info_popular_data.backdrop_path}`" class="detail__poster" />
+              <img :src="`${MOVIE_IMG}/${movie_info_popular_data.backdrop_path}`" class="detail__poster" />
               <div class="detail__btn" @click="detail(movie_info_popular_data.id)">상세보기</div>
             </div>
             <div class="__des">{{ movie_info_popular_data.overview !== "" ? movie_info_popular_data.overview : "상세설명이 없습니다" }}</div>
@@ -433,7 +458,7 @@ export default {
         <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 4 : (displaySize > 768) ? 3 : 2" :space-between="30" :modules="modules" Navigation="false">
           <swiper-slide class="mv__video" v-for="movie in new_video_infos" :key="movie" @click="video_movieInfo(movie.id, movie.backdrop_path)">
             <div class="mv__box">
-              <img class="mv__video__poster" :src="`${this.MOVIE_IMG}/${movie.backdrop_path}`" @mouseover="mvBack(movie.backdrop_path)" />
+              <img class="mv__video__poster" :src="`${MOVIE_IMG}/${movie.backdrop_path}`" @mouseover="mvBack(movie.backdrop_path)" />
               <div class="mv__video__title">{{ movie.title == "아바타" ? "[리마스터링] " + movie.title : movie.title  }}</div>
               <span class="material-symbols-outlined mv__play">youtube_activity</span>
             </div>
@@ -456,7 +481,7 @@ export default {
       <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in trand_movies" :key="movie">
           <div v-if="skeleton_trand" class="skeleton__poster"></div>
-          <img v-else class="mv__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" @click="trand_movieInfo(movie.id, movie.backdrop_path)" />
+          <img v-else class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="trand_movieInfo(movie.id, movie.backdrop_path)" />
         </swiper-slide>
         <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
       </swiper>
@@ -464,7 +489,7 @@ export default {
       <div class="mv__detail__info" :class="{ movie_info_trand }"  ref="detail_trand_bg">
         <div class="detail__info">
           <div class="detail__box" v-if="displaySize > 768">
-            <img :src="`${this.MOVIE_IMG}/${movie_info_trand_data.poster_path}`" class="detail__poster" />
+            <img :src="`${MOVIE_IMG}/${movie_info_trand_data.poster_path}`" class="detail__poster" />
             <div class="detail__btn" @click="detail(movie_info_trand_data.id)">상세보기</div>
           </div>
           <div class="detail__text">
@@ -473,7 +498,7 @@ export default {
               <div class="__close"><span class="material-symbols-outlined" @click="trand_movieInfo_close()">close</span></div>
             </div>
             <div class="detail__box" v-if="displaySize < 768">
-              <img :src="`${this.MOVIE_IMG}/${movie_info_trand_data.backdrop_path}`" class="detail__poster" />
+              <img :src="`${MOVIE_IMG}/${movie_info_trand_data.backdrop_path}`" class="detail__poster" />
               <div class="detail__btn" @click="detail(movie_info_trand_data.id)">상세보기</div>
             </div>
             <div class="__des">{{ movie_info_trand_data.overview !== "" ? movie_info_trand_data.overview : "상세설명이 없습니다" }}</div>
@@ -490,14 +515,33 @@ export default {
 
 
 <style lang="scss" scoped>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700&family=Source+Sans+Pro:wght@600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
 
 @media screen and (max-width: 1024px) {
   .mv__container {
     .mv__img {
       height: 40vh !important;
-      img {
-        // padding-top: 2rem !important;
-        width: 100% !important;
+      .mv__searchBox {
+        display: flex;
+        align-items: center;
+        font-family: 'Source Sans Pro', Arial, sans-serif;
+        font-family: 'Orbitron', sans-serif;
+        background: #fff;
+        width: 70% !important;
+        border-radius: 10px;
+        span {
+          padding-left: 1rem;
+          font-size: 40px;
+          color: #000;
+        }
+        input {
+          padding-left: 2rem;
+          border: none;
+          width: 80% !important;
+          height: 5vh;
+          outline: none;
+        }
       }
     }
     .__container {
@@ -880,9 +924,9 @@ export default {
   .mv__container {
     .mv__img {
       height: 30vh !important;
-      img {
-        padding-top: 5rem !important;
-        width: 100% !important;
+
+      .mv__searchBox {
+        display: none !important;
       }
     }
     .__container {
@@ -980,7 +1024,6 @@ export default {
                   color: #000;
                 }
                 .__close {
-                  
                   span {
                     font-size: 40px;
                     cursor: pointer;
@@ -1262,13 +1305,34 @@ export default {
 }
 .mv__container {
     .mv__img {
+      padding-top: 4rem;
       height: 50vh;
       background-image: url('https://www.justwatch.com/appassets/img/home/bg-tiles/bg-tiles.webp');
       background-repeat: no-repeat;
       background-position: center;
-      // background-size: 100%;
-      img {
-        width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .mv__searchBox {
+        display: flex;
+        align-items: center;
+        font-family: 'Source Sans Pro', Arial, sans-serif;
+        font-family: 'Orbitron', sans-serif;
+        background: #fff;
+        width: 50%;
+        border-radius: 10px;
+        span {
+          padding-left: 1rem;
+          font-size: 40px;
+          color: #000;
+        }
+        input {
+          padding-left: 2rem;
+          border: none;
+          width: 90%;
+          height: 5vh;
+          outline: none;
+        }
       }
     }
     .__container {

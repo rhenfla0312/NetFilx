@@ -116,9 +116,11 @@ export default {
       font-size: 3vw !important;
       height: 7vh !important;
       .__movie {
+        width: 3rem !important;
         font-size: 2vw !important;
       }
       .__tv {
+        width: 3rem !important;
         font-size: 2vw !important;
       }
       .__searchBox {

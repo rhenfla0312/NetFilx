@@ -24,7 +24,7 @@ export default {
 
       CHECK_DATA : "",
 
-      skeleton : false,
+      skeleton : true,
 
       total_page  : Number(this.$route.params.total_page),
       search_page : 2,
@@ -61,13 +61,15 @@ export default {
       entries.forEach(entry => {
         if (entry.isIntersecting) { // 감지대상이 교차영역에 진입 할 경우
           // axios
-          this.page_skeleton = true;
           if(this.total_page >= this.search_page) {
+            this.skeleton = true;
             axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.SEARCH_TITLE}&page=${this.search_page}`)
             .then((res) => {
               console.log(res);
-              this.page_skeleton = false;
               this.SEARCH_FILE = this.SEARCH_FILE.concat(res.data.results)
+              setTimeout(() => {
+                this.skeleton = false;
+              },1000)
             }).catch((error) => {
               console.log(error)
             })
@@ -86,6 +88,9 @@ export default {
         console.log(res)
         this.SEARCH_FILE = res.data.results;
         this.CHECK_DATA = res.data.results[0].media_type;
+        setTimeout(() => {
+          this.skeleton = false;
+        },1000)
       }).catch((error) => {
         console.log(error)
       })
@@ -99,8 +104,8 @@ export default {
     <div class="search__list">
       <div class="search__item">
         <div class="__item" v-for="item in SEARCH_FILE" :key="item" @click="detail(item.id)">
-          <img v-if="SEARCH_TITLE" :src="`${SEARCHR_IMG}/${item.poster_path}`" />
-          <div v-else :class="{ page_skeleton }" class="__skeleton"></div>
+          <div v-if="skeleton" class="__skeleton"></div>
+          <img v-else :src="`${SEARCHR_IMG}/${item.poster_path}`" />
         </div>
         <div class="search__item__plus"></div>
       </div>
@@ -170,24 +175,6 @@ export default {
               }
             }
           }
-          .__skeleton.page_skeleton {
-            width: 11vw;
-            height: 14vw;
-            border-radius: 10px;
-            background-color: #ddd;
-            animation: pulse-bg 1s infinite;
-            @keyframes pulse-bg {
-              0% {
-                background-color: #ddd;
-              }
-              50% {
-                background-color: #d0d0d0;
-              }
-              100% {
-                background-color: #ddd;
-              }
-            }
-          }
           img {
             width: 11vw;
             height: 14vw;
@@ -203,6 +190,88 @@ export default {
       }
     }
   }
+
+  @media screen and (max-width: 1024px) {
+    .search {
+      padding-top: 4.1rem;
+      // height: 100vh;
+      background: #060d17;
+      min-height: 100vh;
+      .search__list {
+        padding-top: 10vh;
+        width: 70vw;
+        margin: auto;
+        .__header {
+          height: 10vh;
+          display: flex;
+          align-items: center;
+          color: #fff;
+          font-size: 22px;
+          .__title {
+            display: flex;
+            .__movie {
+              font-size: 20px;
+              margin-left: 1rem;
+              transition: .2s;
+              cursor: pointer;
+              &:hover {
+                transform: scale(1.1);
+                transition: .2s;
+              }
+            }
+            .__tv {
+              font-size: 20px;
+              margin-left: 5rem;
+              transition: .2s;
+              cursor: pointer;
+              &:hover {
+                transform: scale(1.1);
+                transition: .2s;
+              }
+            }
+          }
+        }
+        .search__item {
+          display: grid;
+          grid-gap: 10px;
+          grid-template-columns: repeat(4, 1fr);
+          justify-items: center;
+          .__item {
+            .__skeleton {
+              width: 17vw;
+              height: 20vw;
+              border-radius: 10px;
+              background-color: #ddd;
+              animation: pulse-bg 1s infinite;
+              @keyframes pulse-bg {
+                0% {
+                  background-color: #ddd;
+                }
+                50% {
+                  background-color: #d0d0d0;
+                }
+                100% {
+                  background-color: #ddd;
+                }
+              }
+            }
+            img {
+              width: 17vw;
+              height: 20vw;
+              border-radius: 10px;
+              transition: .2s;
+              &:hover {
+                cursor: pointer;
+                transform: scale(1.1);
+                transition: .2s;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
   @media screen and (max-width: 768px) {
     .search {
       padding-top: 2.9rem !important;
@@ -216,10 +285,6 @@ export default {
           justify-items: center;
           .__item {
             .__skeleton {
-              width: 28vw !important;
-              height: 35vw !important;
-            }
-            .__skeleton.page_skeleton {
               width: 28vw !important;
               height: 35vw !important;
             }
