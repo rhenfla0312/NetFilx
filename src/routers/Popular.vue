@@ -391,9 +391,9 @@ export default {
           <div v-if="skeleton" class="__skeleton"></div>
           <img v-else :src="`${POPULAR_IMG}/${item.poster_path}`" />
         </div>
-        <div class="popular__item__plus"></div>
       </div>
     </div>
+    <div class="popular__item__plus"></div>
   </div>
 </template>
 
@@ -853,12 +853,12 @@ export default {
           justify-items: center;
           .__item {
             .__skeleton {
-              width: 30vw !important;
-              height: 35vw !important;
+              width: 32vw !important;
+              height: 30vh !important;
             }
             img {
-              width: 30vw !important;
-              height: 35vw !important;
+              width: 32vw !important;
+              height: 30vh !important;
               border-radius: 10px;
               transition: .2s;
               &:hover {

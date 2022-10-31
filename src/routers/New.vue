@@ -81,12 +81,12 @@ export default {
   updated() {
     // 문제 - 상세정보 들어갔다가 뒤로가기하면 초기화 -> store에 상태 저장하기
     const io = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry=> {
+      entries.forEach(async entry=> {
         if (entry.isIntersecting) { // 감지대상이 교차영역에 진입 할 경우
           // axios
           if(this.CHECK_DATA == "movie") {
               this.skeleton = true;
-              axios.get(`${this.NEW_MOVIE_URL}?api_key=${this.API_KEY}&language=ko&page=${this.movie_page}`)
+              await axios.get(`${this.NEW_MOVIE_URL}?api_key=${this.API_KEY}&language=ko&page=${this.movie_page}`)
               .then((res) => {
                 console.log(res);
                 this.NEW_DATA = this.NEW_DATA.concat(res.data.results)
@@ -99,7 +99,7 @@ export default {
               this.movie_page++;
           } else {
             this.skeleton = true;
-            axios.get(`${this.NEW_TV_URL}?api_key=${this.API_KEY}&language=ko&page=${this.tv_page}`)
+            await axios.get(`${this.NEW_TV_URL}?api_key=${this.API_KEY}&language=ko&page=${this.tv_page}`)
             .then((res) => {
               this.NEW_DATA = this.NEW_DATA.concat(res.data.results)
               setTimeout(() => {
@@ -136,9 +136,9 @@ export default {
           <div v-if="skeleton" class="__skeleton"></div>
           <img v-else :src="`${NEW_IMG}/${item.poster_path}`" />
         </div>
-        <div class="new__item__plus"></div>
       </div>
     </div>
+    <div class="new__item__plus"></div>
   </div>
 </template>
 
@@ -345,8 +345,8 @@ export default {
           justify-items: center;
           .__item {
             img {
-              width: 30vw;
-              height: 35vw;
+              width: 32vw;
+              height: 30vh;
               border-radius: 10px;
               transition: .2s;
               &:hover {
@@ -356,8 +356,8 @@ export default {
               }
             }
             .__skeleton {
-              width: 30vw !important;
-              height: 35vw !important;
+              width: 32vw !important;
+              height: 30vh !important;
             }
           }
         }

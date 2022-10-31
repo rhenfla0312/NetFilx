@@ -57,6 +57,7 @@ export default {
     }
   },
   updated() {
+    // console.log(this.total_page)
     const io = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) { // 감지대상이 교차영역에 진입 할 경우
@@ -65,7 +66,7 @@ export default {
             this.skeleton = true;
             axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.SEARCH_TITLE}&page=${this.search_page}`)
             .then((res) => {
-              console.log(res);
+              // console.log(res);
               this.SEARCH_FILE = this.SEARCH_FILE.concat(res.data.results)
               setTimeout(() => {
                 this.skeleton = false;
@@ -107,9 +108,9 @@ export default {
           <div v-if="skeleton" class="__skeleton"></div>
           <img v-else :src="`${SEARCHR_IMG}/${item.poster_path}`" />
         </div>
-        <div class="search__item__plus"></div>
       </div>
     </div>
+    <div class="search__item__plus"></div>
   </div>
 </template>
 
@@ -285,12 +286,12 @@ export default {
           justify-items: center;
           .__item {
             .__skeleton {
-              width: 30vw !important;
-              height: 35vw !important;
+              width: 32vw !important;
+              height: 30vh !important;
             }
             img {
-              width: 30vw !important;
-              height: 35vw !important;
+              width: 32vw !important;
+              height: 30vh !important;
               border-radius: 10px;
               transition: .2s;
               &:hover {

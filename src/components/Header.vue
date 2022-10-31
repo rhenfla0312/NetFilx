@@ -279,6 +279,7 @@ export default {
         span {
           margin-left: 11rem;
           font-size: 6vw !important;
+          margin-top: 0.3rem;
           transition: 0.3s;
           cursor: pointer;
           transform: rotate(0);
@@ -292,6 +293,14 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        .big__mobile__movie,
+        .big__mobile__tv {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
       }
       .small__mobile__movie.mobile__movie__check {
         height: 20vh !important;
