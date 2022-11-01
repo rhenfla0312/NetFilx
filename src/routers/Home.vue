@@ -74,6 +74,8 @@ export default {
       skeleton_popular : true,
       skeleton_video : true,
       skeleton_trand : true,
+
+      window : false,
     }
   },
   computed: {
@@ -126,6 +128,7 @@ export default {
 
     // new
     async new_movieInfo(id, bg) {
+      this.window = true;
       this.movie_info_new_id = ''
 
       this.movie_info_new = true;
@@ -162,9 +165,11 @@ export default {
     },
     new_movieInfo_close() {
       this.movie_info_new = false;
+      this.window = false;
     },  
     // popular
     async popular_movieInfo(id, bg) {
+      this.window = true;
       this.movie_info_popular_id = '';
 
       this.movie_info_new = false;
@@ -201,9 +206,11 @@ export default {
     },
     popular_movieInfo_close() {
       this.movie_info_popular = false;
+      this.window = false;
     },
     // video
     async video_movieInfo(id, bg) {
+      this.window = true;
       this.movie_info_video_id = '';
 
       this.movie_info_new = false;
@@ -240,9 +247,11 @@ export default {
     },
     video_movieInfo_close() {
       this.movie_info_video = false;
+      this.window = false;
     },
     // trand
     async trand_movieInfo(id, bg) {
+      this.window = true;
       this.movie_info_new = false;
       this.movie_info_popular = false;
       this.movie_info_video = false;
@@ -276,6 +285,7 @@ export default {
       }) 
     },
     trand_movieInfo_close() {
+      this.window = false;
       this.movie_info_trand = false;
     }
   },
@@ -292,9 +302,7 @@ export default {
   //   },
   async mounted() {
     this.displaySize = window.innerWidth;
-
     try {
-  
       // 개봉예정 영화 목록
       await axios.get(`${this.NEW_URL}?api_key=${this.API_KEY}&language=ko`)
       .then((res) => {
@@ -302,7 +310,7 @@ export default {
         this.new_movies = res.data.results
         setTimeout(() => {
           this.skeleton_new = false;
-        },1000)
+        },100)
       }).catch((error) => {
         console.log(error)
       })
@@ -314,7 +322,7 @@ export default {
         this.popular_moviles = res.data.results
         setTimeout(() => {
           this.skeleton_popular = false;
-        },1000)
+        },100)
       }).catch((error) => {
         console.log(error)
       })
@@ -326,7 +334,7 @@ export default {
         this.trand_movies = res.data.results
         setTimeout(() => {
           this.skeleton_trand = false;
-        },1000)
+        },100)
       }).catch((error) => {
         console.log(error)
       })
@@ -370,6 +378,7 @@ export default {
 
 
 <template>
+  <div class="windows" :class="{ window }"></div>
   <div class="mv__container">
   <div class="mv__img">
     <div class="mv__searchBox">
@@ -926,7 +935,14 @@ export default {
       height: 30vh !important;
 
       .mv__searchBox {
-        display: none !important;
+        // display: none !important;
+        width: 80% !important;
+        span {
+          font-size: 30px !important;
+        }
+        input {
+          width: 80 !important;
+        }
       }
     }
     .__container {
@@ -1303,6 +1319,7 @@ export default {
     } 
     }
 }
+
 .mv__container {
     .mv__img {
       padding-top: 4rem;
@@ -1457,7 +1474,6 @@ export default {
             }
           }
           display: none;
-  
         }
         .mv__detail__info.movie_info_new {
           display: block;

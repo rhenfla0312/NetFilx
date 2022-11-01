@@ -63,14 +63,14 @@ export default {
         if (entry.isIntersecting) { // 감지대상이 교차영역에 진입 할 경우
           // axios
           if(this.total_page >= this.search_page) {
-            this.skeleton = true;
+            // this.skeleton = true;
             axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.SEARCH_TITLE}&page=${this.search_page}`)
             .then((res) => {
               // console.log(res);
               this.SEARCH_FILE = this.SEARCH_FILE.concat(res.data.results)
-              setTimeout(() => {
-                this.skeleton = false;
-              },1000)
+              // setTimeout(() => {
+              //   this.skeleton = false;
+              // },1000)
             }).catch((error) => {
               console.log(error)
             })
@@ -91,7 +91,7 @@ export default {
         this.CHECK_DATA = res.data.results[0].media_type;
         setTimeout(() => {
           this.skeleton = false;
-        },1000)
+        },100)
       }).catch((error) => {
         console.log(error)
       })
@@ -286,12 +286,12 @@ export default {
           justify-items: center;
           .__item {
             .__skeleton {
-              width: 32vw !important;
-              height: 30vh !important;
+              width: 30vw !important;
+              height: 25vh !important;
             }
             img {
-              width: 32vw !important;
-              height: 30vh !important;
+              width: 30vw !important;
+              height: 25vh !important;
               border-radius: 10px;
               transition: .2s;
               &:hover {

@@ -19,6 +19,12 @@ export default {
       mobile__tv__check : false,
 
       login_check : false,
+      login__layout: false,
+
+      id: "",
+      pw: "",
+      token: "",
+      session_id : "",
 
       CHECK_DATA : ""
     }
@@ -28,7 +34,10 @@ export default {
       this.searchData = true;
     },
     login() {
-      alert("준비중");
+      this.login__layout = true;
+    },
+    login_close() {
+      this.login__layout = false;
     },
     async search() {
       // 총 페이지 개수마 넘겨주는 용도
@@ -47,12 +56,52 @@ export default {
         }
       })
     },
+    singIn() {
+      alert("준비중 ㄱㄷ")
+    }, 
+    signUp() {
+      alert("준비중 ㄱㄷ")
+      // await axios.get(`https://api.themoviedb.org/3/authentication/token/new?api_key=${this.API_KEY}`)
+      // .then(async (res) => {
+      //   console.log(res);
+      //   this.token = res.data.request_token;
+
+        
+      // }).catch((error) => {
+      //   console.log(error)
+      // })
+
+      // window.open(`https://www.themoviedb.org/authenticate/${this.token}`)
+    
+      // setTimeout(() => {
+      //   axios({
+      //     method: 'POST',
+      //     url : `https://api.themoviedb.org/3/authentication/session/new?api_key=${this.API_KEY}`,
+      //     data: {
+      //       request_token: this.token
+      //     }
+      //   }).then((res) => {
+      //     console.log(res)
+      //     this.session_id = res.data.session_id;
+      //     localStorage.setItem("name", this.id);
+      //     localStorage.setItem("session_id", this.session_id);
+      //     this.login_check = true;
+      //     this.login__layout = false;
+      //     document.querySelector(".__myInfo").innerText = localStorage.getItem('name');
+      //   }).catch((error) => {
+      //     console.log(error)
+      //   })
+      // },5000)
+    },
     loginCheck() {
       // 조건으로 로그인 인증 로직 구현
       this.login_check = true;
     },
     mobileBtn() {
       this.mobile__check = !this.mobile__check;
+    },
+    new_popular() {
+      this.mobile__check = false;
     },
     mobileMovieBtn() {
       this.mobile__movie__check = !this.mobile__movie__check;
@@ -87,17 +136,31 @@ export default {
         <input type="text" class="__searchText" ref="searchText" :class="{ searchData }" v-model="searchs" @keydown.enter="search()" @click="searchText()" />
         <div class="__search"><span @click="search()" class="material-symbols-outlined">search</span></div>
       </div>
-      <div v-if="login_check" class="__myInfo">Y</div>
+      <div v-if="login_check" class="__myInfo"></div>
       <div v-else class="__myInfo __login" @click="login()">로그인</div>
+      <div class="login" :class="{ login__layout }">
+        <div class="login__name">Sign In</div>
+        <div class="login__close"><span class="material-symbols-outlined" @click="login_close()">close</span></div>
+        <div class="login__text">
+          <input class="login__id" type="text" name="id" id="id" v-model="id" />
+          <input class="login__pw" type="password" name="pw" id="pw" v-model="pw" />
+        </div>
+        <div class="login__btn">
+          <button class="btn" @click="singIn()">Sign In</button>
+        </div>
+        <div class="login__btn">
+          <button class="btn" @click="signUp()">Sign Up</button>
+        </div>
+      </div>
       <!-- mobile -->
       <div class="mobileMenu"><span @click="mobileBtn()" class="material-symbols-outlined">menu</span></div>
       <div class="mobile__list" :class="{ mobile__check }">
-        <div class="mobile__close"><span @click="mobileBtn()" class="material-symbols-outlined">menu</span></div>
+        <!-- <div class="mobile__close"><span @click="mobileBtn()" class="material-symbols-outlined">menu</span></div> -->
         <div class="mobile__movie">
-          <RouterLink to="/new" class="big__mobile__movie">신규</RouterLink>
+          <RouterLink to="/new" class="big__mobile__movie" @click="new_popular()">신규</RouterLink>
         </div>
         <div class="mobile__movie">
-          <RouterLink to="/popular" class="big__mobile__tv">인기</RouterLink>
+          <RouterLink to="/popular" class="big__mobile__tv" @click="new_popular()">인기</RouterLink>
         </div>
       </div>
     </div>
@@ -179,6 +242,9 @@ export default {
         border-radius: 5px !important;
         width: 8vw !important;
       }
+      .login.login__layout {
+        width: 60vw !important;
+      }
     }
   }
 }
@@ -253,6 +319,110 @@ export default {
         height: 5vw !important;
         font-size: 3vw !important;
       }
+      .login {
+        position: relative;
+        animation: fadeOut 1s;
+        @keyframes fadeOut {
+          0% {
+            opacity: 1;
+            transform: translate(-50%, 20%);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, 100%);
+          }
+        }
+        display: none;
+      }
+      .login.login__layout {
+        display: block;
+        width: 100% !important;
+        height: 100vh !important;
+        position: absolute;
+        top: -307% !important;
+        left: 50% !important;
+        z-index: 1000;
+        transform: translate(-50%, 20%);
+        border-radius: 20px;
+        padding: 2rem;
+        animation: fadeInUp 1s;
+        background: #060d17;
+        box-shadow: 0 28px 48pxrgba(0, 0, 0, 0.4);
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            // translate(x, y)
+            transform: translate(-50%, 100%);
+
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, 20%);
+          }
+        }
+        .login__name {
+          font-size: 30px;
+          color: #fff;
+        }
+        .login__close {
+          position: absolute;
+          // right: 25px;
+          right: 20px;
+          top: 20px;
+          span {
+            width: 80px;
+            cursor: pointer;
+            font-size: 30px;
+            transition: .3s;
+            transform: rotate(0);
+            &:hover {
+              transition: .3s;
+              transform: rotate(180deg);
+            }
+          }
+        }
+        .login__text {
+          padding-top: 2rem;
+          .login__id,
+          .login__pw {
+            color: #fff;
+            width: 60vw !important;
+            height: 5vh;
+            outline: none;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            padding-left: 2rem;
+            background: #1c252f;
+          }
+          .login__pw {
+            margin-top: 1rem;
+          }
+        }
+        .login__btn {
+          padding-top: 2rem;
+          .btn {
+            width: 60vw !important;
+            height: 5vh;
+            outline: none;
+            border: none;
+            border-radius: 5px;
+            background: #fff;
+            color: #000;
+            font-size: 20px;
+            box-shadow: 3px 3px 3px black;
+            transition-duration: .3s;
+            &:active {
+              box-shadow: none;
+              margin-left: 1px;
+              margin-top: 1px;
+            }
+          }
+          &:last-child {
+            padding-top: 1rem;
+          }
+        }
+      }
       .mobileMenu {
         margin-right: 7vw !important;
         display: block !important;
@@ -267,9 +437,9 @@ export default {
         }
       }
       .mobile__list.mobile__check {
-        top: 0 !important;
+        top: 46px !important;
         transition: .3s !important;
-        width: 300px !important;
+        width: 100% !important;
         background: #060d17;
         height: 100vh;
         z-index: 300;
@@ -425,6 +595,111 @@ a {
         transition: .2s;
       }
     }
+    .login {
+      position: relative;
+      animation: fadeOut 1s;
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+          transform: translate(-50%, 20%);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, 100%);
+        }
+      }
+      display: none;
+    }
+    .login.login__layout {
+      display: block;
+      width: 35vw;
+      height: 50vh;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: 1000;
+      transform: translate(-50%, 20%);
+      border-radius: 20px;
+      padding: 2rem;
+      animation: fadeInUp 1s;
+      background: #060d17;
+      box-shadow: 0 28px 48pxrgba(0, 0, 0, 0.4);
+      @keyframes fadeInUp {
+        0% {
+          opacity: 0;
+          // translate(x, y)
+          transform: translate(-50%, 100%);
+
+        }
+        100% {
+          opacity: 1;
+          transform: translate(-50%, 20%);
+        }
+      }
+      .login__name {
+        font-size: 30px;
+        color: #fff;
+      }
+      .login__close {
+        position: absolute;
+        // right: 25px;
+        right: 20px;
+        top: 20px;
+        span {
+          width: 80px;
+          cursor: pointer;
+          font-size: 30px;
+          transition: .3s;
+          transform: rotate(0);
+          &:hover {
+            transition: .3s;
+            transform: rotate(180deg);
+          }
+        }
+      }
+      .login__text {
+        padding-top: 2rem;
+        .login__id,
+        .login__pw {
+          color: #fff;
+          width: 28vw;
+          height: 5vh;
+          outline: none;
+          border: none;
+          border-radius: 5px;
+          font-size: 16px;
+          padding-left: 2rem;
+          background: #1c252f;
+        }
+        .login__pw {
+          margin-top: 1rem;
+        }
+      }
+      .login__btn {
+        padding-top: 2rem;
+        .btn {
+          width: 28vw;
+          height: 5vh;
+          outline: none;
+          border: none;
+          border-radius: 5px;
+          background: #fff;
+          color: #000;
+          font-size: 20px;
+          box-shadow: 3px 3px 3px black;
+          transition-duration: .3s;
+          &:active {
+            box-shadow: none;
+            margin-left: 1px;
+            margin-top: 1px;
+          }
+        }
+        &:last-child {
+          padding-top: 1rem;
+        }
+      }
+    }
+
     .mobileMenu {
       display: none;
       margin-right: 6vw;
@@ -433,7 +708,7 @@ a {
     }
     .mobile__list {
       position: absolute;
-      top: 0;
+      top: 46px;
       right: 0;
       width: 0;
       opacity: 0;

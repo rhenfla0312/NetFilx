@@ -279,7 +279,7 @@ export default {
         this.POPULAR_DATA = res.data.results;
         setTimeout(() => {
           this.skeleton = false;
-        },1000)
+        },100)
       }).catch((error) => {
         console.log(error)
       }) 
@@ -294,16 +294,16 @@ export default {
         if (entry.isIntersecting) { // 감지대상이 교차영역에 진입 할 경우
           // axios
           if(this.CHECK_DATA == "movie") {
-            this.skeleton = true;
+            // this.skeleton = true;
             if(this.genres_start) {
               axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${this.API_KEY}&language=ko&with_genres=${this.genres_url}&page=${this.movie_page}`).
               then(res => {
                 console.log(res);
                 this.POPULAR_DATA = this.POPULAR_DATA.concat(res.data.results);
                 this.genres_start = false;
-                setTimeout(() => {
-                  this.skeleton = false;
-                },1000)
+                // setTimeout(() => {
+                //   this.skeleton = false;
+                // },1000)
               }).catch(e => {
                 console.log(e)
               })
@@ -311,23 +311,23 @@ export default {
               axios.get(`${this.POPULAR_MOVIE_URL}?api_key=${this.API_KEY}&language=ko&page=${this.movie_page}`)
               .then((res) => {
                 this.POPULAR_DATA = this.POPULAR_DATA.concat(res.data.results)
-                setTimeout(() => {
-                  this.skeleton = false;
-                },1000)
+                // setTimeout(() => {
+                //   this.skeleton = false;
+                // },1000)
               }).catch((error) => {
                 console.log(error)
               })
             }
             this.movie_page++;
           } else {
-            this.skeleton = false;
+            // this.skeleton = false;
             if(this.genres_start) {
               axios.get(`https://api.themoviedb.org/3/discover/tv?api_key=${this.API_KEY}&language=ko&with_genres=${this.genres_url}&page=${this.tv_page}`).
                 then(res => {
                   console.log(res);
                   this.POPULAR_DATA = this.POPULAR_DATA.concat(res.data.results);
                   setTimeout(() => {
-                    this.skeleton = false;
+                    // this.skeleton = false;
                     this.genres_start = false;
                   },1000)
                 }).catch(e => {
@@ -337,9 +337,9 @@ export default {
               axios.get(`${this.POPULAR_TV_URL}?api_key=${this.API_KEY}&language=ko&page=${this.tv_page}`)
               .then((res) => {
                 this.POPULAR_DATA = this.POPULAR_DATA.concat(res.data.results)
-                setTimeout(() => {
-                  this.skeleton = false;
-                },1000)
+                // setTimeout(() => {
+                //   this.skeleton = false;
+                // },1000)
               }).catch((error) => {
                 console.log(error);
               })
@@ -853,12 +853,12 @@ export default {
           justify-items: center;
           .__item {
             .__skeleton {
-              width: 32vw !important;
-              height: 30vh !important;
+              width: 30vw !important;
+              height: 25vh !important;
             }
             img {
-              width: 32vw !important;
-              height: 30vh !important;
+              width: 30vw !important;
+              height: 25vh !important;
               border-radius: 10px;
               transition: .2s;
               &:hover {
