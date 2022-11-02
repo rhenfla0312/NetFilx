@@ -1,4 +1,5 @@
 <script>
+import { createAssignmentExpression } from '@vue/compiler-core';
 import axios from 'axios';
 export default {
   data() {
@@ -18,7 +19,7 @@ export default {
       mobile__movie__check : false,
       mobile__tv__check : false,
 
-      login_check : false,
+      login_check : localStorage.getItem('session') === null && localStorage.getItem('guest_session') === null ? false : true,
       login__layout: false,
       singin__text: false,
 
@@ -38,6 +39,7 @@ export default {
     },
     login() {
       this.login__layout = true;
+      this.mobile__check = false;
     },
     login_close() {
       this.login__layout = false;
@@ -66,7 +68,11 @@ export default {
       .then(async (res) => {
         console.log(res)
         this.guest_session = res.data.guest_session_id;
-        // await axios.get(`https://api.themoviedb.org/3/account?api_key=${this.API_KEY}&session_id=${this.guest_session}`)
+        localStorage.setItem('guest_session', this.guest_session)
+        this.login_check = true;
+        this.login__layout = false;
+        // guest_session_info
+        // await axios.get(`https://api.themoviedb.org/3/guest_session/${this.guest_session}/rated/movies?api_key=${this.API_KEY}&language=en-US&sort_by=created_at.asc`)
         // .then((res) => {
         //   console.log(res)
         // }).catch((e) => {
@@ -102,7 +108,9 @@ export default {
           }).then(async (res) => {
             console.log(res);
             this.request_token = res.data.request_token;
-            alert("로그인 되었습니다")
+            // localstorage save
+            localStorage.setItem('session', this.request_token)
+            // alert("로그인 되었습니다")
             this.login_check = true;
             this.login__layout = false;
           }).catch((error) => {
@@ -127,6 +135,7 @@ export default {
     },
     mobileBtn() {
       this.mobile__check = !this.mobile__check;
+      this.login__layout = false;
     },
     new_popular() {
       this.mobile__check = false;
@@ -138,17 +147,8 @@ export default {
       this.mobile__tv__check = !this.mobile__tv__check;
     }
   },
-  watch: {
-    login_check(e) {
-      console.log(e)
-      if(e == true) {
-        this.login_check = true;
-      } else {
-        this.login_check = false;
-      }
-    }
-  },
   updated() {
+    // 해당 요소 밖으로 클릭시 item false
     // window.addEventListener('click', (e) => {
     //   if(this.$refs.searchText) {
     //     // console.log('window-hover')
@@ -160,6 +160,11 @@ export default {
     //     console.log(searchData);
     //   }
     // })
+    },
+  mounted() {
+    // test
+    // localStorage.removeItem('session')
+    // localStorage.removeItem('guest_session')
   }
 }
 </script>
@@ -180,7 +185,7 @@ export default {
         <div class="login__name">Sign In</div>
         <div class="login__close"><span class="material-symbols-outlined" @click="login_close()">close</span></div>
         <div class="login__btn">
-          <button class="btn" @click="guest_singIn()">Guest In</button>
+          <button class="btn" @click="guest_singIn()">Guest Sign In</button>
         </div>
         <div class="login__text" :class="{ singin__text }">
           <input class="login__id" type="text" name="id" id="id" v-model="id" />
@@ -194,7 +199,11 @@ export default {
         </div>
       </div>
       <!-- mobile -->
-      <div class="mobileMyinfo" :class="{ mobile__check }"><span class="material-symbols-outlined"  @click="login()">account_circle</span></div>
+      <!-- useinfo -->
+      <div class="mobileMyinfo" v-if="mobile__check"><span class="material-symbols-outlined">account_circle</span></div>
+      
+      <div class="mobileMyinfo" v-else :class="{ mobile__check }"><span class="material-symbols-outlined" @click="login()">account_circle</span></div>
+      <!-- menu -->
       <div class="mobileMenu"><span @click="mobileBtn()" class="material-symbols-outlined">menu</span></div>
       <div class="mobile__list" :class="{ mobile__check }">
         <!-- <div class="mobile__close"><span @click="mobileBtn()" class="material-symbols-outlined">menu</span></div> -->
