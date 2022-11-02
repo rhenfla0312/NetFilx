@@ -394,6 +394,7 @@ export default {
         <swiper-slide v-for="movie in new_movies" :key="movie">
           <div v-if="skeleton_new" class="skeleton__poster"></div>
           <img v-else class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="new_movieInfo(movie.id, movie.backdrop_path)">
+          <!-- <span class="material-symbols-outlined bookmark">bookmark</span> -->
         </swiper-slide>
         <swiper-slide class="mv__next">
           <RouterLink to="/new"><span class="material-symbols-outlined">arrow_circle_right</span></RouterLink>
@@ -431,6 +432,7 @@ export default {
         <swiper-slide v-for="movie in popular_moviles" :key="movie">
           <div v-if="skeleton_popular" class="skeleton__poster"></div>
           <img v-else class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`"  @click="popular_movieInfo(movie.id, movie.backdrop_path)" />
+          <!-- <span class="material-symbols-outlined bookmark">bookmark</span> -->
         </swiper-slide>
         <swiper-slide class="mv__next">
           <RouterLink to="/popular"><span class="material-symbols-outlined">arrow_circle_right</span></RouterLink>
@@ -491,6 +493,7 @@ export default {
         <swiper-slide v-for="movie in trand_movies" :key="movie">
           <div v-if="skeleton_trand" class="skeleton__poster"></div>
           <img v-else class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="trand_movieInfo(movie.id, movie.backdrop_path)" />
+          <!-- <span class="material-symbols-outlined bookmark">bookmark</span> -->
         </swiper-slide>
         <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
       </swiper>
@@ -1374,10 +1377,21 @@ export default {
             // transition : ease - 자연스러운 변화
             transition: all 0.3s ease;
             &:hover {
-              transform: scale(1.2);
+              transform: scale(1.1);
               transition: all 0.3s ease;
               z-index: 100;
               cursor: pointer;
+            }
+          }
+          .bookmark {
+            position: absolute;
+            top: -5px;
+            left: 20px;
+            font-size: 35px;
+            color: yellow;
+            cursor: pointer;
+            &:hover {
+              opacity: .8;
             }
           }
           .skeleton__poster {

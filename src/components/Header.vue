@@ -20,11 +20,14 @@ export default {
 
       login_check : false,
       login__layout: false,
+      singin__text: false,
 
       id: "",
       pw: "",
       token: "",
-      session_id : "",
+      request_token: "",
+
+      guest_session : "",
 
       CHECK_DATA : ""
     }
@@ -38,6 +41,7 @@ export default {
     },
     login_close() {
       this.login__layout = false;
+      this.singin__text = false;
     },
     async search() {
       // 총 페이지 개수마 넘겨주는 용도
@@ -56,42 +60,66 @@ export default {
         }
       })
     },
-    singIn() {
-      alert("준비중 ㄱㄷ")
-    }, 
-    signUp() {
-      alert("준비중 ㄱㄷ")
-      // await axios.get(`https://api.themoviedb.org/3/authentication/token/new?api_key=${this.API_KEY}`)
-      // .then(async (res) => {
-      //   console.log(res);
-      //   this.token = res.data.request_token;
+    async guest_singIn() {
+      // 게스트 세션 -> 일회용
+      await axios.get(`https://api.themoviedb.org/3/authentication/guest_session/new?api_key=${this.API_KEY}`)
+      .then(async (res) => {
+        console.log(res)
+        this.guest_session = res.data.guest_session_id;
+        // await axios.get(`https://api.themoviedb.org/3/account?api_key=${this.API_KEY}&session_id=${this.guest_session}`)
+        // .then((res) => {
+        //   console.log(res)
+        // }).catch((e) => {
+        //   console.log(e)
+        // })
+      }).catch((e) => {
+        console.log(e)
+      })
+    },
+    async singIn() {
+      this.singin__text = true;
+      // 실제 TMDB의 회원가입 된 정보로 로그인 -> 그 정보로 세션ID발급 -> 세션ID로 활동
+      // 토큰발급
+      if(this.singin__text == true) {
+        // 유효성 검사 시작
 
-        
-      // }).catch((error) => {
-      //   console.log(error)
-      // })
-
-      // window.open(`https://www.themoviedb.org/authenticate/${this.token}`)
+        if(this.id.length > 0) {
+          await axios.get(`https://api.themoviedb.org/3/authentication/token/new?api_key=${this.API_KEY}`)
+          .then((res) => {
+            this.token = res.data.request_token;
+          }).catch((e) => {
+            console.log(e)
+          })
     
-      // setTimeout(() => {
-      //   axios({
-      //     method: 'POST',
-      //     url : `https://api.themoviedb.org/3/authentication/session/new?api_key=${this.API_KEY}`,
-      //     data: {
-      //       request_token: this.token
-      //     }
-      //   }).then((res) => {
-      //     console.log(res)
-      //     this.session_id = res.data.session_id;
-      //     localStorage.setItem("name", this.id);
-      //     localStorage.setItem("session_id", this.session_id);
-      //     this.login_check = true;
-      //     this.login__layout = false;
-      //     document.querySelector(".__myInfo").innerText = localStorage.getItem('name');
-      //   }).catch((error) => {
-      //     console.log(error)
-      //   })
-      // },5000)
+          await axios({
+            url: `https://api.themoviedb.org/3/authentication/token/validate_with_login?api_key=${this.API_KEY}`,
+            method: "POST",
+            data: {
+              username: this.id,
+              password: this.pw,
+              request_token: this.token
+            }
+          }).then(async (res) => {
+            console.log(res);
+            this.request_token = res.data.request_token;
+            alert("로그인 되었습니다")
+            this.login_check = true;
+            this.login__layout = false;
+          }).catch((error) => {
+            console.log(error)
+          })
+        }
+      }
+    }, 
+    async signUp() {
+      // 생성한 토큰으로 -> tmdb 페이지에서 회원가입 및 승인
+      await axios.get(`https://api.themoviedb.org/3/authentication/token/new?api_key=${this.API_KEY}`)
+      .then((res) => {
+        // TMDB페이지에 로그인이 되어있다면 승인만, 안되어있다면 로그인 및 회원가입
+        window.open(`https://www.themoviedb.org/authenticate/${res.data.request_token}?redirect_to=http://www.yourapp.com/approved`)
+      }).catch((e) => {
+        console.log(e)
+      })
     },
     loginCheck() {
       // 조건으로 로그인 인증 로직 구현
@@ -108,6 +136,16 @@ export default {
     },
     mobileTvBtn() {
       this.mobile__tv__check = !this.mobile__tv__check;
+    }
+  },
+  watch: {
+    login_check(e) {
+      console.log(e)
+      if(e == true) {
+        this.login_check = true;
+      } else {
+        this.login_check = false;
+      }
     }
   },
   updated() {
@@ -136,12 +174,15 @@ export default {
         <input type="text" class="__searchText" ref="searchText" :class="{ searchData }" v-model="searchs" @keydown.enter="search()" @click="searchText()" />
         <div class="__search"><span @click="search()" class="material-symbols-outlined">search</span></div>
       </div>
-      <div v-if="login_check" class="__myInfo"></div>
+      <div v-if="login_check" class="__myInfo"><span class="material-symbols-outlined"></span></div>
       <div v-else class="__myInfo __login" @click="login()">로그인</div>
       <div class="login" :class="{ login__layout }">
         <div class="login__name">Sign In</div>
         <div class="login__close"><span class="material-symbols-outlined" @click="login_close()">close</span></div>
-        <div class="login__text">
+        <div class="login__btn">
+          <button class="btn" @click="guest_singIn()">Guest In</button>
+        </div>
+        <div class="login__text" :class="{ singin__text }">
           <input class="login__id" type="text" name="id" id="id" v-model="id" />
           <input class="login__pw" type="password" name="pw" id="pw" v-model="pw" />
         </div>
@@ -153,6 +194,7 @@ export default {
         </div>
       </div>
       <!-- mobile -->
+      <div class="mobileMyinfo" :class="{ mobile__check }"><span class="material-symbols-outlined"  @click="login()">account_circle</span></div>
       <div class="mobileMenu"><span @click="mobileBtn()" class="material-symbols-outlined">menu</span></div>
       <div class="mobile__list" :class="{ mobile__check }">
         <!-- <div class="mobile__close"><span @click="mobileBtn()" class="material-symbols-outlined">menu</span></div> -->
@@ -400,7 +442,7 @@ export default {
           }
         }
         .login__btn {
-          padding-top: 2rem;
+          padding-top: 1rem;
           .btn {
             width: 60vw !important;
             height: 5vh;
@@ -427,7 +469,7 @@ export default {
         margin-right: 7vw !important;
         display: block !important;
         span {
-          font-size: 6vw !important;
+          font-size: 35px !important;
           transform: rotate(0);
           transition: .3s;
           &:hover {
@@ -444,6 +486,21 @@ export default {
         height: 100vh;
         z-index: 300;
         opacity: 1 !important;
+      }
+      .mobileMyinfo {
+        display: block !important;
+        margin-right: 3vw !important;
+        // margin-top: 6px !important;
+        line-height: 1;
+        span {
+          cursor: pointer;
+          font-size: 33px;
+        }
+        &:hover {
+          border-radius: 50%;
+          // background: #eee;
+          opacity: .5;
+        }
       }
       .mobile__close {
         span {
@@ -613,7 +670,7 @@ a {
     .login.login__layout {
       display: block;
       width: 35vw;
-      height: 50vh;
+      // height: 50vh;
       position: absolute;
       top: 50%;
       left: 50%;
@@ -658,7 +715,10 @@ a {
         }
       }
       .login__text {
-        padding-top: 2rem;
+        height: 0;
+        opacity: 0;
+        padding-top: 0;
+        transition: .4s;
         .login__id,
         .login__pw {
           color: #fff;
@@ -675,8 +735,16 @@ a {
           margin-top: 1rem;
         }
       }
+      .login__text.singin__text {
+        transition: .4s;
+        padding-top: 1rem;
+        height: auto;
+        opacity: 1;
+      }
       .login__btn {
-        padding-top: 2rem;
+        padding-top: 1rem;
+        position: relative;
+        z-index: 100;
         .btn {
           width: 28vw;
           height: 5vh;
@@ -705,6 +773,9 @@ a {
       margin-right: 6vw;
       cursor: pointer;
       font-size: 1vw;
+    }
+    .mobileMyinfo {
+      display: none;
     }
     .mobile__list {
       position: absolute;

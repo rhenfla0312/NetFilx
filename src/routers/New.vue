@@ -346,7 +346,7 @@ export default {
           justify-items: center;
           .__item {
             img {
-              width: 30vw;
+              width: 28vw;
               height: 25vh;
               border-radius: 10px;
               transition: .2s;
@@ -357,7 +357,7 @@ export default {
               }
             }
             .__skeleton {
-              width: 30vw !important;
+              width: 28vw !important;
               height: 25vh !important;
             }
           }

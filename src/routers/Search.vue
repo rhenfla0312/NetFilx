@@ -48,11 +48,12 @@ export default {
     async "$route.params.title"(value) {
       await axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${value}`)
       .then((res) => {
-        console.log(res)
+        this.SEARCH_TITLE = value
         this.SEARCH_FILE = res.data.results;
         this.CHECK_DATA = res.data.results[0].media_type;
       }).catch((error) => {
         console.log(error)
+        this.SEARCH_TITLE = "";
       })
     }
   },
@@ -103,12 +104,13 @@ export default {
 <template>
   <div class="search">
     <div class="search__list">
-      <div class="search__item">
+      <div class="search__item" v-if="this.SEARCH_TITLE !== ''">
         <div class="__item" v-for="item in SEARCH_FILE" :key="item" @click="detail(item.id)">
           <div v-if="skeleton" class="__skeleton"></div>
           <img v-else :src="`${SEARCHR_IMG}/${item.poster_path}`" />
         </div>
       </div>
+      <div class="no__item" v-else>검색된 결과가 없습니다</div>
     </div>
     <div class="search__item__plus"></div>
   </div>
@@ -188,6 +190,17 @@ export default {
             }
           }
         }
+      }
+      .no__item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 35px;
+        color: #fff;
+        // text-align: center;
+        border: 1px solid #fff;
+        border-radius: 10px;
+        height: 20vh;
       }
     }
   }
@@ -286,11 +299,11 @@ export default {
           justify-items: center;
           .__item {
             .__skeleton {
-              width: 30vw !important;
+              width: 28vw !important;
               height: 25vh !important;
             }
             img {
-              width: 30vw !important;
+              width: 28vw !important;
               height: 25vh !important;
               border-radius: 10px;
               transition: .2s;
