@@ -405,8 +405,8 @@ export default {
         <div class="detail__info">
           <!-- <img :src="(displaySize > 768) ? `${this.MOVIE_IMG}/${movie_info_new_data.poster_path}` : `${this.MOVIE_IMG}/${movie_info_new_data.backdrop_path}`" alt="" class="detail__poster" /> -->
           <div class="detail__box" v-if="displaySize > 768">
-            <img :src="`${MOVIE_IMG}/${movie_info_new_data.poster_path}`" class="detail__poster" />
-            <div class="detail__btn" @click="detail(movie_info_new_data.id)">상세보기</div>
+            <img :src="`${MOVIE_IMG}/${movie_info_new_data.poster_path}`" class="detail__poster" @click="detail(movie_info_new_data.id)" />
+            <!-- <div class="detail__btn" @click="detail(movie_info_new_data.id)">상세보기</div> -->
           </div>
           <div class="detail__text">
             <div class="__header">
@@ -414,8 +414,8 @@ export default {
               <div class="__close"><span class="material-symbols-outlined" @click="new_movieInfo_close()">close</span></div>
             </div>
             <div class="detail__box" v-if="displaySize < 768">
-              <img :src="`${MOVIE_IMG}/${movie_info_new_data.backdrop_path}`" class="detail__poster" />
-              <div class="detail__btn" @click="detail(movie_info_new_data.id)">상세보기</div>
+              <img :src="`${MOVIE_IMG}/${movie_info_new_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_new_data.id)" />
+              <!-- <div class="detail__btn" @click="detail(movie_info_new_data.id)">상세보기</div> -->
             </div>
             <div class="__des">{{ movie_info_new_data.overview !== "" ? movie_info_new_data.overview : "상세설명이 없습니다" }}</div>
             <div class="detail__video">
@@ -442,8 +442,8 @@ export default {
       <div class="mv__detail__info" :class="{ movie_info_popular }" ref="detail_popular_bg">
         <div class="detail__info">
           <div class="detail__box" v-if="displaySize > 768">
-            <img :src="`${MOVIE_IMG}/${movie_info_popular_data.poster_path}`" class="detail__poster" />
-            <div class="detail__btn" @click="detail(movie_info_popular_data.id)">상세보기</div>
+            <img :src="`${MOVIE_IMG}/${movie_info_popular_data.poster_path}`" class="detail__poster" @click="detail(movie_info_popular_data.id)" />
+            <!-- <div class="detail__btn" @click="detail(movie_info_popular_data.id)">상세보기</div> -->
           </div>
           <div class="detail__text">
             <div class="__header">
@@ -451,8 +451,8 @@ export default {
               <div class="__close"><span class="material-symbols-outlined" @click="popular_movieInfo_close()">close</span></div>
             </div>
             <div class="detail__box" v-if="displaySize < 768">
-              <img :src="`${MOVIE_IMG}/${movie_info_popular_data.backdrop_path}`" class="detail__poster" />
-              <div class="detail__btn" @click="detail(movie_info_popular_data.id)">상세보기</div>
+              <img :src="`${MOVIE_IMG}/${movie_info_popular_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_popular_data.id)" />
+              <!-- <div class="detail__btn" @click="detail(movie_info_popular_data.id)">상세보기</div> -->
             </div>
             <div class="__des">{{ movie_info_popular_data.overview !== "" ? movie_info_popular_data.overview : "상세설명이 없습니다" }}</div>
             <div class="detail__video">
@@ -501,8 +501,8 @@ export default {
       <div class="mv__detail__info" :class="{ movie_info_trand }"  ref="detail_trand_bg">
         <div class="detail__info">
           <div class="detail__box" v-if="displaySize > 768">
-            <img :src="`${MOVIE_IMG}/${movie_info_trand_data.poster_path}`" class="detail__poster" />
-            <div class="detail__btn" @click="detail(movie_info_trand_data.id)">상세보기</div>
+            <img :src="`${MOVIE_IMG}/${movie_info_trand_data.poster_path}`" class="detail__poster" @click="detail(movie_info_trand_data.id)" />
+            <!-- <div class="detail__btn" @click="detail(movie_info_trand_data.id)">상세보기</div> -->
           </div>
           <div class="detail__text">
             <div class="__header">
@@ -510,8 +510,8 @@ export default {
               <div class="__close"><span class="material-symbols-outlined" @click="trand_movieInfo_close()">close</span></div>
             </div>
             <div class="detail__box" v-if="displaySize < 768">
-              <img :src="`${MOVIE_IMG}/${movie_info_trand_data.backdrop_path}`" class="detail__poster" />
-              <div class="detail__btn" @click="detail(movie_info_trand_data.id)">상세보기</div>
+              <img :src="`${MOVIE_IMG}/${movie_info_trand_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_trand_data.id)" />
+              <!-- <div class="detail__btn" @click="detail(movie_info_trand_data.id)">상세보기</div> -->
             </div>
             <div class="__des">{{ movie_info_trand_data.overview !== "" ? movie_info_trand_data.overview : "상세설명이 없습니다" }}</div>
             <div class="detail__video">
@@ -1516,6 +1516,33 @@ export default {
             display: flex;
             .detail__box {
               position: relative;
+              transition: .2s;
+              &:hover::before {
+                content: ">>";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 100px;
+                font-weight: bold;
+                color: #fff;
+                animation: slice 1s infinite;
+                @keyframes slice {
+                  0% {
+                    opacity: .8;
+                  }
+                  100% {
+                    opacity: 1;
+                  }
+                }
+              }
+              &:hover {
+                // scale() -> 1은 기본이다 1.1부터 변한다
+                cursor: pointer;
+                transform: scale(1.01);
+                transition: .2s;
+                opacity: .8;
+              }
               .detail__poster {
                 width: 25vw;
                 height: 100%;
@@ -1570,6 +1597,33 @@ export default {
               }
               .detail__box {
                 position: relative;
+                transition: .2s;
+                &:hover::before {
+                  content: ">>";
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  font-size: 100px;
+                  font-weight: bold;
+                  color: #fff;
+                  animation: slice 1s infinite;
+                  @keyframes slice {
+                    0% {
+                      opacity: .8;
+                    }
+                    100% {
+                      opacity: 1;
+                    }
+                  }
+                }
+                &:hover {
+                  // scale() -> 1은 기본이다 1.1부터 변한다
+                  cursor: pointer;
+                  transform: scale(1.01);
+                  transition: .2s;
+                  opacity: .8;
+                }
                 .detail__poster {
                   width: 25vw;
                   height: 100%;
@@ -1647,6 +1701,33 @@ export default {
             display: flex;
             .detail__box {
               position: relative;
+              transition: .2s;
+              &:hover::before {
+                content: ">>";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 100px;
+                font-weight: bold;
+                color: #fff;
+                animation: slice 1s infinite;
+                @keyframes slice {
+                  0% {
+                    opacity: .8;
+                  }
+                  100% {
+                    opacity: 1;
+                  }
+                }
+              }
+              &:hover {
+                // scale() -> 1은 기본이다 1.1부터 변한다
+                cursor: pointer;
+                transform: scale(1.01);
+                transition: .2s;
+                opacity: .8;
+              }
               .detail__poster {
                 width: 25vw;
                 height: 100%;
@@ -1701,6 +1782,33 @@ export default {
               }
               .detail__box {
                 position: relative;
+                transition: .2s;
+                &:hover::before {
+                  content: ">>";
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  font-size: 100px;
+                  font-weight: bold;
+                  color: #fff;
+                  animation: slice 1s infinite;
+                  @keyframes slice {
+                    0% {
+                      opacity: .8;
+                    }
+                    100% {
+                      opacity: 1;
+                    }
+                  }
+                }
+                &:hover {
+                  // scale() -> 1은 기본이다 1.1부터 변한다
+                  cursor: pointer;
+                  transform: scale(1.01);
+                  transition: .2s;
+                  opacity: .8;
+                }
                 .detail__poster {
                   width: 25vw;
                   height: 100%;
@@ -1833,6 +1941,33 @@ export default {
             display: flex;
             .detail__box {
               position: relative;
+              transition: .2s;
+              &:hover::before {
+                content: ">>";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 100px;
+                font-weight: bold;
+                color: #fff;
+                animation: slice 1s infinite;
+                @keyframes slice {
+                  0% {
+                    opacity: .8;
+                  }
+                  100% {
+                    opacity: 1;
+                  }
+                }
+              }
+              &:hover {
+                // scale() -> 1은 기본이다 1.1부터 변한다
+                cursor: pointer;
+                transform: scale(1.01);
+                transition: .2s;
+                opacity: .8;
+              }
               .detail__poster {
                 width: 25vw;
                 height: 100%;
@@ -1888,6 +2023,33 @@ export default {
               }
               .detail__box {
                 position: relative;
+                transition: .2s;
+                &:hover::before {
+                  content: ">>";
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  font-size: 100px;
+                  font-weight: bold;
+                  color: #fff;
+                  animation: slice 1s infinite;
+                  @keyframes slice {
+                    0% {
+                      opacity: .8;
+                    }
+                    100% {
+                      opacity: 1;
+                    }
+                  }
+                }
+                &:hover {
+                  // scale() -> 1은 기본이다 1.1부터 변한다
+                  cursor: pointer;
+                  transform: scale(1.01);
+                  transition: .2s;
+                  opacity: .8;
+                }
                 .detail__poster {
                   width: 25vw;
                   height: 100%;

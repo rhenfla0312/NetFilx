@@ -1,5 +1,4 @@
 <script>
-import { createAssignmentExpression } from '@vue/compiler-core';
 import axios from 'axios';
 export default {
   data() {
@@ -19,16 +18,17 @@ export default {
       mobile__movie__check : false,
       mobile__tv__check : false,
 
-      login_check : localStorage.getItem('session') === null && localStorage.getItem('guest_session') === null ? false : true,
+      login_check : localStorage.getItem('session_id') === null && localStorage.getItem('guest_session_id') === null ? false : true,
       login__layout: false,
       singin__text: false,
+      open__item: false,
 
       id: "",
       pw: "",
       token: "",
       request_token: "",
 
-      guest_session : "",
+      guest_session_id : "",
 
       CHECK_DATA : ""
     }
@@ -44,6 +44,16 @@ export default {
     login_close() {
       this.login__layout = false;
       this.singin__text = false;
+    },
+    openItem() {
+      this.open__item = !this.open__item;
+      this.mobile__check = false;
+    },
+    logOut() {
+      localStorage.removeItem('session_id');
+      localStorage.removeItem('guest_session_id');
+      this.open__item = false;
+      this.$router.go();
     },
     async search() {
       // 총 페이지 개수마 넘겨주는 용도
@@ -66,9 +76,9 @@ export default {
       // 게스트 세션 -> 일회용
       await axios.get(`https://api.themoviedb.org/3/authentication/guest_session/new?api_key=${this.API_KEY}`)
       .then(async (res) => {
-        console.log(res)
-        this.guest_session = res.data.guest_session_id;
-        localStorage.setItem('guest_session', this.guest_session)
+        // console.log(res)
+        this.guest_session_id = res.data.guest_session_id;
+        localStorage.setItem('guest_session_id', this.guest_session_id)
         this.login_check = true;
         this.login__layout = false;
         // guest_session_info
@@ -93,10 +103,11 @@ export default {
           await axios.get(`https://api.themoviedb.org/3/authentication/token/new?api_key=${this.API_KEY}`)
           .then((res) => {
             this.token = res.data.request_token;
+            // window.open(`https://www.themoviedb.org/authenticate/${res.data.request_token}?redirect_to=http://www.yourapp.com/approved`)
           }).catch((e) => {
             console.log(e)
           })
-    
+          
           await axios({
             url: `https://api.themoviedb.org/3/authentication/token/validate_with_login?api_key=${this.API_KEY}`,
             method: "POST",
@@ -109,13 +120,23 @@ export default {
             console.log(res);
             this.request_token = res.data.request_token;
             // localstorage save
-            localStorage.setItem('session', this.request_token)
+            localStorage.setItem('session_id', this.request_token)
             // alert("로그인 되었습니다")
             this.login_check = true;
             this.login__layout = false;
           }).catch((error) => {
             console.log(error)
           })
+
+          // setTimeout(() => {
+          //   axios.get(`https://api.themoviedb.org/3/account?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`)
+          //   .then((res) => {
+          //     console.log('성공')
+          //     console.log(res)
+          //   }).catch((e) => {
+          //     console.log(e)
+          //   })
+          // },5000)
         }
       }
     }, 
@@ -136,6 +157,7 @@ export default {
     mobileBtn() {
       this.mobile__check = !this.mobile__check;
       this.login__layout = false;
+      this.open__item = false;
     },
     new_popular() {
       this.mobile__check = false;
@@ -160,11 +182,17 @@ export default {
     //     console.log(searchData);
     //   }
     // })
-    },
+  },
   mounted() {
-    // test
-    // localStorage.removeItem('session')
-    // localStorage.removeItem('guest_session')
+    // 계정 세부정보
+    // setTimeout(() => {
+    //   axios.get(`https://api.themoviedb.org/3/account?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`)
+    //   .then((res) => {
+    //     console.log(res)
+    //   }).catch((e) => {
+    //     console.log(e)
+    //   })
+    // },5000)
   }
 }
 </script>
@@ -179,8 +207,16 @@ export default {
         <input type="text" class="__searchText" ref="searchText" :class="{ searchData }" v-model="searchs" @keydown.enter="search()" @click="searchText()" />
         <div class="__search"><span @click="search()" class="material-symbols-outlined">search</span></div>
       </div>
-      <div v-if="login_check" class="__myInfo"><span class="material-symbols-outlined"></span></div>
+      <div class="__myInfo __users" v-if="login_check"><span class="material-symbols-outlined" @click="openItem()">account_circle</span></div>
       <div v-else class="__myInfo __login" @click="login()">로그인</div>
+      
+      <!-- myinfo__item -->
+      <div class="__myInfoItem" :class="{ open__item }">
+        <div class="__saveMovie">북마크(Movie)</div>
+        <div class="__saveTv">북마크(TV)</div>
+        <div class="__logOut" @click="logOut()">로그아웃</div>
+      </div>
+      <!-- login__item -->
       <div class="login" :class="{ login__layout }">
         <div class="login__name">Sign In</div>
         <div class="login__close"><span class="material-symbols-outlined" @click="login_close()">close</span></div>
@@ -200,7 +236,7 @@ export default {
       </div>
       <!-- mobile -->
       <!-- useinfo -->
-      <div class="mobileMyinfo" v-if="mobile__check"><span class="material-symbols-outlined">account_circle</span></div>
+      <div class="mobileMyinfo" v-if="login_check"><span class="material-symbols-outlined" @click="openItem()">account_circle</span></div>
       
       <div class="mobileMyinfo" v-else :class="{ mobile__check }"><span class="material-symbols-outlined" @click="login()">account_circle</span></div>
       <!-- menu -->
@@ -297,6 +333,42 @@ export default {
         width: 60vw !important;
       }
     }
+    .__myInfoItem.open__item {
+      display: block;
+      position: absolute;
+      top: 4rem !important;
+      // left: -6rem;
+      // left: 0;
+      right: 4rem !important;
+      min-width: 13rem;
+      font-size: 20px;
+      border-radius: 10px;
+      text-align: start;
+      background: #10161d;
+      animation: fadeInUps 1s;
+      @keyframes fadeInUps {
+        0% {
+          opacity: 0;
+          transform: translateY(100%);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0%);
+        }
+      }
+      div {
+        padding: 1rem;
+        cursor: pointer;
+        border-radius: 10px;
+        &:last-child {
+          margin-top: 2rem;
+        }
+        &:hover {
+          background: #797a7b;
+
+        }
+      }
+    }
   }
 }
 
@@ -370,6 +442,47 @@ export default {
         height: 5vw !important;
         font-size: 3vw !important;
       }
+      .__myInfoItem.open__item {
+        display: block;
+        width: 100% !important;
+        height: 100vh !important;
+        position: absolute;
+        left: 0 !important;
+        top: 102% !important;
+        border-radius: 0 !important;
+        // bottom: -10% !important;
+        // right: -115px !important;
+        z-index: 1000;
+        // border-radius: 20px;
+        // padding: 2rem;
+        animation: fadeInUp 1s;
+        background: #060d17;
+        box-shadow: 0 28px 48pxrgba(0, 0, 0, 0.4);
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            // translate(x, y)
+            transform: translate(-50%, 100%);
+
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, 20%);
+          }
+        }
+        div {
+          padding: 1rem;
+          text-align: center;
+          cursor: pointer;
+          border-radius: 0 !important;
+          &:last-child {
+            margin-top: 2rem;
+          }
+          &:hover {
+            background: #797a7b;
+          }
+        }
+      }
       .login {
         position: relative;
         animation: fadeOut 1s;
@@ -393,6 +506,7 @@ export default {
         top: -307% !important;
         left: 50% !important;
         z-index: 1000;
+        border-radius: 0 !important;
         transform: translate(-50%, 20%);
         border-radius: 20px;
         padding: 2rem;
@@ -641,16 +755,61 @@ a {
     }
     .__myInfo {
       margin-right: 6vw;
-      cursor: pointer;
-      background: #fff;
-      border-radius: 50%;
       width: 2vw;
       height: 2vw;
       color: #000;
+      background: #fff;
       font-size: 1vw;
       display: flex;
       justify-content: center;
       align-items: center;
+      cursor: pointer;
+      span {
+        font-size: 2.5rem;
+        color: #fff;
+      }
+    }
+    .__users {
+      background: none;
+    }
+    .__myInfoItem {
+      display: none;
+    }
+    .__myInfoItem.open__item {
+      display: block;
+      position: absolute;
+      top: 4rem;
+      // left: -6rem;
+      // left: 0;
+      right: 7rem;
+      min-width: 13rem;
+      font-size: 20px;
+      border-radius: 10px;
+      text-align: start;
+      background: #10161d;
+      animation: fadeInUps 1s;
+      @keyframes fadeInUps {
+        0% {
+          opacity: 0;
+          transform: translateY(100%);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0%);
+        }
+      }
+      div {
+        padding: 1rem;
+        cursor: pointer;
+        border-radius: 10px;
+        &:last-child {
+          margin-top: 2rem;
+        }
+        &:hover {
+          background: #797a7b;
+
+        }
+      }
     }
     .__login {
       border-radius: 5px;

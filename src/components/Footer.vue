@@ -1,13 +1,17 @@
 <script>
 export default {
-
+  methods: {
+    myGithub() {
+      window.open('https://github.com/rhenfla0312')
+    }
+  }
 }
 </script>
 
 
 <template>
   <div class="footer">
-    <div class="text">© 2022 SPMV - 영화 및 TV프로그램 정보 - - Welcome this is a speed movie.</div>
+    <div class="text">© 2022 SPMV - 영화 및 TV프로그램 정보 - - Welcome this is a speed movie.<span @click="myGithub()"></span></div>
   </div>
 </template>
 
@@ -24,6 +28,17 @@ export default {
     justify-content: center;
     align-items: center;
     color: #fff;
+    .text {
+      span {
+        &::after {
+          font-family: FontAwesome;
+          content: "\f09b";
+          font-size: 25px;
+          margin-left: 1rem;
+          cursor: pointer;
+        }
+      }
+    }
   }
 
   @media screen and (max-width: 1024px) {
