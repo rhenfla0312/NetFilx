@@ -28,9 +28,11 @@ export default {
       token: "",
       request_token: "",
 
+      session_id: "",
       guest_session_id : "",
 
-      CHECK_DATA : ""
+      CHECK_DATA : "",
+
     }
   },
   methods: {
@@ -92,6 +94,7 @@ export default {
         console.log(e)
       })
     },
+    // 하나의 async함수 내부에 await함수들이 여러개가 있다면 비동기지만 await들이 순서대로 동기적으로? 실행된다 -> await이 여러개라면 하나의 await이 전부끝나야 다음 await부분이 실행되기때문에 (하나가 끝나기도전에 다음께 실행되어 오류되는 상황) -> 이런상황은 걱정할 필요가 없다
     async singIn() {
       this.singin__text = true;
       // 실제 TMDB의 회원가입 된 정보로 로그인 -> 그 정보로 세션ID발급 -> 세션ID로 활동
@@ -100,14 +103,25 @@ export default {
         // 유효성 검사 시작
 
         if(this.id.length > 0) {
+          // 1 - 인증이 필요한 토큰 생성
+          // 인증해야하는 리퀘스트 토큰 생성
+          // 토큰으로 리퀘스트 토큰 생성 -> 따로 페이지 열어서 인증이 필요하다 (tmdb에선 페이지열어서 인증하는걸 권장한다)
           await axios.get(`https://api.themoviedb.org/3/authentication/token/new?api_key=${this.API_KEY}`)
           .then((res) => {
+            console.log(res)
             this.token = res.data.request_token;
-            // window.open(`https://www.themoviedb.org/authenticate/${res.data.request_token}?redirect_to=http://www.yourapp.com/approved`)
+            // 아이디로 로그인 안할경우 웹페이지로 인증(권한 허용)
+            // window.open(`https://www.themoviedb.org/authenticate/${this.token}`)
+
+
           }).catch((e) => {
             console.log(e)
           })
           
+          
+          // 2 - 인증이 필요한 토큰을 -> 인증이 필요없는 토큰으로 생성
+          // 아이디로 로그인(실제 tmdb 회원가입된거여야함) -> 따로 페이지 열어서 인증 필요없음 -> 인증할필요없는 리퀘스트 토큰 생성
+          // 인증안한 랜덤 리퀘스트 토큰으로 인증필요없는 리퀘스트 토큰 생성
           await axios({
             url: `https://api.themoviedb.org/3/authentication/token/validate_with_login?api_key=${this.API_KEY}`,
             method: "POST",
@@ -116,27 +130,38 @@ export default {
               password: this.pw,
               request_token: this.token
             }
-          }).then(async (res) => {
+          }).then((res) => {
             console.log(res);
             this.request_token = res.data.request_token;
-            // localstorage save
-            localStorage.setItem('session_id', this.request_token)
-            // alert("로그인 되었습니다")
+
+          }).catch((error) => {
+            console.log(error)
+          })
+          // 3 - 인증이 끝난 토큰으로 -세션생성 -> 로그인
+          // 리퀘스트 토큰 -> 세션 생성 -> 이 세션을 저장해서 사용한다 -> 로그인할때마다 토큰은 바뀐다
+          await axios({
+            url: `https://api.themoviedb.org/3/authentication/session/new?api_key=${this.API_KEY}`,
+            method: "POST",
+            data: {
+              request_token: this.request_token
+            }
+          }).then((res) => {
+            console.log(res);
+            this.session_id = res.data.session_id;
+            localStorage.setItem('session_id', this.session_id)
             this.login_check = true;
             this.login__layout = false;
           }).catch((error) => {
             console.log(error)
           })
 
-          // setTimeout(() => {
-          //   axios.get(`https://api.themoviedb.org/3/account?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`)
-          //   .then((res) => {
-          //     console.log('성공')
-          //     console.log(res)
-          //   }).catch((e) => {
-          //     console.log(e)
-          //   })
-          // },5000)
+          // 생성된 세션으로 계정 관리
+          axios.get(`https://api.themoviedb.org/3/account?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`)
+          .then((res) => {
+            console.log(res)
+          }).catch((e) => {
+            console.log(e)
+          })
         }
       }
     }, 
@@ -183,17 +208,6 @@ export default {
     //   }
     // })
   },
-  mounted() {
-    // 계정 세부정보
-    // setTimeout(() => {
-    //   axios.get(`https://api.themoviedb.org/3/account?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`)
-    //   .then((res) => {
-    //     console.log(res)
-    //   }).catch((e) => {
-    //     console.log(e)
-    //   })
-    // },5000)
-  }
 }
 </script>
 
@@ -801,9 +815,12 @@ a {
       div {
         padding: 1rem;
         cursor: pointer;
-        border-radius: 10px;
+        &:first-child {
+          border-radius: 10px 10px 0 0;
+        }
         &:last-child {
           margin-top: 2rem;
+          border-radius: 0 0 10px 10px;
         }
         &:hover {
           background: #797a7b;
