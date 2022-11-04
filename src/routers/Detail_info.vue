@@ -46,6 +46,11 @@ export default {
       facebook_url: [],
       twitter_url: [],
 
+      list__save : false,
+      favorites__save : false,
+      watchlist__save : false,
+      like__save : false,
+
       video_check: false,
       displaySize : 0,
 
@@ -80,6 +85,38 @@ export default {
         this.$router.go();
       },10) 
     },
+    listBtn() {
+      if(this.CHECK_DATA == "movie") {
+      
+      } else {
+
+      }
+      this.list__save = !this.list__save;
+    },
+    favoritesBtn() {
+      if(this.CHECK_DATA == "movie") {
+      
+      } else {
+
+      }
+      this.favorites__save = !this.favorites__save;
+    },
+    watchlistBtn() {
+      if(this.CHECK_DATA == "movie") {
+      
+      } else {
+
+      }
+      this.watchlist__save = !this.watchlist__save;
+    },
+    likeBtn() {
+      if(this.CHECK_DATA == "movie") {
+      
+      } else {
+
+      }
+      this.like__save = !this.like__save;
+    },
     // -> css before content -> a태그가 아닌 클릭이벤트로 location으로 이동
     instagram() {
       if(this.instagram_url) {
@@ -109,14 +146,14 @@ export default {
       }
     }
   },
-  async mounted() { 
+  mounted() { 
     this.displaySize = window.innerWidth;
 
     try {
       if(this.CHECK_DATA == "movie") {
         // movie
         // id에 맞는 정보 가져오기
-        await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}?api_key=${this.API_KEY}&language=ko`)
+        axios.get(`${this.MOVIE_INFO_URL}/${this.ID}?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
           // console.log(res)
           this.detail_data = res.data
@@ -126,7 +163,7 @@ export default {
         })
     
         // id에 맞는 영상 가져오기
-        await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/videos?api_key=${this.API_KEY}&language=ko`)
+        axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/videos?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
           // console.log(res)
           if(res.data.results.length > 0) {
@@ -137,7 +174,7 @@ export default {
         })
   
         // id에 맞는 비슷한 영상 가져오기
-        await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/recommendations?api_key=${this.API_KEY}&language=ko`)
+        axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/recommendations?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
           // console.log(res)
           if(res.data.results.length > 0) {
@@ -148,7 +185,7 @@ export default {
         })
 
         // id에 맞는 출연진
-        await axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/credits?api_key=${this.API_KEY}&language=ko`)
+        axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/credits?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
           // console.log(res);
           this.detail_cast = res.data.cast
@@ -175,10 +212,12 @@ export default {
         }).catch((e) => {
           console.log(e)
         })
+
+        
       } else {
         // tv
         // id에 맞는 정보 가져오기
-        await axios.get(`${this.TV_INFO_URL}/${this.ID}?api_key=${this.API_KEY}&language=ko`)
+        axios.get(`${this.TV_INFO_URL}/${this.ID}?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
           // console.log(res)
           this.detail_data = res.data
@@ -188,7 +227,7 @@ export default {
         })
     
         // id에 맞는 영상 가져오기
-        await axios.get(`${this.TV_INFO_URL}/${this.ID}/videos?api_key=${this.API_KEY}&language=ko`)
+        axios.get(`${this.TV_INFO_URL}/${this.ID}/videos?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
           // console.log(res)
           if(res.data.results.length > 0) {
@@ -199,7 +238,7 @@ export default {
         })
   
         // id에 맞는 비슷한 영상 가져오기
-        await axios.get(`${this.TV_INFO_URL}/${this.ID}/recommendations?api_key=${this.API_KEY}&language=ko`)
+        axios.get(`${this.TV_INFO_URL}/${this.ID}/recommendations?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
           // console.log(res)
           if(res.data.results.length > 0) {
@@ -210,7 +249,7 @@ export default {
         })
 
         // id에 맞는 출연진
-        await axios.get(`${this.TV_INFO_URL}/${this.ID}/aggregate_credits?api_key=${this.API_KEY}&language=ko`)
+        axios.get(`${this.TV_INFO_URL}/${this.ID}/aggregate_credits?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
           // console.log(res);
           this.detail_cast = res.data.cast
@@ -263,6 +302,12 @@ export default {
             </div>
             <div class="__text">
               <div class="__title">{{ CHECK_DATA == "movie" ? detail_data.title : detail_data.name }}</div>
+              <div class="my__list">
+                <div class="__list" :class="{ list__save }" @click="listBtn()" title="목록에 추가"></div>
+                <div class="__favorites" :class="{ favorites__save }"  @click="favoritesBtn()" title="즐겨찾기에 추가"></div>
+                <div class="__watchlist" :class="{ watchlist__save }"  @click="watchlistBtn()" title="관심목록에 추가"></div>
+                <div class="__like" :class="{ like__save }"  @click="likeBtn()" title="평점 등록"></div>
+              </div>
               <div class="talineBox">
                 <div class="__tagline">{{ detail_data.tagline}}</div>
                 <div class="__sns">
@@ -419,12 +464,122 @@ export default {
                 color: #fff;
                 font-weight: bold;
               }
+              .my__list {
+                padding-top: 1rem;
+                display: flex;
+                div {
+                  margin-left: 2rem;
+                  &:first-child {
+                    margin-left: 0;
+                  }
+                }
+                .__list {
+                  border-radius: 50%;
+                  width: 47px;
+                  height: 47px;
+                  background-image: linear-gradient(to right, #243949 0%, #517fa4 100%);
+                  &::before {
+                    font-family: FontAwesome;
+                    content: "\f03a";
+                    width: 100%;
+                    height: 100%;
+                    color: #fff;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    cursor: pointer;
+                  }
+                }
+                .__list.list__save {
+                  &::before {
+                    font-family: FontAwesome;
+                    content: "\f03a";
+                    color: #283593;
+                  }
+                }
+                .__favorites {
+                  border-radius: 50%;
+                  width: 47px;
+                  height: 47px;
+                  background-image: linear-gradient(to right, #243949 0%, #517fa4 100%);
+                  &::before {
+                    font-family: FontAwesome;
+                    content: "\f004";
+                    width: 100%;
+                    height: 100%;
+                    color: #fff;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    cursor: pointer;
+                    
+                  }
+                }
+                .__favorites.favorites__save {
+                  &::before {
+                    font-family: FontAwesome;
+                    content: "\f004";
+                    color: #d50000;
+                  }
+                }
+                .__watchlist {
+                  border-radius: 50%;
+                  width: 47px;
+                  height: 47px;
+                  background-image: linear-gradient(to right, #243949 0%, #517fa4 100%);
+                  &::before {
+                    font-family: FontAwesome;
+                    content: "\f02e";
+                    width: 100%;
+                    height: 100%;
+                    color: #fff;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    cursor: pointer;
+                    
+                  }
+                }
+                .__watchlist.watchlist__save {
+                  &::before {
+                    font-family: FontAwesome;
+                    content: "\f02e";
+                    color: #558b2f;
+                  }
+                }
+                .__like {
+                  border-radius: 50%;
+                  width: 47px;
+                  height: 47px;
+                  background-image: linear-gradient(to right, #243949 0%, #517fa4 100%);
+                  &::before {
+                    font-family: FontAwesome;
+                    content: "\f005";
+                    width: 100%;
+                    height: 100%;
+                    color: #fff;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    cursor: pointer;
+                    
+                  }
+                }
+                .__like.like__save {
+                  &::before {
+                    font-family: FontAwesome;
+                    content: "\f005";
+                    color: yellow;
+                  }
+                }
+              }
               .talineBox {
                 display: flex;
                 justify-content: space-between;
+                padding-top: 1rem;
+                align-items: center;
                 .__tagline {
                   font-size: 20px;
-                  padding-top: 1rem;
                   color: #fff;
                   opacity: 0.7;
                 }
@@ -571,21 +726,21 @@ export default {
                 color: #fff;
               }
               .swiper-slide {
-                padding-top: 1rem;
+                // padding-top: 1rem;
                 padding-bottom: 1rem;
                 .detail__info__box {
                   width: 10vw;
-                  height: 31vh;
+                  // height: 40vh !important;
                   .detail__poster {
                     width: 10vw;
                     height: 31vh;
                     border-radius: 10px;
                     cursor: pointer;
                     transition: .2s;
-                    &:hover {
-                      transform: scale(1.1);
-                      transition: .2s;
-                    }
+                  }
+                  &:hover {
+                    transform: scale(1.1);
+                    transition: .2s;
                   }
                   .detail__name {
                     color: #fff;
@@ -596,26 +751,26 @@ export default {
                 }
               }
               .detail__cast__title {
-                padding-top: 1rem;
+                // padding-top: 1rem;
                 font-size: 30px;
                 color: #fff;
               }
               .swiper-slide {
-                padding-top: 1rem;
+                // padding-top: 1rem;
                 padding-bottom: 1rem;
                 .detail__cast__info__box {
                   width: 10vw;
-                  height: 31vh;
+                  // height: 31vh;
                   .detail__cast__poster {
                     width: 10vw;
                     height: 31vh;
                     border-radius: 10px;
                     cursor: pointer;
                     transition: .2s;
-                    &:hover {
-                      transform: scale(1.1);
-                      transition: .2s;
-                    }
+                  }
+                  &:hover {
+                    transform: scale(1.1);
+                    transition: .2s;
                   }
                   .detail__cast__name {
                     color: #fff;
@@ -677,7 +832,16 @@ export default {
     }
   }
 
-
+  @media screen and (max-width: 1024px) {
+    .__des {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      word-break: break-word;
+      display: -webkit-box;
+      -webkit-line-clamp: 7;
+      -webkit-box-orient: vertical;
+    }
+  }
 
   @media screen and (max-width: 768px) {
     .mv__detail {
@@ -745,13 +909,16 @@ export default {
                   font-size: 30px;
                   color: #fff;
                 }
-              .talineBox {
-                display: block !important;
-                .__sns {
-                  padding-top: 1rem;
+                .my__list {
                   justify-content: center;
                 }
-              }
+                .talineBox {
+                  display: block !important;
+                  .__sns {
+                    padding-top: 1rem;
+                    justify-content: center;
+                  }
+                }
                 .__des {
                   padding-top: 2rem;
                   font-size: 20px;
@@ -829,21 +996,21 @@ export default {
                   color: #fff;
                 }
                 .swiper-slide {
-                  padding-top: 1rem;
+                  // padding-top: 1rem;
                   padding-bottom: 1rem;
                   .detail__info__box {
                     width: 24vw !important;
-                    height: 25vh !important;
+                    // height: 25vh !important;
                     .detail__poster {
                       width: 24vw !important;
                       height: 25vh !important;
                       border-radius: 10px;
                       cursor: pointer;
                       transition: .2s;
-                      &:hover {
-                        transform: scale(1.1);
-                        transition: .2s;
-                      }
+                    }
+                    &:hover {
+                      transform: scale(1.1);
+                      transition: .2s;
                     }
                   }
                 }
@@ -853,21 +1020,21 @@ export default {
                   color: #fff;
                 }
                 .swiper-slide {
-                  padding-top: 1rem;
+                  // padding-top: 1rem;
                   padding-bottom: 1rem;
                   .detail__cast__info__box {
                     width: 24vw !important;
-                    height: 25vh !important;
+                    // height: 25vh !important;
                     .detail__cast__poster {
                       width: 24vw !important;
                       height: 25vh !important;
                       border-radius: 10px;
                       cursor: pointer;
                       transition: .2s;
-                      &:hover {
-                        transform: scale(1.1);
-                        transition: .2s;
-                      }
+                    }
+                    &:hover {
+                      transform: scale(1.1);
+                      transition: .2s;
                     }
                   }
                 }

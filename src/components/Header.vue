@@ -30,8 +30,13 @@ export default {
 
       session_id: "",
       guest_session_id : "",
+      account_id : "",
 
       CHECK_DATA : "",
+
+      // 유효성 검사
+      error_id : false,
+      error_pw : false,
 
     }
   },
@@ -52,10 +57,26 @@ export default {
       this.mobile__check = false;
     },
     logOut() {
-      localStorage.removeItem('session_id');
-      localStorage.removeItem('guest_session_id');
-      this.open__item = false;
-      this.$router.go();
+      this.$swal.fire({
+        title: '정말 로그아웃 하시겠습니까?',
+        // text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'LogOut'
+        }).then((result) => {
+        if (result.isConfirmed) {
+          this.$swal.fire(
+            '로그아웃 되셨습니다!',
+          )
+          localStorage.removeItem('session_id');
+          localStorage.removeItem('guest_session_id');
+          localStorage.removeItem('account_id');
+          this.open__item = false;
+          this.$router.go();
+        }
+      })
     },
     async search() {
       // 총 페이지 개수마 넘겨주는 용도
@@ -75,94 +96,180 @@ export default {
       })
     },
     async guest_singIn() {
+      // 타이머
+      let timerInterval
+        this.$swal.fire({
+          title: 'Auto close alert!',
+          html: 'I will close in <b></b> milliseconds.',
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: () => {
+            this.$swal.showLoading()
+            const b = this.$swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+              b.textContent = this.$swal.getTimerLeft()
+            }, 100)
+          },
+          willClose: () => {
+            clearInterval(timerInterval)
+          }
+        }).then((result) => {
+          /* Read more about handling dismissals below */
+          if (result.dismiss === this.$swal.DismissReason.timer) {
+            console.log('I was closed by the timer')
+          }
+        })
       // 게스트 세션 -> 일회용
       await axios.get(`https://api.themoviedb.org/3/authentication/guest_session/new?api_key=${this.API_KEY}`)
-      .then(async (res) => {
-        // console.log(res)
+      .then((res) => {
+        console.log(res)
         this.guest_session_id = res.data.guest_session_id;
         localStorage.setItem('guest_session_id', this.guest_session_id)
         this.login_check = true;
         this.login__layout = false;
-        // guest_session_info
-        // await axios.get(`https://api.themoviedb.org/3/guest_session/${this.guest_session}/rated/movies?api_key=${this.API_KEY}&language=en-US&sort_by=created_at.asc`)
-        // .then((res) => {
-        //   console.log(res)
-        // }).catch((e) => {
-        //   console.log(e)
-        // })
+        this.$swal.fire({
+          position: 'top-end',
+          icon: 'success',
+          title: '로그인 되었습니다',
+          showConfirmButton: false,
+          timer: 2000
+        })
       }).catch((e) => {
         console.log(e)
       })
+      // guest_session_info
+      // await axios.get(`https://api.themoviedb.org/3/guest_session/${localStorage.getItem('guest_session_id')}/rated/movies?api_key=${this.API_KEY}&language=en-US`)
+      // .then((res) => {
+      //   console.log(res)
+      // }).catch((e) => {
+      //   console.log(e)
+      // })
     },
     // 하나의 async함수 내부에 await함수들이 여러개가 있다면 비동기지만 await들이 순서대로 동기적으로? 실행된다 -> await이 여러개라면 하나의 await이 전부끝나야 다음 await부분이 실행되기때문에 (하나가 끝나기도전에 다음께 실행되어 오류되는 상황) -> 이런상황은 걱정할 필요가 없다
     async singIn() {
+      // 유효성 검사
       this.singin__text = true;
-      // 실제 TMDB의 회원가입 된 정보로 로그인 -> 그 정보로 세션ID발급 -> 세션ID로 활동
-      // 토큰발급
-      if(this.singin__text == true) {
-        // 유효성 검사 시작
-
-        if(this.id.length > 0) {
-          // 1 - 인증이 필요한 토큰 생성
-          // 인증해야하는 리퀘스트 토큰 생성
-          // 토큰으로 리퀘스트 토큰 생성 -> 따로 페이지 열어서 인증이 필요하다 (tmdb에선 페이지열어서 인증하는걸 권장한다)
-          await axios.get(`https://api.themoviedb.org/3/authentication/token/new?api_key=${this.API_KEY}`)
-          .then((res) => {
-            console.log(res)
-            this.token = res.data.request_token;
-            // 아이디로 로그인 안할경우 웹페이지로 인증(권한 허용)
-            // window.open(`https://www.themoviedb.org/authenticate/${this.token}`)
-
-
-          }).catch((e) => {
-            console.log(e)
-          })
-          
-          
-          // 2 - 인증이 필요한 토큰을 -> 인증이 필요없는 토큰으로 생성
-          // 아이디로 로그인(실제 tmdb 회원가입된거여야함) -> 따로 페이지 열어서 인증 필요없음 -> 인증할필요없는 리퀘스트 토큰 생성
-          // 인증안한 랜덤 리퀘스트 토큰으로 인증필요없는 리퀘스트 토큰 생성
-          await axios({
-            url: `https://api.themoviedb.org/3/authentication/token/validate_with_login?api_key=${this.API_KEY}`,
-            method: "POST",
-            data: {
-              username: this.id,
-              password: this.pw,
-              request_token: this.token
+      if(this.id.length <= 0) {
+        this.error_id = true;
+      } else {
+        this.error_id = false;
+      }
+      if(this.pw.length <= 0) {
+        this.error_pw = true;
+      } else {
+        this.error_pw = false;
+      }
+      if(this.id.length > 0 && this.pw.length > 0) {
+        // 타이머
+        let timerInterval
+          this.$swal.fire({
+            title: 'Auto close alert!',
+            html: 'I will close in <b></b> milliseconds.',
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: () => {
+              this.$swal.showLoading()
+              const b = this.$swal.getHtmlContainer().querySelector('b')
+              timerInterval = setInterval(() => {
+                b.textContent = this.$swal.getTimerLeft()
+              }, 100)
+            },
+            willClose: () => {
+              clearInterval(timerInterval)
             }
-          }).then((res) => {
-            console.log(res);
-            this.request_token = res.data.request_token;
-
-          }).catch((error) => {
-            console.log(error)
-          })
-          // 3 - 인증이 끝난 토큰으로 -세션생성 -> 로그인
-          // 리퀘스트 토큰 -> 세션 생성 -> 이 세션을 저장해서 사용한다 -> 로그인할때마다 토큰은 바뀐다
-          await axios({
-            url: `https://api.themoviedb.org/3/authentication/session/new?api_key=${this.API_KEY}`,
-            method: "POST",
-            data: {
-              request_token: this.request_token
+          }).then((result) => {
+            /* Read more about handling dismissals below */
+            if (result.dismiss === this.$swal.DismissReason.timer) {
+              console.log('I was closed by the timer')
             }
-          }).then((res) => {
-            console.log(res);
-            this.session_id = res.data.session_id;
-            localStorage.setItem('session_id', this.session_id)
-            this.login_check = true;
-            this.login__layout = false;
-          }).catch((error) => {
-            console.log(error)
           })
+        // 1 - 인증이 필요한 토큰 생성
+        // 인증해야하는 리퀘스트 토큰 생성
+        // 토큰으로 리퀘스트 토큰 생성 -> 따로 페이지 열어서 인증이 필요하다 (tmdb에선 페이지열어서 인증하는걸 권장한다)
+        await axios.get(`https://api.themoviedb.org/3/authentication/token/new?api_key=${this.API_KEY}`)
+        .then((res) => {
+          console.log(res)
+          this.token = res.data.request_token;
+          // 아이디로 로그인 안할경우 웹페이지로 인증(권한 허용)
+          // window.open(`https://www.themoviedb.org/authenticate/${this.token}`)
 
-          // 생성된 세션으로 계정 관리
-          axios.get(`https://api.themoviedb.org/3/account?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`)
-          .then((res) => {
-            console.log(res)
-          }).catch((e) => {
-            console.log(e)
+
+        }).catch((e) => {
+          console.log(e)
+        })
+
+        // 2 - 인증이 필요한 토큰을 -> 인증이 필요없는 토큰으로 생성
+        // 2.1 - id, pw가 필요없는 인증된 토큰으로 로그인
+        // 2.2 - id, pw로 인증이 필요없는 토큰으로 로그인 (선택)
+        // 아이디로 로그인(실제 tmdb 회원가입된거여야함) -> 따로 페이지 열어서 인증 필요없음 -> 인증할필요없는 리퀘스트 토큰 생성
+        // 인증안한 랜덤 리퀘스트 토큰으로 인증필요없는 리퀘스트 토큰 생성
+        await axios({
+          url: `https://api.themoviedb.org/3/authentication/token/validate_with_login?api_key=${this.API_KEY}`,
+          method: "POST",
+          data: {
+            username: this.id,
+            password: this.pw,
+            request_token: this.token
+          }
+        }).then((res) => {
+          console.log(res);
+          this.request_token = res.data.request_token;
+
+        }).catch((error) => {
+          console.log(error)
+        })
+        // 3 - 인증이 끝난 토큰으로 -세션생성 -> 로그인
+        // 리퀘스트 토큰 -> 세션 생성 -> 이 세션을 저장해서 사용한다 -> 로그인할때마다 토큰은 바뀐다
+        await axios({
+          url: `https://api.themoviedb.org/3/authentication/session/new?api_key=${this.API_KEY}`,
+          method: "POST",
+          data: {
+            request_token: this.request_token
+          }
+        }).then((res) => {
+          console.log(res);
+          this.session_id = res.data.session_id;
+          localStorage.setItem('session_id', this.session_id)
+          this.login_check = true;
+          this.login__layout = false;
+          // 로그인 정보가 일치한다면
+          this.$swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: '로그인 되었습니다',
+            showConfirmButton: false,
+            timer: 2000
           })
-        }
+        }).catch((error) => {
+          console.log(error)
+          // 로그인 정보가 일치하지 않다면
+          this.$swal.fire({
+            position: 'top-right',
+            icon: 'error',
+            title: '정보가 일치하지 않습니다',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        })
+
+        // 생성된 세션으로 계정 관리 -> 계정 세부 정보 가져오기 (account id -> 이 id로 목록 검색가능)
+        await axios.get(`https://api.themoviedb.org/3/account?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`)
+        .then((res) => {
+          console.log(res)
+          this.account_id = res.data.id;
+          localStorage.setItem('account_id', this.account_id)
+        }).catch((e) => {
+          console.log(e)
+        })
+
+        // 생성된 목록 가져오기
+        await axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/lists?api_key=${this.API_KEY}&language=en-US&session_id=${localStorage.getItem('session_id')}`)
+        .then((res) => {
+          this
+          console.log(res)
+        }).catch((e) => {
+          console.log(e)
+        })
       }
     }, 
     async signUp() {
@@ -226,8 +333,8 @@ export default {
       
       <!-- myinfo__item -->
       <div class="__myInfoItem" :class="{ open__item }">
-        <div class="__saveMovie">북마크(Movie)</div>
-        <div class="__saveTv">북마크(TV)</div>
+        <div class="__saveMovie">즐겨찾기</div>
+        <div class="__saveTv">관심목록</div>
         <div class="__logOut" @click="logOut()">로그아웃</div>
       </div>
       <!-- login__item -->
@@ -239,7 +346,9 @@ export default {
         </div>
         <div class="login__text" :class="{ singin__text }">
           <input class="login__id" type="text" name="id" id="id" v-model="id" />
+          <div class="__error__id" :class="{ error_id }">아이디를 입력해주세요</div>
           <input class="login__pw" type="password" name="pw" id="pw" v-model="pw" />
+          <div class="__error__pw" :class="{ error_pw }">비밀번호를 입력해주세요</div>
         </div>
         <div class="login__btn">
           <button class="btn" @click="singIn()">Sign In</button>
@@ -577,6 +686,16 @@ export default {
           .login__pw {
             margin-top: 1rem;
           }
+          .__error__id.error_id,
+          .__error__pw.error_pw {
+            display: block !important;
+            text-align: start;
+            margin: auto;
+            width: 60vw !important;
+            padding-top: 1rem;
+            color: red;
+            font-size: 15px;
+          }
         }
         .login__btn {
           padding-top: 1rem;
@@ -699,7 +818,7 @@ a {
     display: flex;
     align-items: center;
     position: fixed;
-    z-index: 10000;
+    z-index: 100;
     color: #fff;
     font-size: 2vw;
     text-align: center;
@@ -918,6 +1037,21 @@ a {
         }
         .login__pw {
           margin-top: 1rem;
+        }
+        
+        .__error__id,
+        .__error__pw {
+          display: none;
+        }
+        .__error__id.error_id,
+        .__error__pw.error_pw {
+          display: block !important;
+          text-align: start;
+          margin: auto;
+          width: 28vw;
+          padding-top: 1rem;
+          color: red;
+          font-size: 15px;
         }
       }
       .login__text.singin__text {

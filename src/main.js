@@ -6,4 +6,9 @@ import App from './App.vue'
 import router from './routers/index.js'
 import store from './store/index.js'
 
-createApp(App).use(router).use(store).mount('#app')
+// alert plugin
+// 전역으로 사용한다면 this.$plugin 으로 객체처럼 사용할수가 있다
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
+createApp(App).use(VueSweetalert2).use(router).use(store).mount('#app')
