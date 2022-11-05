@@ -1518,7 +1518,7 @@ export default {
               position: relative;
               transition: .2s;
               &:hover::before {
-                content: ">>";
+                // content: ">>";
                 position: absolute;
                 top: 50%;
                 left: 50%;
@@ -1599,7 +1599,7 @@ export default {
                 position: relative;
                 transition: .2s;
                 &:hover::before {
-                  content: ">>";
+                  // content: ">>";
                   position: absolute;
                   top: 50%;
                   left: 50%;
@@ -1703,7 +1703,7 @@ export default {
               position: relative;
               transition: .2s;
               &:hover::before {
-                content: ">>";
+                // content: ">>";
                 position: absolute;
                 top: 50%;
                 left: 50%;
@@ -1784,7 +1784,7 @@ export default {
                 position: relative;
                 transition: .2s;
                 &:hover::before {
-                  content: ">>";
+                  // content: ">>";
                   position: absolute;
                   top: 50%;
                   left: 50%;
@@ -1943,7 +1943,7 @@ export default {
               position: relative;
               transition: .2s;
               &:hover::before {
-                content: ">>";
+                // content: ">>";
                 position: absolute;
                 top: 50%;
                 left: 50%;
@@ -2025,7 +2025,7 @@ export default {
                 position: relative;
                 transition: .2s;
                 &:hover::before {
-                  content: ">>";
+                  // content: ">>";
                   position: absolute;
                   top: 50%;
                   left: 50%;

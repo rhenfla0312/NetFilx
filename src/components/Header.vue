@@ -137,13 +137,6 @@ export default {
       }).catch((e) => {
         console.log(e)
       })
-      // guest_session_info
-      // await axios.get(`https://api.themoviedb.org/3/guest_session/${localStorage.getItem('guest_session_id')}/rated/movies?api_key=${this.API_KEY}&language=en-US`)
-      // .then((res) => {
-      //   console.log(res)
-      // }).catch((e) => {
-      //   console.log(e)
-      // })
     },
     // 하나의 async함수 내부에 await함수들이 여러개가 있다면 비동기지만 await들이 순서대로 동기적으로? 실행된다 -> await이 여러개라면 하나의 await이 전부끝나야 다음 await부분이 실행되기때문에 (하나가 끝나기도전에 다음께 실행되어 오류되는 상황) -> 이런상황은 걱정할 필요가 없다
     async singIn() {
@@ -180,7 +173,7 @@ export default {
           }).then((result) => {
             /* Read more about handling dismissals below */
             if (result.dismiss === this.$swal.DismissReason.timer) {
-              console.log('I was closed by the timer')
+              // 
             }
           })
         // 1 - 인증이 필요한 토큰 생성
@@ -214,6 +207,7 @@ export default {
         }).then((res) => {
           console.log(res);
           this.request_token = res.data.request_token;
+          window.open(`https://www.themoviedb.org/authenticate/${this.request_token}`)
 
         }).catch((error) => {
           console.log(error)
@@ -255,18 +249,9 @@ export default {
         // 생성된 세션으로 계정 관리 -> 계정 세부 정보 가져오기 (account id -> 이 id로 목록 검색가능)
         await axios.get(`https://api.themoviedb.org/3/account?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`)
         .then((res) => {
-          console.log(res)
+          console.log(res);
           this.account_id = res.data.id;
           localStorage.setItem('account_id', this.account_id)
-        }).catch((e) => {
-          console.log(e)
-        })
-
-        // 생성된 목록 가져오기
-        await axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/lists?api_key=${this.API_KEY}&language=en-US&session_id=${localStorage.getItem('session_id')}`)
-        .then((res) => {
-          this
-          console.log(res)
         }).catch((e) => {
           console.log(e)
         })
@@ -315,6 +300,27 @@ export default {
     //   }
     // })
   },
+  async mounted() {
+
+    if(localStorage.getItem('guest_session_id')) {
+      // guest_session_info
+      await axios.get(`https://api.themoviedb.org/3/guest_session/${localStorage.getItem('guest_session_id')}/rated/movies?api_key=${this.API_KEY}&language=en-US`)
+      .then((res) => {
+        console.log(res)
+      }).catch((e) => {
+        console.log(e)
+      })
+    } else if(localStorage.getItem('session_id')) {
+      // id/pw_session_info
+      await axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/lists?api_key=${this.API_KEY}&language=en-US&session_id=${localStorage.getItem('session_id')}`)
+      .then((res) => {
+        console.log(res)
+      }).catch((e) => {
+        console.log(e)
+      })
+    }
+
+  }
 }
 </script>
 
@@ -345,9 +351,9 @@ export default {
           <button class="btn" @click="guest_singIn()">Guest Sign In</button>
         </div>
         <div class="login__text" :class="{ singin__text }">
-          <input class="login__id" type="text" name="id" id="id" v-model="id" />
+          <input class="login__id" type="text" name="id" id="id" v-model="id" placeholder="ID" />
           <div class="__error__id" :class="{ error_id }">아이디를 입력해주세요</div>
-          <input class="login__pw" type="password" name="pw" id="pw" v-model="pw" />
+          <input class="login__pw" type="password" name="pw" id="pw" v-model="pw" @keyup.enter="singIn()" placeholder="PW" />
           <div class="__error__pw" :class="{ error_pw }">비밀번호를 입력해주세요</div>
         </div>
         <div class="login__btn">

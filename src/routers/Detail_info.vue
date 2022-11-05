@@ -50,9 +50,12 @@ export default {
       favorites__save : false,
       watchlist__save : false,
       like__save : false,
+      like__open : false,
 
       video_check: false,
       displaySize : 0,
+
+      value : 0,
 
     }
   },
@@ -94,56 +97,292 @@ export default {
       this.list__save = !this.list__save;
     },
     favoritesBtn() {
-      if(this.CHECK_DATA == "movie") {
-      
-      } else {
+   // 관심목록 추가 대기 -> 401로 -> 토큰쪽 문제있는거같음
+   if(this.favorites__save == false) {
+        if(localStorage.getItem('session_id')) {
+          // 타이머
+          let timerInterval
+          this.$swal.fire({
+            title: 'Auto close alert!',
+            html: 'I will close in <b></b> milliseconds.',
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: () => {  
+              this.$swal.showLoading()
+              const b = this.$swal.getHtmlContainer().querySelector('b')
+              timerInterval = setInterval(() => {
+                b.textContent = this.$swal.getTimerLeft()
+              }, 100)
+            },
+            willClose: () => {
+              clearInterval(timerInterval)
+            }
+          }).then((result) => {
+            /* Read more about handling dismissals below */
+            if (result.dismiss === this.$swal.DismissReason.timer) {
+              // 
+            }
+          })
+          axios({
+            method: "POST",
+            url: `https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/favorite?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
+            data: {
+              "media_type": this.CHECK_DATA,
+              "media_id": this.ID,
+              "favorite": true
+            }
+          }).then((res) => {
+            console.log(res);
+            this.favorites__save = true;
 
+            this.$swal.fire({
+              position: 'top-end',
+              icon: 'success',
+              title: '즐겨찾기에 담겼습니다',
+              showConfirmButton: false,
+              timer: 2000
+            })
+          }).catch((e) => {
+            console.log(e)
+          })
+        } else if(localStorage.getItem('guest_session_id')) {
+          alert("즐겨찾기 추가는 게스트 아이디로는 불가능합니다")
+        } else {
+          alert("로그인이 필요합니다");
+        }
+      } else {
+        this.favorites__save = true;
       }
-      this.favorites__save = !this.favorites__save;
     },
     watchlistBtn() {
-      if(this.CHECK_DATA == "movie") {
-      
-      } else {
+      // 관심목록 추가 대기 -> 401로 -> 토큰쪽 문제있는거같음
+      if(this.watchlist__save == false) {
+        if(localStorage.getItem('session_id')) {
+          axios({
+            method: "POST",
+            url: `https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/watchlist?api_key=${this.API_KEY}`,
+            data: {
+              "media_type": this.CHECK_DATA,
+              "media_id": this.ID,
+              "watchlist": true
+            }
+          }).then((res) => {
+            console.log(res);
+            this.watchlist__save = true;
 
+            this.$swal.fire({
+              position: 'top-end',
+              icon: 'success',
+              title: '관심목록에 담겼습니다',
+              showConfirmButton: false,
+              timer: 2000
+            })
+          }).catch((e) => {
+            console.log(e)
+          })
+        } else if(localStorage.getItem('guest_session_id')) {
+          alert("관심목록 추가는 게스트 아이디로는 불가능합니다")
+        } else {
+          alert("로그인이 필요합니다");
+        }
+      } else {
+        this.watchlist__save = true;
       }
-      this.watchlist__save = !this.watchlist__save;
     },
+    // 평점은 1점 이상부터 가능
     likeBtn() {
-      if(this.CHECK_DATA == "movie") {
-      
-      } else {
+      this.like__open = !this.like__open;
+      // 없으면 오류나니까 일단 이렇게 하나의 버튼으로 등록 -> 나중에 분리(별 클릭할때로 분리)
+      if(this.like__open == true) {
+        if(this.CHECK_DATA == "movie") {
+          if(localStorage.getItem('session_id')) {
+            axios({
+              url: `https://api.themoviedb.org/3/movie/${this.ID}/rating?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
+              method: 'POST',
+              value: {
+                value : this.value
+              }
+            }).then((res) => {
+              console.log(res);
+              this.like__save = true;
+              
+              this.$swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: '평점을 등록했습니다',
+                showConfirmButton: false,
+                timer: 2000
+              })
+            }).catch((e) => {
+              console.log(e)
+            })
+          } else if(localStorage.getItem('guest_session_id')) {
+            axios({
+              url: `https://api.themoviedb.org/3/movie/436270/rating?api_key=${this.API_KEY}&guest_session_id=42f0f2801f34217bb0b2798737b342e1`,
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              data : {
+                value : this.value
+              }
+            }).then((res) => {
+              console.log(res);
+              this.like__save = true;
 
+              this.$swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: '평점을 등록했습니다',
+                showConfirmButton: false,
+                timer: 2000
+              })
+            }).catch((e) => {
+              console.log(e);
+            })
+          }
+        } else {
+          if(localStorage.getItem('session_id')) {
+            axios({
+              url: `https://api.themoviedb.org/3/tv/${this.ID}/rating?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
+              method: 'POST',
+              value: {
+                value : this.value
+              }
+            }).then((res) => {
+              console.log(res);
+              this.like__save = true;
+
+              this.$swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: '평점을 등록했습니다',
+                showConfirmButton: false,
+                timer: 2000
+              })
+            }).catch((e) => {
+              console.log(e)
+            })
+          } else if(localStorage.getItem('guest_session_id')) {
+            axios({
+              url: `https://api.themoviedb.org/3/tv/436270/rating?api_key=${this.API_KEY}&guest_session_id=42f0f2801f34217bb0b2798737b342e1`,
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              data : {
+                value : this.value
+              }
+            }).then((res) => {
+              console.log(res);
+              this.like__save = true;
+
+              this.$swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: '평점을 등록했습니다',
+                showConfirmButton: false,
+                timer: 2000
+              })
+            }).catch((e) => {
+              console.log(e)
+            })
+          }
+        }
       }
-      this.like__save = !this.like__save;
+      // this.like__save = !this.like__save;
     },
     // -> css before content -> a태그가 아닌 클릭이벤트로 location으로 이동
     instagram() {
       if(this.instagram_url) {
         window.open(`https://www.instagram.com/${this.instagram_url}`)
       } else if(this.CHECK_DATA == "movie") {
-        alert("해당 영화는 instagram링크가 걸려있지 않습니다")
+        this.$swal.fire({
+          position: 'top-end',
+          icon: 'warning',
+          title: '해당 영화는 instagram링크가 걸려있지 않습니다',
+          showConfirmButton: false,
+          timer: 2000
+        })
       } else {
-        alert("해당 TV 프로그램은 instagram링크가 걸려있지 않습니다")
+        this.$swal.fire({
+          position: 'top-end',
+          icon: 'warning',
+          title: '해당 TV 프로그램은 instagram링크가 걸려있지 않습니다',
+          showConfirmButton: false,
+          timer: 2000
+        })
       }
     },
     facebook() {
       if(this.instagram_url) {
         window.open(`https://www.facebook.com/${this.facebook_url}`)
       } else if(this.CHECK_DATA == "movie") {
-        alert("해당 영화는 facebook링크가 걸려있지 않습니다")
+        this.$swal.fire({
+          position: 'top-end',
+          icon: 'warning',
+          title: '해당 영화는 facebook링크가 걸려있지 않습니다',
+          showConfirmButton: false,
+          timer: 2000
+        })
       } else {
-        alert("해당 TV 프로그램은 facebook링크가 걸려있지 않습니다")
+        this.$swal.fire({
+          position: 'top-end',
+          icon: 'warning',
+          title: '해당 영화는 facebook링크가 걸려있지 않습니다',
+          showConfirmButton: false,
+          timer: 2000
+        })
       }
     },
     twitter() {
       if(this.twitter_url) {
         window.open(`https://twitter.com/${this.twitter_url}`)
       } else if(this.CHECK_DATA == "movie") {
-        alert("해당 영화는 twitter링크가 걸려있지 않습니다")
+        this.$swal.fire({
+          position: 'top-end',
+          icon: 'warning',
+          title: '해당 영화는 twitter링크가 걸려있지 않습니다',
+          showConfirmButton: false,
+          timer: 2000
+        })
       } else {
-        alert("해당 TV 프로그램은 twitter링크가 걸려있지 않습니다")
+        this.$swal.fire({
+          position: 'top-end',
+          icon: 'warning',
+          title: '해당 TV 프로그램은 twitter링크가 걸려있지 않습니다',
+          showConfirmButton: false,
+          timer: 2000
+        })
       }
+    },
+    // 영화 평가
+    movieReviews() {
+      // if(localStorage.getItem('session_id')) {
+      //   axios({
+      //     url: `https://api.themoviedb.org/3/movie/${this.ID}/rating?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
+      //     method: 'GET',
+      //     params: {
+      //       value : this.value
+      //     }
+      //   }).then((res) => {
+      //     console.log(res);
+      //   }).catch((e) => {
+      //     console.log(e)
+      //   })
+      // } else if(localStorage.getItem('guest_session_id')) {
+      //   axios({
+      //     url: `https://api.themoviedb.org/3/movie/${this.ID}/rating?api_key=${this.API_KEY}&guest_session_id=${localStorage.getItem('session_id')}`,
+      //     method: 'GET',
+      //     params: {
+      //       value : this.value
+      //     }
+      //   }).then((res) => {
+      //     console.log(res);
+      //   }).catch((e) => {
+      //     console.log(e)
+      //   })
+      // }
     }
   },
   mounted() { 
@@ -155,7 +394,7 @@ export default {
         // id에 맞는 정보 가져오기
         axios.get(`${this.MOVIE_INFO_URL}/${this.ID}?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
-          // console.log(res)
+          console.log(res)
           this.detail_data = res.data
           this.detail_data_genres = res.data.genres[0].name
         }).catch((error) => {
@@ -212,8 +451,6 @@ export default {
         }).catch((e) => {
           console.log(e)
         })
-
-        
       } else {
         // tv
         // id에 맞는 정보 가져오기
@@ -278,6 +515,23 @@ export default {
         })
       }
 
+      if(localStorage.getItem('session_id')) {
+        axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/favorite/movies?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}&language=en-US&sort_by=created_at.asc`)
+        .then((res) => {
+          // 즐겨찾기한 영화 아이디와 -> 상세페이지의 아이디가 같으면 해당 아이템에 색깔 표시해주기 (mounted라 새로고침해도 그때마다 입력이라 안변한다 -> 변하면 안되는걸 mounted로 새로고침마다 부여하면 된다)
+          console.log(res);
+          res.data.results.forEach((e) => {
+            if(this.ID === String(e.id)) {
+              // 같은 값이 맞지않다면 타입이 다른거다 -> 맞춰줘라
+              this.favorites__save = true;
+            }
+          })
+        }).catch((e) => {
+          console.log(e);
+        })
+      } else if(localStorage.getItem('guest_session_id')) {
+        
+      }
     } catch(e) {
       console.error(e);
     }
@@ -306,7 +560,15 @@ export default {
                 <div class="__list" :class="{ list__save }" @click="listBtn()" title="목록에 추가"></div>
                 <div class="__favorites" :class="{ favorites__save }"  @click="favoritesBtn()" title="즐겨찾기에 추가"></div>
                 <div class="__watchlist" :class="{ watchlist__save }"  @click="watchlistBtn()" title="관심목록에 추가"></div>
-                <div class="__like" :class="{ like__save }"  @click="likeBtn()" title="평점 등록"></div>
+                <div class="__likeBtn">
+                  <div class="__like" :class="{ like__save }"  @click="likeBtn()" title="평점 등록"></div>
+                  <div class="__likeBox" :class="{ like__open }">
+                    <div class="star __one"></div>
+                    <div class="star __two"></div>
+                    <div class="star __three"></div>
+                    <div class="star __four"></div>
+                  </div>
+                </div>
               </div>
               <div class="talineBox">
                 <div class="__tagline">{{ detail_data.tagline}}</div>
@@ -435,7 +697,7 @@ export default {
       .detail__info {
         background: #060d17;
         position: relative;
-        z-index: 50;
+        z-index: 30;
         width: 80vw;
         margin: -5vh auto 0;
         border-radius: 30px 30px 0 0;
@@ -547,29 +809,63 @@ export default {
                     color: #558b2f;
                   }
                 }
-                .__like {
-                  border-radius: 50%;
-                  width: 47px;
-                  height: 47px;
-                  background-image: linear-gradient(to right, #243949 0%, #517fa4 100%);
-                  &::before {
-                    font-family: FontAwesome;
-                    content: "\f005";
-                    width: 100%;
-                    height: 100%;
-                    color: #fff;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    cursor: pointer;
-                    
+                .__likeBtn {
+                  position: relative;
+                  .__like {
+                    border-radius: 50%;
+                    width: 47px;
+                    height: 47px;
+                    background-image: linear-gradient(to right, #243949 0%, #517fa4 100%);
+                    &::before {
+                      font-family: FontAwesome;
+                      content: "\f005";
+                      width: 100%;
+                      height: 100%;
+                      color: #fff;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      cursor: pointer;
+                      
+                    }
                   }
-                }
-                .__like.like__save {
-                  &::before {
-                    font-family: FontAwesome;
-                    content: "\f005";
-                    color: yellow;
+                  .__like.like__save {
+                    &::before {
+                      font-family: FontAwesome;
+                      content: "\f005";
+                      color: yellow;
+                    }
+                  }
+                  .__likeBox {
+                    display: none;
+                  }
+                  .__likeBox.like__open {
+                    display: flex;
+                    position: absolute;
+                    bottom: -80px;
+                    z-index: 40;
+                    padding: 1rem;
+                    right: 0;
+                    background: #10161d;
+                    border-radius: 10px;
+
+                    .star {
+                      &::before {
+                        font-family: FontAwesome;
+                        content: "\f005";
+                        width: 100%;
+                        height: 100%;
+                        font-size: 25px;
+                        color: #fff;
+                        cursor: pointer;
+                      }
+                      &:hover:before {
+                        color: yellow;
+                      }
+                      &:active:before {
+                        color: yellow;
+                      }
+                    }
                   }
                 }
               }
@@ -885,7 +1181,7 @@ export default {
         }
         .detail__info {
           width: 90vw !important;
-          z-index: 100 !important;
+          z-index: 50 !important;
           .__info {
             padding: 2rem !important;
             .__first {
