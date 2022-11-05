@@ -6,7 +6,8 @@ import DetailInfo from './Detail_info.vue'
 import New from './New.vue'
 import Popular from './Popular.vue'
 import Search from './Search.vue'
-
+import Favorite from './Favorite.vue'
+import Rating from './Rating.vue'
 export default createRouter({
   scrollBehavior() {
     return { top : 0 }
@@ -38,6 +39,16 @@ export default createRouter({
       path: '/search/:title?',
       name: "Search",
       component: Search
+    },
+    {
+      path: '/favorite',
+      name: "favorite",
+      component: Favorite
+    },
+    {
+      path: "/rating",
+      name: "rating",
+      component: Rating
     }
   ]
 })

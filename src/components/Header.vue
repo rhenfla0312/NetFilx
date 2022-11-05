@@ -339,8 +339,12 @@ export default {
       
       <!-- myinfo__item -->
       <div class="__myInfoItem" :class="{ open__item }">
-        <div class="__saveMovie">즐겨찾기</div>
-        <div class="__saveTv">관심목록</div>
+        <RouterLink to="/favorite">
+          <div class="__saveMovie">즐겨찾기</div>
+        </RouterLink>
+        <RouterLink to="/rating">
+          <div class="__saveTv">관심목록</div>
+        </RouterLink>
         <div class="__logOut" @click="logOut()">로그아웃</div>
       </div>
       <!-- login__item -->
@@ -489,9 +493,6 @@ export default {
         padding: 1rem;
         cursor: pointer;
         border-radius: 10px;
-        &:last-child {
-          margin-top: 2rem;
-        }
         &:hover {
           background: #797a7b;
 
@@ -604,9 +605,6 @@ export default {
           text-align: center;
           cursor: pointer;
           border-radius: 0 !important;
-          &:last-child {
-            margin-top: 2rem;
-          }
           &:hover {
             background: #797a7b;
           }
@@ -944,7 +942,7 @@ a {
           border-radius: 10px 10px 0 0;
         }
         &:last-child {
-          margin-top: 2rem;
+          // margin-top: 2rem;
           border-radius: 0 0 10px 10px;
         }
         &:hover {
