@@ -52,10 +52,13 @@ export default {
       like__save : false,
       like__open : false,
 
-      video_check: false,
-      displaySize : 0,
+      like__one : false,
+      like__two : false,
+      like__three : false,
+      like__four : false,
 
-      value : 0,
+      video_check: false,
+      displaySize : 0
 
     }
   },
@@ -88,17 +91,55 @@ export default {
         this.$router.go();
       },10) 
     },
-    listBtn() {
-      if(this.CHECK_DATA == "movie") {
-      
-      } else {
-
-      }
-      this.list__save = !this.list__save;
+    like_number_one() {
+      this.like__one = true;
     },
-    favoritesBtn() {
-   // 관심목록 추가 대기 -> 401로 -> 토큰쪽 문제있는거같음
-   if(this.favorites__save == false) {
+    like_number_two() {
+      this.like__one = true;
+      this.like__two = true;
+    },
+    like_number_three() {
+      this.like__one = true;
+      this.like__two = true;
+      this.like__three = true;
+    },
+    like_number_four() {
+      this.like__one = true;
+      this.like__two = true;
+      this.like__three = true;
+      this.like__four = true;
+    },
+    like_number_one_out() {
+      if(this.like__two === false && this.like__three == false && this.like__four == true || this.like__four == false) {
+        this.like__one = false;
+      }
+    },
+    like_number_two_out() {
+      if(this.like__three == false && this.like__four == true || this.like__four == false) {
+        this.like__two = false;
+      }
+    
+    },
+    like_number_three_out() {
+      if(this.like__four == true || this.like__four == false) {
+        this.like__three = false;
+        this.like__four = false;
+      }
+    },
+    // 목록 추가
+    listBtn() {
+      this.$swal.fire({
+        position: 'top-end',
+        icon: 'warning',
+        title: '준비중입니다',
+        showConfirmButton: false,
+        timer: 2000
+      })
+      // this.list__save = !this.list__save;
+    },
+    // 즐겨찾기 추가
+    async favoritesBtn() {
+      if(this.favorites__save == false) {
         if(localStorage.getItem('session_id')) {
           // 타이머
           let timerInterval
@@ -123,7 +164,7 @@ export default {
               // 
             }
           })
-          axios({
+          await axios({
             method: "POST",
             url: `https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/favorite?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
             data: {
@@ -146,21 +187,101 @@ export default {
             console.log(e)
           })
         } else if(localStorage.getItem('guest_session_id')) {
-          alert("즐겨찾기 추가는 게스트 아이디로는 불가능합니다")
+          this.$swal.fire({
+            position: 'top-end',
+            icon: 'warning',
+            title: '즐겨찾기 추가는 게스트 아이디로는 불가능합니다',
+            showConfirmButton: false,
+            timer: 2000
+          })
         } else {
-          alert("로그인이 필요합니다");
+          this.$swal.fire({
+            position: 'top-end',
+            icon: 'warning',
+            title: '로그인이 필요합니다',
+            showConfirmButton: false,
+            timer: 2000
+          })
         }
       } else {
-        this.favorites__save = true;
+        // 즐겨찾기 삭제
+        // 타이머
+        let timerInterval
+        this.$swal.fire({
+          title: 'Auto close alert!',
+          html: 'I will close in <b></b> milliseconds.',
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: () => {  
+            this.$swal.showLoading()
+            const b = this.$swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+              b.textContent = this.$swal.getTimerLeft()
+            }, 100)
+          },
+          willClose: () => {
+            clearInterval(timerInterval)
+          }
+        }).then((result) => {
+          /* Read more about handling dismissals below */
+          if (result.dismiss === this.$swal.DismissReason.timer) {
+            // 
+          }
+        })
+        await axios({
+          method: "POST",
+          url: `https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/favorite?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
+          data: {
+            "media_type": this.CHECK_DATA,
+            "media_id": this.ID,
+            "favorite": false
+          }
+        }).then((res) => {
+          console.log(res);
+          this.favorites__save = false;
+
+          this.$swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: '즐겨찾기에서 삭제되었습니다',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        }).catch((e) => {
+          console.log(e)
+        })
       }
     },
-    watchlistBtn() {
+    async watchlistBtn() {
       // 관심목록 추가 대기 -> 401로 -> 토큰쪽 문제있는거같음
       if(this.watchlist__save == false) {
         if(localStorage.getItem('session_id')) {
-          axios({
+          // 타이머
+          let timerInterval
+          this.$swal.fire({
+            title: 'Auto close alert!',
+            html: 'I will close in <b></b> milliseconds.',
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: () => {  
+              this.$swal.showLoading()
+              const b = this.$swal.getHtmlContainer().querySelector('b')
+              timerInterval = setInterval(() => {
+                b.textContent = this.$swal.getTimerLeft()
+              }, 100)
+            },
+            willClose: () => {
+              clearInterval(timerInterval)
+            }
+          }).then((result) => {
+            /* Read more about handling dismissals below */
+            if (result.dismiss === this.$swal.DismissReason.timer) {
+              // 
+            }
+          })
+          await axios({
             method: "POST",
-            url: `https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/watchlist?api_key=${this.API_KEY}`,
+            url: `https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/watchlist?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
             data: {
               "media_type": this.CHECK_DATA,
               "media_id": this.ID,
@@ -181,116 +302,150 @@ export default {
             console.log(e)
           })
         } else if(localStorage.getItem('guest_session_id')) {
-          alert("관심목록 추가는 게스트 아이디로는 불가능합니다")
+          this.$swal.fire({
+            position: 'top-end',
+            icon: 'warning',
+            title: '관심목록 추가는 게스트 아이디로는 불가능합니다',
+            showConfirmButton: false,
+            timer: 2000
+          })
         } else {
-          alert("로그인이 필요합니다");
+          this.$swal.fire({
+            position: 'top-end',
+            icon: 'warning',
+            title: '로그인이 필요합니다',
+            showConfirmButton: false,
+            timer: 2000
+          })
         }
       } else {
-        this.watchlist__save = true;
+        // 관심목록 삭제
+        // 타이머
+        let timerInterval
+        this.$swal.fire({
+          title: 'Auto close alert!',
+          html: 'I will close in <b></b> milliseconds.',
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: () => {  
+            this.$swal.showLoading()
+            const b = this.$swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+              b.textContent = this.$swal.getTimerLeft()
+            }, 100)
+          },
+          willClose: () => {
+            clearInterval(timerInterval)
+          }
+        }).then((result) => {
+          /* Read more about handling dismissals below */
+          if (result.dismiss === this.$swal.DismissReason.timer) {
+            // 
+          }
+        })
+
+        await axios({
+          method: "POST",
+          url: `https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/watchlist?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
+          data: {
+            "media_type": this.CHECK_DATA,
+            "media_id": this.ID,
+            "watchlist": false
+          }
+        }).then((res) => {
+          console.log(res);
+          this.watchlist__save = false;
+
+          this.$swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: '관심목록에서 삭제되었습니다',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        }).catch((e) => {
+          console.log(e)
+        })
       }
     },
-    // 평점은 1점 이상부터 가능
-    likeBtn() {
+    likeOpenBtn() {
       this.like__open = !this.like__open;
-      // 없으면 오류나니까 일단 이렇게 하나의 버튼으로 등록 -> 나중에 분리(별 클릭할때로 분리)
-      if(this.like__open == true) {
-        if(this.CHECK_DATA == "movie") {
-          if(localStorage.getItem('session_id')) {
-            axios({
-              url: `https://api.themoviedb.org/3/movie/${this.ID}/rating?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
-              method: 'POST',
-              value: {
-                value : this.value
-              }
-            }).then((res) => {
-              console.log(res);
-              this.like__save = true;
-              
-              this.$swal.fire({
-                position: 'top-end',
-                icon: 'success',
-                title: '평점을 등록했습니다',
-                showConfirmButton: false,
-                timer: 2000
-              })
-            }).catch((e) => {
-              console.log(e)
-            })
-          } else if(localStorage.getItem('guest_session_id')) {
-            axios({
-              url: `https://api.themoviedb.org/3/movie/436270/rating?api_key=${this.API_KEY}&guest_session_id=42f0f2801f34217bb0b2798737b342e1`,
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              data : {
-                value : this.value
-              }
-            }).then((res) => {
-              console.log(res);
-              this.like__save = true;
-
-              this.$swal.fire({
-                position: 'top-end',
-                icon: 'success',
-                title: '평점을 등록했습니다',
-                showConfirmButton: false,
-                timer: 2000
-              })
-            }).catch((e) => {
-              console.log(e);
-            })
-          }
-        } else {
-          if(localStorage.getItem('session_id')) {
-            axios({
-              url: `https://api.themoviedb.org/3/tv/${this.ID}/rating?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
-              method: 'POST',
-              value: {
-                value : this.value
-              }
-            }).then((res) => {
-              console.log(res);
-              this.like__save = true;
-
-              this.$swal.fire({
-                position: 'top-end',
-                icon: 'success',
-                title: '평점을 등록했습니다',
-                showConfirmButton: false,
-                timer: 2000
-              })
-            }).catch((e) => {
-              console.log(e)
-            })
-          } else if(localStorage.getItem('guest_session_id')) {
-            axios({
-              url: `https://api.themoviedb.org/3/tv/436270/rating?api_key=${this.API_KEY}&guest_session_id=42f0f2801f34217bb0b2798737b342e1`,
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              data : {
-                value : this.value
-              }
-            }).then((res) => {
-              console.log(res);
-              this.like__save = true;
-
-              this.$swal.fire({
-                position: 'top-end',
-                icon: 'success',
-                title: '평점을 등록했습니다',
-                showConfirmButton: false,
-                timer: 2000
-              })
-            }).catch((e) => {
-              console.log(e)
-            })
-          }
-        }
+      if(this.like__open === false) {
+        this.like__one = false;
+        this.like__two = false;
+        this.like__three = false;
+        this.like__four = false;
+        
       }
-      // this.like__save = !this.like__save;
+    },
+    // 평점
+    // ui적으로 평점잡는게 문제가 좀 있다
+    async likeBtn(value) {
+      // 평점은 1점 이상부터 가능
+      // 타이머
+      let timerInterval
+      this.$swal.fire({
+        title: 'Auto close alert!',
+        html: 'I will close in <b></b> milliseconds.',
+        timer: 2000,
+        timerProgressBar: true,
+        didOpen: () => {  
+          this.$swal.showLoading()
+          const b = this.$swal.getHtmlContainer().querySelector('b')
+          timerInterval = setInterval(() => {
+            b.textContent = this.$swal.getTimerLeft()
+          }, 100)
+        },
+        willClose: () => {
+          clearInterval(timerInterval)
+        }
+      }).then((result) => {
+        /* Read more about handling dismissals below */
+        if (result.dismiss === this.$swal.DismissReason.timer) {
+          // 
+        }
+      })
+
+      await axios({
+        url: `https://api.themoviedb.org/3/${this.CHECK_DATA === "movie" ? "movie" : "tv"}/${this.ID}/rating?api_key=${this.API_KEY}&${localStorage.getItem('session_id') !== undefined ? "session_id=" + localStorage.getItem('session_id') : "guest_session_id=" + localStorage.getItem('guest_session_id')}`,
+        method: 'POST',
+        data: {
+          value : value
+        }
+      }).then((res) => {
+        console.log(res);
+        this.like__save = true;
+        
+        this.$swal.fire({
+          position: 'top-end',
+          icon: 'success',
+          title: '평점을 등록했습니다',
+          showConfirmButton: false,
+          timer: 2000
+        })
+        setTimeout(() => {
+          this.$router.go();
+        },1000)
+      }).catch((e) => {
+        console.log(e)
+      })
+      // 평점 삭제
+      // axios({
+      //   url: `https://api.themoviedb.org/3/${this.CHECK_DATA === "movie" ? "movie" : "tv"}/${this.ID}/rating?api_key=${this.API_KEY}&${localStorage.getItem('session_id') !== undefined ? "session_id=" + localStorage.getItem('session_id') : "guest_session_id=" + localStorage.getItem('guest_session_id')}`,
+      //   method: 'DELETE'
+      // }).then((res) => {
+      //   console.log(res);
+      //   this.like__save = false;
+      //   this.$swal.fire({
+      //     position: 'top-end',
+      //     icon: 'success',
+      //     title: '평점을 삭제했습니다',
+      //     showConfirmButton: false,
+      //     timer: 2000
+      //   })
+      // }).catch((e) => {
+      //   console.log(e)
+      // })
     },
     // -> css before content -> a태그가 아닌 클릭이벤트로 location으로 이동
     instagram() {
@@ -516,9 +671,11 @@ export default {
       }
 
       if(localStorage.getItem('session_id')) {
-        axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/favorite/movies?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}&language=en-US&sort_by=created_at.asc`)
+        // favorite
+        axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/favorite/${this.CHECK_DATA === "movie" ? "movies" : "tv" }?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}&language=ko&sort_by=created_at.asc`)
         .then((res) => {
           // 즐겨찾기한 영화 아이디와 -> 상세페이지의 아이디가 같으면 해당 아이템에 색깔 표시해주기 (mounted라 새로고침해도 그때마다 입력이라 안변한다 -> 변하면 안되는걸 mounted로 새로고침마다 부여하면 된다)
+          console.log("즐겨찾기")
           console.log(res);
           res.data.results.forEach((e) => {
             if(this.ID === String(e.id)) {
@@ -529,9 +686,54 @@ export default {
         }).catch((e) => {
           console.log(e);
         })
-      } else if(localStorage.getItem('guest_session_id')) {
-        
+
+        // rating
+        axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/watchlist/${this.CHECK_DATA === "movie" ? "movies" : "tv" }?api_key=${this.API_KEY}&language=ko&session_id=${localStorage.getItem('session_id')}&sort_by=created_at.asc`)
+        .then((res) => {
+          // 관심목록에 영화 아이디와 -> 상세페이지의 아이디가 같으면 해당 아이템에 색깔 표시해주기 (mounted라 새로고침해도 그때마다 입력이라 안변한다 -> 변하면 안되는걸 mounted로 새로고침마다 부여하면 된다)
+          console.log("관심목록")
+          console.log(res);
+          res.data.results.forEach((e) => {
+            if(this.ID === String(e.id)) {
+              // 같은 값이 맞지않다면 타입이 다른거다 -> 맞춰줘라
+              this.watchlist__save = true;
+            }
+          })
+        }).catch((e) => {
+          console.log(e);
+        })
       }
+
+      // 전체 session
+      // 평점
+      axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/rated/${this.CHECK_DATA === "movie" ? "movies" : "tv" }?api_key=${this.API_KEY}&language=ko&${ localStorage.getItem('session_id') !== undefined ? "session_id=" + localStorage.getItem('session_id') : "guest_session_id=" + localStorage.getItem('guest_session_id')}&sort_by=created_at.asc`)
+      .then((res) => {
+        console.log('리뷰');
+        console.log(res);
+        res.data.results.forEach((e) => {
+          if(this.ID === String(e.id)) {
+            // 같은 값이 맞지않다면 타입이 다른거다 -> 맞춰줘라
+            this.like__save = true;
+            if(e.rating === 2.5) {
+              this.like__one = true;
+            } else if(e.rating === 5) {
+              this.like__one = true;
+              this.like__two = true;
+            } else if(e.rating === 7.5) {
+              this.like__one = true;
+              this.like__two = true;
+              this.like__three = true;
+            }else if(e.rating === 10) {
+              this.like__one = true;
+              this.like__two = true;
+              this.like__three = true;
+              this.like__four = true;
+            }
+          }
+        })
+      }).catch((e) => {
+        console.log(e);
+      })
     } catch(e) {
       console.error(e);
     }
@@ -561,12 +763,12 @@ export default {
                 <div class="__favorites" :class="{ favorites__save }"  @click="favoritesBtn()" title="즐겨찾기에 추가"></div>
                 <div class="__watchlist" :class="{ watchlist__save }"  @click="watchlistBtn()" title="관심목록에 추가"></div>
                 <div class="__likeBtn">
-                  <div class="__like" :class="{ like__save }"  @click="likeBtn()" title="평점 등록"></div>
+                  <div class="__like" :class="{ like__save }"  @click="likeOpenBtn()" title="평점 등록"></div>
                   <div class="__likeBox" :class="{ like__open }">
-                    <div class="star __one"></div>
-                    <div class="star __two"></div>
-                    <div class="star __three"></div>
-                    <div class="star __four"></div>
+                    <div class="star __one" @mouseover="like_number_one()" @mouseout="like_number_one_out()" @click="likeBtn(2.5)" :class="{ like__one }"></div>
+                    <div class="star __two" @mouseover="like_number_two()" @mouseout="like_number_two_out()" @click="likeBtn(5)" :class="{ like__two }"></div>
+                    <div class="star __three" @mouseover="like_number_three()" @mouseout="like_number_three_out()" @click="likeBtn(7.5)" :class="{ like__three }"></div>
+                    <div class="star __four" @mouseover="like_number_four()" @click="likeBtn(10)" :class="{ like__four }"></div>
                   </div>
                 </div>
               </div>
@@ -865,6 +1067,26 @@ export default {
                       &:active:before {
                         color: yellow;
                       }
+                    }
+                  }
+                  .__one.like__one {
+                    &::before {
+                      color: yellow !important;
+                    }
+                  }
+                  .__two.like__two {
+                    &::before {
+                      color: yellow !important;
+                    }
+                  }
+                  .__three.like__three {
+                    &::before {
+                      color: yellow !important;
+                    }
+                  }
+                  .__four.like__four {
+                    &::before {
+                      color: yellow !important;
                     }
                   }
                 }

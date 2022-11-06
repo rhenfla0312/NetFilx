@@ -56,6 +56,21 @@ export default {
       this.open__item = !this.open__item;
       this.mobile__check = false;
     },
+    userInfo(e) {
+      if(localStorage.getItem('guest_session_id')) {
+        // guest_session_id로는 불가능하다
+        // e.preventDefault();
+        
+        this.$swal.fire({
+          position: 'top-end',
+          icon: 'warning',
+          title: 'guest id로는 불가능합니다',
+          showConfirmButton: false,
+          timer: 2000
+        })
+      }
+      this.open__item = false;
+    },
     logOut() {
       this.$swal.fire({
         title: '정말 로그아웃 하시겠습니까?',
@@ -207,7 +222,7 @@ export default {
         }).then((res) => {
           console.log(res);
           this.request_token = res.data.request_token;
-          window.open(`https://www.themoviedb.org/authenticate/${this.request_token}`)
+          // window.open(`https://www.themoviedb.org/authenticate/${this.request_token}`)
 
         }).catch((error) => {
           console.log(error)
@@ -314,7 +329,7 @@ export default {
       // id/pw_session_info
       await axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/lists?api_key=${this.API_KEY}&language=en-US&session_id=${localStorage.getItem('session_id')}`)
       .then((res) => {
-        console.log(res)
+        // console.log(res)
       }).catch((e) => {
         console.log(e)
       })
@@ -339,10 +354,10 @@ export default {
       
       <!-- myinfo__item -->
       <div class="__myInfoItem" :class="{ open__item }">
-        <RouterLink to="/favorite">
+        <RouterLink to="/favorite" @click="userInfo($event)">
           <div class="__saveMovie">즐겨찾기</div>
         </RouterLink>
-        <RouterLink to="/rating">
+        <RouterLink to="/rating" @click="userInfo($event)">
           <div class="__saveTv">관심목록</div>
         </RouterLink>
         <div class="__logOut" @click="logOut()">로그아웃</div>
