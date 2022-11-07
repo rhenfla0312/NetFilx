@@ -1,6 +1,10 @@
 <script>
 import axios from 'axios';
+import Skeleton from '../components/Skeleton.vue';
 export default {
+  components: {
+    Skeleton
+  },
   data() {
     return {
       // 개봉예정 URL
@@ -277,9 +281,7 @@ export default {
       .then((res) => {
         // console.log(res)
         this.POPULAR_DATA = res.data.results;
-        setTimeout(() => {
-          this.skeleton = false;
-        },100)
+        this.skeleton = false;
       }).catch((error) => {
         console.log(error)
       }) 
@@ -294,40 +296,31 @@ export default {
         if (entry.isIntersecting) { // 감지대상이 교차영역에 진입 할 경우
           // axios
           if(this.CHECK_DATA == "movie") {
-            // this.skeleton = true;
             if(this.genres_start) {
               axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${this.API_KEY}&language=ko&with_genres=${this.genres_url}&page=${this.movie_page}`).
               then(res => {
                 console.log(res);
                 this.POPULAR_DATA = this.POPULAR_DATA.concat(res.data.results);
                 this.genres_start = false;
-                // setTimeout(() => {
-                //   this.skeleton = false;
-                // },1000)
               }).catch(e => {
                 console.log(e)
               })
             } else {
               axios.get(`${this.POPULAR_MOVIE_URL}?api_key=${this.API_KEY}&language=ko&page=${this.movie_page}`)
               .then((res) => {
-                this.POPULAR_DATA = this.POPULAR_DATA.concat(res.data.results)
-                // setTimeout(() => {
-                //   this.skeleton = false;
-                // },1000)
+                this.POPULAR_DATA = this.POPULAR_DATA.concat(res.data.results);
               }).catch((error) => {
                 console.log(error)
               })
             }
             this.movie_page++;
           } else {
-            // this.skeleton = false;
             if(this.genres_start) {
               axios.get(`https://api.themoviedb.org/3/discover/tv?api_key=${this.API_KEY}&language=ko&with_genres=${this.genres_url}&page=${this.tv_page}`).
                 then(res => {
                   console.log(res);
                   this.POPULAR_DATA = this.POPULAR_DATA.concat(res.data.results);
                   setTimeout(() => {
-                    // this.skeleton = false;
                     this.genres_start = false;
                   },1000)
                 }).catch(e => {
@@ -337,9 +330,6 @@ export default {
               axios.get(`${this.POPULAR_TV_URL}?api_key=${this.API_KEY}&language=ko&page=${this.tv_page}`)
               .then((res) => {
                 this.POPULAR_DATA = this.POPULAR_DATA.concat(res.data.results)
-                // setTimeout(() => {
-                //   this.skeleton = false;
-                // },1000)
               }).catch((error) => {
                 console.log(error);
               })
@@ -386,10 +376,10 @@ export default {
           </div>
         </div>
       </div>
-      <div class="popular__item">
+      <Skeleton v-if="skeleton" />
+      <div class="popular__item" v-else>
         <div class="__item" v-for="item in POPULAR_DATA" :key="item" @click="detail(item.id)">
-          <div v-if="skeleton" class="__skeleton"></div>
-          <img v-else :src="`${POPULAR_IMG}/${item.poster_path}`" />
+          <img :src="`${POPULAR_IMG}/${item.poster_path}`" />
         </div>
       </div>
     </div>

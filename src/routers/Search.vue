@@ -1,6 +1,11 @@
 <script>
 import axios from 'axios';
+import Skeleton from '../components/Skeleton.vue';
+
 export default {
+  components: {
+    Skeleton
+  },
   data() {
     return {
       SEARCH_URL : 'https://api.themoviedb.org/3/search/multi',
@@ -64,14 +69,10 @@ export default {
         if (entry.isIntersecting) { // 감지대상이 교차영역에 진입 할 경우
           // axios
           if(this.total_page >= this.search_page) {
-            // this.skeleton = true;
             axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.SEARCH_TITLE}&page=${this.search_page}`)
             .then((res) => {
               // console.log(res);
               this.SEARCH_FILE = this.SEARCH_FILE.concat(res.data.results)
-              // setTimeout(() => {
-              //   this.skeleton = false;
-              // },1000)
             }).catch((error) => {
               console.log(error)
             })
@@ -85,17 +86,24 @@ export default {
     io.observe(search)
   },
   async mounted() {
-    await axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.SEARCH_TITLE}`)
-      .then((res) => {
-        console.log(res)
-        this.SEARCH_FILE = res.data.results;
-        this.CHECK_DATA = res.data.results[0].media_type;
-        setTimeout(() => {
+    if(this.SEARCH_TITLE === '') {
+      this.skeleton = false;
+      return
+    } else {
+      await axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.SEARCH_TITLE}`)
+        .then((res) => {
+          console.log(res)
+          this.SEARCH_FILE = res.data.results;
+          if(res.data.results.length === 0) {
+            return;
+          } else {
+            this.CHECK_DATA = res.data.results[0].media_type;
+          }
           this.skeleton = false;
-        },100)
-      }).catch((error) => {
-        console.log(error)
-      })
+        }).catch((error) => {
+          console.log(error)
+        })
+    }
   }
 }
 </script>
@@ -104,10 +112,10 @@ export default {
 <template>
   <div class="search">
     <div class="search__list">
-      <div class="search__item" v-if="this.SEARCH_TITLE !== ''">
+      <Skeleton v-if="skeleton" />
+      <div class="search__item" v-else-if="this.CHECK_DATA !== ''">
         <div class="__item" v-for="item in SEARCH_FILE" :key="item" @click="detail(item.id)">
-          <div v-if="skeleton" class="__skeleton"></div>
-          <img v-else :src="`${SEARCHR_IMG}/${item.poster_path}`" />
+          <img :src="`${SEARCHR_IMG}/${item.poster_path}`" />
         </div>
       </div>
       <div class="no__item" v-else>검색된 결과가 없습니다</div>

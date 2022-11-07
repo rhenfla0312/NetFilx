@@ -3,6 +3,8 @@
 import axios from 'axios'
 import { Pagination, Navigation } from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/vue'
+import Slide_Skeleton from '../components/Slide_Skeleton.vue'
+import Slide_Video_Skeleton from '../components/Slide_Video_Skeleton.vue'
 
 import 'swiper/css'
 import 'swiper/css/pagination'
@@ -13,6 +15,8 @@ export default {
   components: {
     Swiper,
     SwiperSlide,
+    Slide_Skeleton,
+    Slide_Video_Skeleton
   },
   setup() {
     return {
@@ -308,9 +312,7 @@ export default {
       .then((res) => {
         // console.log(res);
         this.new_movies = res.data.results
-        setTimeout(() => {
-          this.skeleton_new = false;
-        },100)
+        this.skeleton_new = false;
       }).catch((error) => {
         console.log(error)
       })
@@ -320,9 +322,7 @@ export default {
       .then((res) => {
         // console.log(res)
         this.popular_moviles = res.data.results
-        setTimeout(() => {
-          this.skeleton_popular = false;
-        },100)
+        this.skeleton_popular = false;
       }).catch((error) => {
         console.log(error)
       })
@@ -332,9 +332,7 @@ export default {
       .then((res) => {
         // console.log(res)
         this.trand_movies = res.data.results
-        setTimeout(() => {
-          this.skeleton_trand = false;
-        },100)
+        this.skeleton_trand = false;
       }).catch((error) => {
         console.log(error)
       })
@@ -344,6 +342,13 @@ export default {
       .then((res) => {
         // console.log(res)
         this.new_video_infos.push(res.data);
+        this.skeleton_video = false;
+
+        this.$refs.mv_bg.style.backgroundImage = `url(${this.MOVIE_IMG}${res.data.backdrop_path})`;
+        this.$refs.mv_bg.style.backgroundPosition = 'center';
+        this.$refs.mv_bg.style.backgroundSize = '100%';
+        this.$refs.mv_bg.style.backgroundRepeat = 'no-repeat';
+
       }).catch((error) => {
         console.log(error)
       })
@@ -351,6 +356,7 @@ export default {
       .then((res) => {
         // console.log(res)
         this.new_video_infos.push(res.data);
+        this.skeleton_video = false;
       }).catch((error) => {
         console.log(error)
       })
@@ -358,6 +364,7 @@ export default {
       .then((res) => {
         // console.log(res)
         this.new_video_infos.push(res.data);
+        this.skeleton_video = false;
       }).catch((error) => {
         console.log(error)
       })
@@ -365,6 +372,7 @@ export default {
       .then((res) => {
         // console.log(res)
         this.new_video_infos.push(res.data);
+        this.skeleton_video = false;
       }).catch((error) => {
         console.log(error)
       })
@@ -382,7 +390,7 @@ export default {
   <div class="mv__container">
   <div class="mv__img">
     <div class="mv__searchBox">
-      <span class="material-symbols-outlined">search</span>
+      <span class="material-symbols-outlined" @click="search()">search</span>
       <input type="text" v-model="searchs" @keydown.enter="search()" placeholder="영화 및 TV프로그램을 검색하세요">
     </div>
   </div>
@@ -390,10 +398,11 @@ export default {
     <!-- 1 swiper -> new -->
     <div class="mv__first">
       <div class="first">개봉예정</div>
-      <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
+      <Slide_Skeleton v-if="skeleton_new" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false" />
+      <swiper class="first__swiper" v-else :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in new_movies" :key="movie">
-          <div v-if="skeleton_new" class="skeleton__poster"></div>
-          <img v-else class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="new_movieInfo(movie.id, movie.backdrop_path)">
+          <!-- <div v-if="skeleton_new" class="skeleton__poster"></div> -->
+          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="new_movieInfo(movie.id, movie.backdrop_path)">
           <!-- <span class="material-symbols-outlined bookmark">bookmark</span> -->
         </swiper-slide>
         <swiper-slide class="mv__next">
@@ -428,10 +437,10 @@ export default {
     <!-- 2 swiper -> popular -->
     <div class="mv__first">
       <div class="first">인기</div>
-      <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
+      <Slide_Skeleton v-if="skeleton_popular" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false" />
+      <swiper class="first__swiper" v-else :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in popular_moviles" :key="movie">
-          <div v-if="skeleton_popular" class="skeleton__poster"></div>
-          <img v-else class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`"  @click="popular_movieInfo(movie.id, movie.backdrop_path)" />
+          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`"  @click="popular_movieInfo(movie.id, movie.backdrop_path)" />
           <!-- <span class="material-symbols-outlined bookmark">bookmark</span> -->
         </swiper-slide>
         <swiper-slide class="mv__next">
@@ -466,7 +475,8 @@ export default {
     <div class="mv__first">
       <div class="video__swiper" ref="mv_bg">
         <div class="first first__video">최신예고편</div>
-        <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 4 : (displaySize > 768) ? 3 : 2" :space-between="30" :modules="modules" Navigation="false">
+        <Slide_Video_Skeleton v-if="skeleton_video" :slides-per-view="(displaySize > 1024) ? 4 : (displaySize > 768) ? 3 : 2" :space-between="30" :modules="modules" Navigation="false" />
+        <swiper class="first__swiper" v-else :slides-per-view="(displaySize > 1024) ? 4 : (displaySize > 768) ? 3 : 2" :space-between="30" :modules="modules" Navigation="false">
           <swiper-slide class="mv__video" v-for="movie in new_video_infos" :key="movie" @click="video_movieInfo(movie.id, movie.backdrop_path)">
             <div class="mv__box">
               <img class="mv__video__poster" :src="`${MOVIE_IMG}/${movie.backdrop_path}`" @mouseover="mvBack(movie.backdrop_path)" />
@@ -489,10 +499,10 @@ export default {
     <!-- 4 swiper -> trand -->
     <div class="mv__first">
       <div class="first">실시간 급상승</div>
-      <swiper class="first__swiper" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
+      <Slide_Skeleton v-if="skeleton_trand" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false" />
+      <swiper class="first__swiper" v-else :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in trand_movies" :key="movie">
-          <div v-if="skeleton_trand" class="skeleton__poster"></div>
-          <img v-else class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="trand_movieInfo(movie.id, movie.backdrop_path)" />
+          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="trand_movieInfo(movie.id, movie.backdrop_path)" />
           <!-- <span class="material-symbols-outlined bookmark">bookmark</span> -->
         </swiper-slide>
         <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
@@ -979,7 +989,7 @@ export default {
           }
         }
         .video__swiper {
-          height: 35vh !important;
+          height: 30vh !important;
         }
       }
       .mv__first {

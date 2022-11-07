@@ -45,12 +45,16 @@ export default {
       instagram_url: [],
       facebook_url: [],
       twitter_url: [],
+      rated_id : [],
+      list_item : [],
 
       list__save : false,
       favorites__save : false,
       watchlist__save : false,
       like__save : false,
       like__open : false,
+      list__open : false,
+      create__list : false,
 
       like__one : false,
       like__two : false,
@@ -126,16 +130,41 @@ export default {
         this.like__four = false;
       }
     },
+    like_number_four_out() {
+      this.like__four == false;
+    },
     // 목록 추가
+    listOpenBtn() {
+      if(localStorage.getItem('session_id')) {
+        this.list__open = true;
+      } else if(localStorage.getItem('guest_session_id')) {
+        this.$swal.fire({
+          position: 'top-end',
+          icon: 'warning',
+          title: '즐겨찾기 추가는 게스트 아이디로는 불가능합니다',
+          showConfirmButton: false,
+          timer: 2000
+        })
+      } else {
+        this.$swal.fire({
+          position: 'top-end',
+          icon: 'warning',
+          title: '로그인이 필요합니다',
+          showConfirmButton: false,
+          timer: 2000
+        })
+      }
+    },
+    list_close() {
+      this.list__open = false;
+    },
+    create__listBtn() {
+      this.create__list = true;
+    },
     listBtn() {
-      this.$swal.fire({
-        position: 'top-end',
-        icon: 'warning',
-        title: '준비중입니다',
-        showConfirmButton: false,
-        timer: 2000
-      })
-      // this.list__save = !this.list__save;
+      // 목록 추가
+      alert('추가');
+      // this.list_item
     },
     // 즐겨찾기 추가
     async favoritesBtn() {
@@ -370,13 +399,32 @@ export default {
     },
     likeOpenBtn() {
       this.like__open = !this.like__open;
-      if(this.like__open === false) {
-        this.like__one = false;
-        this.like__two = false;
-        this.like__three = false;
-        this.like__four = false;
-        
-      }
+      this.rated_id.forEach((e) => {
+        if(this.ID === String(e.id)) {
+          // 같은 값이 맞지않다면 타입이 다른거다 -> 맞춰줘라
+          this.like__save = true;
+          if(e.rating === 2.5) {
+            this.like__one = true;
+          } else if(e.rating === 5) {
+            this.like__one = true;
+            this.like__two = true;
+          } else if(e.rating === 7.5) {
+            this.like__one = true;
+            this.like__two = true;
+            this.like__three = true;
+          }else if(e.rating === 10) {
+            this.like__one = true;
+            this.like__two = true;
+            this.like__three = true;
+            this.like__four = true;
+          } else {
+            this.like__one = false;
+            this.like__two = false;
+            this.like__three = false;
+            this.like__four = false;
+          }
+        }
+      })
     },
     // 평점
     // ui적으로 평점잡는게 문제가 좀 있다
@@ -407,7 +455,7 @@ export default {
       })
 
       await axios({
-        url: `https://api.themoviedb.org/3/${this.CHECK_DATA === "movie" ? "movie" : "tv"}/${this.ID}/rating?api_key=${this.API_KEY}&${localStorage.getItem('session_id') !== undefined ? "session_id=" + localStorage.getItem('session_id') : "guest_session_id=" + localStorage.getItem('guest_session_id')}`,
+        url: `https://api.themoviedb.org/3/${this.CHECK_DATA === "movie" ? "movie" : "tv"}/${this.ID}/rating?api_key=${this.API_KEY}&${localStorage.getItem('session_id') !== null ? "session_id=" + localStorage.getItem('session_id') : "guest_session_id=" + localStorage.getItem('guest_session_id')}`,
         method: 'POST',
         data: {
           value : value
@@ -431,7 +479,7 @@ export default {
       })
       // 평점 삭제
       // axios({
-      //   url: `https://api.themoviedb.org/3/${this.CHECK_DATA === "movie" ? "movie" : "tv"}/${this.ID}/rating?api_key=${this.API_KEY}&${localStorage.getItem('session_id') !== undefined ? "session_id=" + localStorage.getItem('session_id') : "guest_session_id=" + localStorage.getItem('guest_session_id')}`,
+      //   url: `https://api.themoviedb.org/3/${this.CHECK_DATA === "movie" ? "movie" : "tv"}/${this.ID}/rating?api_key=${this.API_KEY}&${localStorage.getItem('session_id') !== null ? "session_id=" + localStorage.getItem('session_id') : "guest_session_id=" + localStorage.getItem('guest_session_id')}`,
       //   method: 'DELETE'
       // }).then((res) => {
       //   console.log(res);
@@ -511,36 +559,9 @@ export default {
         })
       }
     },
-    // 영화 평가
-    movieReviews() {
-      // if(localStorage.getItem('session_id')) {
-      //   axios({
-      //     url: `https://api.themoviedb.org/3/movie/${this.ID}/rating?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
-      //     method: 'GET',
-      //     params: {
-      //       value : this.value
-      //     }
-      //   }).then((res) => {
-      //     console.log(res);
-      //   }).catch((e) => {
-      //     console.log(e)
-      //   })
-      // } else if(localStorage.getItem('guest_session_id')) {
-      //   axios({
-      //     url: `https://api.themoviedb.org/3/movie/${this.ID}/rating?api_key=${this.API_KEY}&guest_session_id=${localStorage.getItem('session_id')}`,
-      //     method: 'GET',
-      //     params: {
-      //       value : this.value
-      //     }
-      //   }).then((res) => {
-      //     console.log(res);
-      //   }).catch((e) => {
-      //     console.log(e)
-      //   })
-      // }
-    }
   },
-  mounted() { 
+  // try, catch문은 해당 함수가 async를 가지고있을때 사용이 가능하다 -> await쓰면서 await안에서 then, catch안할거면 async await을 쓰면서 전체를 try, catch 로 묶어라
+  async mounted() { 
     this.displaySize = window.innerWidth;
 
     try {
@@ -702,38 +723,66 @@ export default {
         }).catch((e) => {
           console.log(e);
         })
-      }
-
-      // 전체 session
-      // 평점
-      axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/rated/${this.CHECK_DATA === "movie" ? "movies" : "tv" }?api_key=${this.API_KEY}&language=ko&${ localStorage.getItem('session_id') !== undefined ? "session_id=" + localStorage.getItem('session_id') : "guest_session_id=" + localStorage.getItem('guest_session_id')}&sort_by=created_at.asc`)
-      .then((res) => {
-        console.log('리뷰');
-        console.log(res);
-        res.data.results.forEach((e) => {
-          if(this.ID === String(e.id)) {
-            // 같은 값이 맞지않다면 타입이 다른거다 -> 맞춰줘라
-            this.like__save = true;
-            if(e.rating === 2.5) {
-              this.like__one = true;
-            } else if(e.rating === 5) {
-              this.like__one = true;
-              this.like__two = true;
-            } else if(e.rating === 7.5) {
-              this.like__one = true;
-              this.like__two = true;
-              this.like__three = true;
-            }else if(e.rating === 10) {
-              this.like__one = true;
-              this.like__two = true;
-              this.like__three = true;
-              this.like__four = true;
+        // 세션 평점
+        axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/rated/${this.CHECK_DATA === "movie" ? "movies" : "tv" }?api_key=${this.API_KEY}&language=ko$session_id=${localStorage.getItem('session_id')}&sort_by=created_at.asc`)
+        .then((res) => {
+          console.log(res);
+          this.rated_id = res.data.results;
+          res.data.results.forEach((e) => {
+            if(this.ID === String(e.id)) {
+              // 같은 값이 맞지않다면 타입이 다른거다 -> 맞춰줘라
+              this.like__save = true;
+              if(e.rating === 2.5) {
+                this.like__one = true;
+              } else if(e.rating === 5) {
+                this.like__one = true;
+                this.like__two = true;
+              } else if(e.rating === 7.5) {
+                this.like__one = true;
+                this.like__two = true;
+                this.like__three = true;
+              }else if(e.rating === 10) {
+                this.like__one = true;
+                this.like__two = true;
+                this.like__three = true;
+                this.like__four = true;
+              }
             }
-          }
+          })
+        }).catch((e) => {
+          console.log(e);
         })
-      }).catch((e) => {
-        console.log(e);
-      })
+      } else {
+        // 게스트 평점
+        axios.get(`https://api.themoviedb.org/3/guest_session/${localStorage.getItem('guest_session_id')}/rated/${this.CHECK_DATA === "movie" ? "movies" : "tv" }?api_key=${this.API_KEY}&language=en-US&sort_by=created_at.asc`)
+        .then((res) => {
+          console.log(res);
+          this.rated_id = res.data.results;
+          res.data.results.forEach((e) => {
+            if(this.ID === String(e.id)) {
+              // 같은 값이 맞지않다면 타입이 다른거다 -> 맞춰줘라
+              this.like__save = true;
+              if(e.rating === 2.5) {
+                this.like__one = true;
+              } else if(e.rating === 5) {
+                this.like__one = true;
+                this.like__two = true;
+              } else if(e.rating === 7.5) {
+                this.like__one = true;
+                this.like__two = true;
+                this.like__three = true;
+              }else if(e.rating === 10) {
+                this.like__one = true;
+                this.like__two = true;
+                this.like__three = true;
+                this.like__four = true;
+              }
+            }
+          })
+        }).catch((e) => {
+          console.log(e);
+        })
+      }
     } catch(e) {
       console.error(e);
     }
@@ -759,7 +808,37 @@ export default {
             <div class="__text">
               <div class="__title">{{ CHECK_DATA == "movie" ? detail_data.title : detail_data.name }}</div>
               <div class="my__list">
-                <div class="__list" :class="{ list__save }" @click="listBtn()" title="목록에 추가"></div>
+                <div class="__list" :class="{ list__save }" @click="listOpenBtn()" title="목록에 추가"></div>
+                <div class="__listBox" :class="{ list__open }">
+                  <div class="list__header">
+                    <div class="list__title">재생목록 추가</div>
+                    <div class="list__close"><span class="material-symbols-outlined" @click="list_close()">close</span></div>
+                  </div>
+                  <!-- 재생목록 -->
+                  <div class="list__body">
+                    <div class="__body">
+                      <div class="body__checkbox">
+                        <input type="checkbox" value="" class="__checkbox" />
+                      </div>
+                      <div class="body__title"></div>
+                    </div>
+                  </div>
+                  <div class="list__create" @click="create__listBtn()">
+                    <div class="create__icon"><span class="material-symbols-outlined">playlist_add</span></div>
+                    <div class="create__title">새 재생목록 만들기</div>
+                  </div>
+
+                  <!-- 재생목록 추가 -->
+                  <div class="__createBox" :class="{ create__list }">
+                    <div class="__createText">
+                      <input type="text" class="__createContent" />
+                    </div>
+                    <div class="__createBtnBox">
+                      <button class="__createClose">취소</button>
+                      <button class="__createBtn">추가하기</button>
+                    </div>
+                  </div>
+                </div>
                 <div class="__favorites" :class="{ favorites__save }"  @click="favoritesBtn()" title="즐겨찾기에 추가"></div>
                 <div class="__watchlist" :class="{ watchlist__save }"  @click="watchlistBtn()" title="관심목록에 추가"></div>
                 <div class="__likeBtn">
@@ -931,11 +1010,14 @@ export default {
               .my__list {
                 padding-top: 1rem;
                 display: flex;
-                div {
+                .__favorites {
                   margin-left: 2rem;
-                  &:first-child {
-                    margin-left: 0;
-                  }
+                }
+                .__watchlist {
+                  margin-left: 2rem;
+                }
+                .__likeBtn {
+                  margin-left: 2rem;
                 }
                 .__list {
                   border-radius: 50%;
@@ -959,6 +1041,157 @@ export default {
                     font-family: FontAwesome;
                     content: "\f03a";
                     color: #283593;
+                  }
+                }
+                .__listBox {
+                  display: none;
+                }
+                .__listBox.list__open {
+                  display: block;
+                  position: fixed;
+                  top: 30%;
+                  width: 15vw;
+                  min-height: 50vh;
+                  left: 0;
+                  right: 0;
+                  margin: auto;
+                  border-radius: 15px;
+                  z-index: 70;
+                  background: #10161d;
+                  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+                  animation: fadeInUp 1s;
+                  @keyframes fadeInUp {
+                    0% {
+                      opacity: 0;
+                      // translate(x, y)
+                      transform: translateY(100%);
+                    }
+                    100% {
+                      opacity: 1;
+                      transform: translateY(0);
+                    }
+                  }
+                  .list__header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    color: #fff;
+                    padding: 1rem;
+                    border-bottom: 1px solid #fff;
+                    .list__title {
+                      font-size: 20px;
+                    }
+                    .list__close {
+                      display: flex;
+                      align-items: center;
+                      span {
+                        font-size: 25px;
+                        cursor: pointer;
+                        transform: rotate(0);
+                        transition: .2s;
+                        &:hover {
+                          transform: rotate(180deg);
+                          transition: .2s;
+                        }
+                      }
+                    }
+                  }
+                  .list__body {
+                    padding: 1rem;
+                    min-height: 38vh;
+                    .__body {
+                      display: flex;
+                      align-items: center;
+                      margin-bottom: .5rem;
+                      .body__checkbox {
+                        display: flex;
+                        .__checkbox {
+                          width: 1.3rem;
+                          height: 1.3rem;
+                        }
+                      }
+                      .body__title {
+                        margin-left: 1rem;
+                        font-size: 18px;
+                        color: #fff;
+                      }
+                    }
+                  }
+                  .list__create {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 1rem;
+                    border-top: 1px solid #fff;
+                    color: #fff;
+                    cursor: pointer;
+                    .create__icon {
+                      display: flex;
+                      align-items: center;
+                      span {
+                        font-size: 30px;
+                      }
+                    }
+                    .create__title {
+                      margin-left: .3rem;
+                    }
+                  }
+                  .__createBox {
+                    display: none;
+                  }
+                  .__createBox.create__list {
+                    display: block;
+                    width: 20vw;
+                    height: 14vh;
+                    position: absolute;
+                    top: 20%;
+                    // bottom: 0;
+                    left: -50%;
+                    right: -50%;
+                    border-radius: 15px;
+                    margin: auto;
+                    padding: 1rem;
+                    background: #10161d;
+                    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+                    animation: fadeInUp 1s;
+                    @keyframes fadeInUp {
+                      0% {
+                        opacity: 0;
+                        transform: translateY(100%);
+                      }
+                      100% {
+                        opacity: 1;
+                        transform: translateY(0);
+                      }
+                    }
+                    .__createText {
+                      .__createContent {
+                        outline: none;
+                        border: none;
+                        width: 100%;
+                        height: 4vh;
+                        background: #797a7b;
+                        border-radius: 5px;
+                        border: 1px solid #797a7b;
+                      }
+                    }
+                    .__createBtnBox {
+                      display: flex;
+                      padding-top: 2rem;
+                      justify-content: end;
+                      .__createClose,
+                      .__createBtn {
+                        background: #797a7b;
+                        color: #fff;
+                        border: none;
+                        border-radius: 5px;
+                        width: 5vw;
+                        height: 3vh;
+                      }
+                      .__createClose {
+                        margin-right: 10px;
+                      }
+                    }
                   }
                 }
                 .__favorites {

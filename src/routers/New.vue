@@ -1,6 +1,10 @@
 <script>
 import axios from 'axios';
+import Skeleton from '../components/Skeleton.vue';
 export default {
+  components: {
+    Skeleton
+  },
   data() {
     return {
       // 개봉예정 URL
@@ -68,9 +72,7 @@ export default {
       .then((res) => {
         // console.log(res)
         this.NEW_DATA = res.data.results;
-        setTimeout(() => {
-          this.skeleton = false;
-        },100)
+        this.skeleton = false;
       }).catch((error) => {
         console.log(error)
       }) 
@@ -86,26 +88,18 @@ export default {
         if (entry.isIntersecting) { // 감지대상이 교차영역에 진입 할 경우
           // axios
           if(this.CHECK_DATA == "movie") {
-              // this.skeleton = true;
               await axios.get(`${this.NEW_MOVIE_URL}?api_key=${this.API_KEY}&language=ko&page=${this.movie_page}`)
               .then((res) => {
                 console.log(res);
                 this.NEW_DATA = this.NEW_DATA.concat(res.data.results)
-                // setTimeout(() => {
-                //   this.skeleton = false;
-                // },1000)
               }).catch((error) => {
                 console.log(error)
               })
               this.movie_page++;
           } else {
-            // this.skeleton = true;
             await axios.get(`${this.NEW_TV_URL}?api_key=${this.API_KEY}&language=ko&page=${this.tv_page}`)
             .then((res) => {
               this.NEW_DATA = this.NEW_DATA.concat(res.data.results)
-              // setTimeout(() => {
-              //   this.skeleton = false;
-              // },1000)
             }).catch((error) => {
               console.log(error)
             })
@@ -132,10 +126,12 @@ export default {
           <div class="__tv" @click="tv()">TV프로그램</div>
         </div>
       </div>
-      <div class="new__item">
+      <Skeleton v-if="skeleton" />
+      <div class="new__item" v-else>
         <div class="__item" v-for="item in NEW_DATA" :key="item" @click="detail(item.id)">
-          <div v-if="skeleton" class="__skeleton"></div>
-          <img v-else :src="`${NEW_IMG}/${item.poster_path}`" />
+          <!-- <Skeleton /> -->
+          <!-- <div v-if="skeleton" class="__skeleton"></div> -->
+          <img :src="`${NEW_IMG}/${item.poster_path}`" />
         </div>
       </div>
     </div>
@@ -147,7 +143,6 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@500&display=swap');
   .new {
     padding-top: 4.1rem;
-    // height: 100vh;
     background: #060d17;
     .new__list {
       width: 70vw;

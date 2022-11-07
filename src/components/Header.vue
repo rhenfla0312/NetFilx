@@ -31,12 +31,15 @@ export default {
       session_id: "",
       guest_session_id : "",
       account_id : "",
+      session_check: true,
 
       CHECK_DATA : "",
 
       // 유효성 검사
       error_id : false,
       error_pw : false,
+
+      mobile__close: false,
 
     }
   },
@@ -56,7 +59,14 @@ export default {
       this.open__item = !this.open__item;
       this.mobile__check = false;
     },
-    userInfo(e) {
+    mobile_close_check() {
+      this.mobile__close = true;
+    },
+    mobile_close() {
+      this.searchData = false;
+      this.mobile__close = false;
+    },
+    userInfo() {
       if(localStorage.getItem('guest_session_id')) {
         // guest_session_id로는 불가능하다
         // e.preventDefault();
@@ -82,9 +92,13 @@ export default {
         confirmButtonText: 'LogOut'
         }).then((result) => {
         if (result.isConfirmed) {
-          this.$swal.fire(
-            '로그아웃 되셨습니다!',
-          )
+          this.$swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: '로그아웃 되셨습니다!',
+            showConfirmButton: false,
+            timer: 1500
+          })
           localStorage.removeItem('session_id');
           localStorage.removeItem('guest_session_id');
           localStorage.removeItem('account_id');
@@ -94,6 +108,7 @@ export default {
       })
     },
     async search() {
+      this.searchData = false;
       // 총 페이지 개수마 넘겨주는 용도
       await axios.get(`${this.SEARCH_URL}?api_key=${this.API_KEY}&language=ko&query=${this.searchs}`)
         .then((res) => {
@@ -142,6 +157,7 @@ export default {
         localStorage.setItem('guest_session_id', this.guest_session_id)
         this.login_check = true;
         this.login__layout = false;
+        this.session_check = false;
         this.$swal.fire({
           position: 'top-end',
           icon: 'success',
@@ -223,7 +239,7 @@ export default {
           console.log(res);
           this.request_token = res.data.request_token;
           // window.open(`https://www.themoviedb.org/authenticate/${this.request_token}`)
-
+          this.session_check = true;
         }).catch((error) => {
           console.log(error)
         })
@@ -346,20 +362,29 @@ export default {
       <RouterLink to="/new" class="__movie">신규</RouterLink>
       <RouterLink to="/popular" class="__tv">인기</RouterLink>
       <div class="__searchBox" :class="{ searchData }">
-        <input type="text" class="__searchText" ref="searchText" :class="{ searchData }" v-model="searchs" @keydown.enter="search()" @click="searchText()" />
-        <div class="__search"><span @click="search()" class="material-symbols-outlined">search</span></div>
+        <div class="__searchLineBox" :class="{ searchData }">
+          <input type="text" class="__searchText" ref="searchText" :class="{ searchData }" v-model="searchs" @keydown.enter="search()" @click="searchText(), mobile_close_check()" />
+          <div class="__search"><span @click="search()" class="material-symbols-outlined">search</span></div>
+          <span class="search__close" @click="mobile_close()" :class="{ mobile__close }">취소</span>
+        </div>
       </div>
       <div class="__myInfo __users" v-if="login_check"><span class="material-symbols-outlined" @click="openItem()">account_circle</span></div>
       <div v-else class="__myInfo __login" @click="login()">로그인</div>
       
       <!-- myinfo__item -->
       <div class="__myInfoItem" :class="{ open__item }">
-        <RouterLink to="/favorite" @click="userInfo($event)">
+        <RouterLink to="/favorite" v-if="session_check">
           <div class="__saveMovie">즐겨찾기</div>
         </RouterLink>
-        <RouterLink to="/rating" @click="userInfo($event)">
+        <span v-else @click="userInfo()">
+          <div class="__saveMovie">즐겨찾기</div>
+        </span>
+        <RouterLink to="/rating" v-if="session_check">
           <div class="__saveTv">관심목록</div>
         </RouterLink>
+        <span v-else @click.prevent="userInfo()">
+          <div class="__saveTv">관심목록</div>
+        </span>
         <div class="__logOut" @click="logOut()">로그아웃</div>
       </div>
       <!-- login__item -->
@@ -518,6 +543,13 @@ export default {
 }
 
 @media screen and (max-width: 768px) {
+  // 모바일에서만 스크롤 없애기 -> 손으로 넘기기
+  * {
+    // mobile -> search scroll none
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
   .mv__header {
     // height: 10vh !impo/rtant;
     .mv__menu {
@@ -578,7 +610,55 @@ export default {
         }
       }
       .__searchBox.searchData {
-        width: 50% !important;
+        width: 100% !important;
+        height: 100vh !important;
+        background: #eeeeee !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        background: #10161d !important;
+        .__searchLineBox.searchData {
+          width: 100%;
+          height: 5.5vh;
+          border-bottom: 1px solid #ffffff !important;
+          .__searchText.searchData {
+            padding-left: 2rem;
+            padding-right: 4rem;
+            height: 5vh !important;
+            border-radius: 0;
+            transition: 0 !important;
+          }
+          .__search {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            // margin-top: 0.1vw;
+            position: absolute;
+            right: 5rem;
+            z-index: 200;
+            color: #797a7b;
+            top: 0.5rem;
+            bottom: auto;
+            margin: auto;
+            span {
+              font-size: 30px !important;
+            }
+          }
+        }
+        .search__close.mobile__close {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 15vw;
+          padding-right: .5rem;
+          padding-left: .5rem;
+          font-size: 20px;
+          cursor: pointer;
+          // border-left: 1px solid #ffffff;
+        }
       }
       .__myInfo {
         display: none !important;
@@ -819,7 +899,6 @@ export default {
     }
   }
 }
-
 a {
   color: #fff !important;
   text-decoration: none !important;
@@ -860,50 +939,57 @@ a {
     .__searchBox {
       height: 4.2vh;
       position: relative;
-      display: flex;
+      // display: flex;
       margin-left: auto;
       outline: none;
       border: none;
       margin-right: 2vw;
-      .__search {
+      .__searchLineBox {
+        background: #10161d;
         display: flex;
-        justify-content: center;
-        align-items: center;
-        // margin-left: auto;
-        margin-top: 0.1vw;
-        position: absolute;
-        right: 1vw;
-        z-index: 200;
-        color: #797a7b;
-        top: 0;
-        bottom: 0;
-        margin: auto;
-        span {
-          cursor: pointer;
-          font-size: 2vw;
+        .__search {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          // margin-left: auto;
+          margin-top: 0.1vw;
+          position: absolute;
+          right: 1vw;
+          z-index: 200;
+          color: #797a7b;
+          top: 0;
+          bottom: 0;
+          margin: auto;
+          span {
+            cursor: pointer;
+            font-size: 2vw;
+          }
+        }
+        .__searchText {
+          padding-left: 1rem;
+          width: 100%;
+          border-radius: 5px;
+          margin-left: auto;
+          opacity: 1;
+          transition: .4s;
+          font-size: 25px;
+          outline: none;
+          border: none;
+          // color: #797a7b;
+          color: #fff;
+          // background: #fff;
+          background: #10161d;
+        }
+        .__searchText.searchData {
+          width: 100% !important;
         }
       }
-      .__searchText {
-        padding-left: 1rem;
-        width: 50%;
-        border-radius: 5px;
-        margin-left: auto;
-        opacity: 1;
-        transition: .4s;
-        font-size: 25px;
-        outline: none;
-        border: none;
-        // color: #797a7b;
-        color: #fff;
-        // background: #fff;
-        background: #10161d;
-      }
-      .__searchText.searchData {
-        width: 100% !important;
+      .search__close {
+        display: none;
       }
     }
     .__searchBox.searchData {
-      width: 50% !important;
+      width: 50%;
     }
     .__myInfo {
       margin-right: 6vw;
@@ -953,17 +1039,15 @@ a {
       div {
         padding: 1rem;
         cursor: pointer;
-        &:first-child {
-          border-radius: 10px 10px 0 0;
-        }
-        &:last-child {
-          // margin-top: 2rem;
-          border-radius: 0 0 10px 10px;
-        }
         &:hover {
           background: #797a7b;
-
         }
+      }
+      .__saveMovie {
+        border-radius: 10px 10px 0 0;
+      }
+      .__logOut {
+        border-radius: 0 0 10px 10px;
       }
     }
     .__login {
