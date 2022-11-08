@@ -144,6 +144,7 @@ export default {
   .new {
     padding-top: 4.1rem;
     background: #060d17;
+    min-height: 80vh;
     .new__list {
       width: 70vw;
       margin: auto;

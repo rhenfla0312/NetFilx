@@ -8,6 +8,7 @@ import Popular from './Popular.vue'
 import Search from './Search.vue'
 import Favorite from './Favorite.vue'
 import Rating from './Rating.vue'
+import List from './List.vue'
 export default createRouter({
   scrollBehavior() {
     return { top : 0 }
@@ -17,6 +18,7 @@ export default createRouter({
   routes: [
     {
       path: '/',
+      name: "Home",
       component: Home
     },
     {
@@ -49,6 +51,11 @@ export default createRouter({
       path: "/rating",
       name: "rating",
       component: Rating
+    },
+    {
+      path: "/list/:id?",
+      name: "List",
+      component: List
     }
   ]
 })

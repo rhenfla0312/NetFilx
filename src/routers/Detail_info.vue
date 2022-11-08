@@ -41,12 +41,14 @@ export default {
       detail_reviews : [],
       detail_video: "",
       detail_data_genres : "",
+      createlist : "",
 
       instagram_url: [],
       facebook_url: [],
       twitter_url: [],
       rated_id : [],
       list_item : [],
+      listBoxData : [],
 
       list__save : false,
       favorites__save : false,
@@ -55,6 +57,8 @@ export default {
       like__open : false,
       list__open : false,
       create__list : false,
+      error_createlist : false,
+      item_present : false,
 
       like__one : false,
       like__two : false,
@@ -161,10 +165,145 @@ export default {
     create__listBtn() {
       this.create__list = true;
     },
-    listBtn() {
-      // 목록 추가
-      alert('추가');
-      // this.list_item
+    createClose() {
+      this.create__list = false;
+      this.error_createlist = false;
+    },
+    async createList() {
+      console.log(this.createlist.length)
+      if(this.createlist.length > 0) {
+        this.error_createlist = false;
+        // 타이머
+        let timerInterval
+        this.$swal.fire({
+          title: 'Auto close alert!',
+          html: 'I will close in <b></b> milliseconds.',
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: () => {  
+            this.$swal.showLoading()
+            const b = this.$swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+              b.textContent = this.$swal.getTimerLeft()
+            }, 100)
+          },
+          willClose: () => {
+            clearInterval(timerInterval)
+          }
+        }).then((result) => {
+          /* Read more about handling dismissals below */
+          if (result.dismiss === this.$swal.DismissReason.timer) {
+            // 
+          }
+        })
+        await axios({
+          method: "POST",
+          url: `https://api.themoviedb.org/3/list?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
+          data: {
+            name : this.createlist,
+            description : "test",
+            language: "ko"
+          }
+        }).then((res) => {
+          console.log(res);
+          this.create__list = false;
+
+          this.list_item = this.list_item.concat(res.data.list_id);
+          localStorage.setItem('list_id', JSON.stringify(this.list_item));
+        }).catch((e) => {
+          console.log(e)
+        })
+      } else {
+        this.error_createlist = true;
+      }
+    },
+    // 재생목록 -> 영화 추가
+    async list_checkbox(id) {
+      // 해당 영화가 추가되었는지 확인
+      await axios.get(`https://api.themoviedb.org/3/list/${id}/item_status?api_key=${this.API_KEY}&movie_id=${this.ID}`)
+      .then((res) => {
+        console.log(res);
+        this.item_present = res.data.item_present;
+      }).catch((e) => {
+        console.log(e)
+      })
+
+      // 타이머
+      let timerInterval
+      this.$swal.fire({
+        title: 'Auto close alert!',
+        html: 'I will close in <b></b> milliseconds.',
+        timer: 2000,
+        timerProgressBar: true,
+        didOpen: () => {  
+          this.$swal.showLoading()
+          const b = this.$swal.getHtmlContainer().querySelector('b')
+          timerInterval = setInterval(() => {
+            b.textContent = this.$swal.getTimerLeft()
+          }, 100)
+        },
+        willClose: () => {
+          clearInterval(timerInterval)
+        }
+      }).then((result) => {
+        /* Read more about handling dismissals below */
+        if (result.dismiss === this.$swal.DismissReason.timer) {
+          // 
+        }
+      })
+      // if else하면 뭔가 안될때도 있다 불안하다 -> else말고 확실한 조건으로 else if로 걸고 연산자도 ===로 확실하게 하자
+      if(this.item_present === false) {
+        // await 했는데도 불과하고 axios 한번할때마다 안붙여도될 then, catch로 코드가 엄청 늘어간다 -> 다음부턴 async await쓸거면 then catch빼고 변수로 받고(then), 함수 전체를 try, catch로 묶어서 한꺼번에 사용해라
+        await axios({
+          method: "POST",
+          url: `https://api.themoviedb.org/3/list/${id}/add_item?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
+          data: {
+            media_id : this.ID
+          }
+        }).then((res) => {
+          console.log(res);
+          this.list__save = true;
+          this.$swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: '재생목록에 추가되었습니다',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        }).catch((e) => {
+          console.log(e)
+        })
+      } else if(this.item_present === true) {
+        await axios({
+          method: "POST",
+          url: `https://api.themoviedb.org/3/list/${id}/remove_item?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
+          data: {
+            media_id : this.ID
+          }
+        }).then((res) => {
+          console.log(res);
+          this.list__save = false;
+
+          this.$swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: '재생목록에서 삭제되었습니다',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        }).catch((e) => {
+          console.log(e)
+        })
+      }
+    },
+    list_checkbox_close(id) {
+      this.$swal.fire({
+        position: 'center',
+        icon: 'info',
+        title: '준비중입니다',
+        showConfirmButton: false,
+        timer: 2000
+      })
     },
     // 즐겨찾기 추가
     async favoritesBtn() {
@@ -560,6 +699,9 @@ export default {
       }
     },
   },
+  // updated() {
+
+  // },
   // try, catch문은 해당 함수가 async를 가지고있을때 사용이 가능하다 -> await쓰면서 await안에서 then, catch안할거면 async await을 쓰면서 전체를 try, catch 로 묶어라
   async mounted() { 
     this.displaySize = window.innerWidth;
@@ -724,7 +866,7 @@ export default {
           console.log(e);
         })
         // 세션 평점
-        axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/rated/${this.CHECK_DATA === "movie" ? "movies" : "tv" }?api_key=${this.API_KEY}&language=ko$session_id=${localStorage.getItem('session_id')}&sort_by=created_at.asc`)
+        axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/rated/${this.CHECK_DATA === "movie" ? "movies" : "tv" }?api_key=${this.API_KEY}&language=ko&session_id=${localStorage.getItem('session_id')}&sort_by=created_at.asc`)
         .then((res) => {
           console.log(res);
           this.rated_id = res.data.results;
@@ -752,7 +894,44 @@ export default {
         }).catch((e) => {
           console.log(e);
         })
-      } else {
+
+        // 재생목록 불러오기
+        // localStorage에 배열을 넣을땐 stringify, localStorage에서 불러올떈 parse를 해야 사용이 가능하다 -> 안하고할경우 넣어지긴하지만 배열형태로 안들어간다(불러올때도)
+        // tmdb api에서 현재 재생목록에 넣는걸 유지하는 방법을 못찾고있다 -> 현재 로컬스토리지를 이용해서 일시적으로 가지고있다 -> 그래서 로그아웃할떄도 일단 삭제는 하지않을거지만 그래도 언젠가 삭제되서 맞지않게되겠지 정보랑 -> 목록에 넣을때 id제공하고있던데 그거 받아오는 방법을 구상해보자
+        JSON.parse(localStorage.getItem('list_id')).forEach(async (e, i) => {
+          await axios.get(`https://api.themoviedb.org/3/list/${e}?api_key=${this.API_KEY}&language=ko`)
+          .then((res) => {
+            console.log(res)
+            this.listBoxData = this.listBoxData.concat(res.data);
+          }).catch((error) => {
+            console.log(error)
+          })
+
+          // 재생목록에 영화 들어있는지 확인
+          await axios.get(`https://api.themoviedb.org/3/list/${e}/item_status?api_key=${this.API_KEY}&movie_id=${this.ID}`)
+          .then((res) => {
+            console.log('영화 추가목록 확인')
+            console.log(res);
+            // 하나라도 이영화를 재생목록에 넣었다면 있는걸로 색깔을 바꾼다
+            // 이렇게 반복문중에서 true인 것만 안에다 담으면 false인것들은 지나간다 그래서 모든 반복문 요소에 true인 요소에만 변화주고 싶다면 이렇게 true인 요소안에 담긴요소들만 적용하게 할수있다 (foreach로 모든 index값을 줘도 true조건 안에는 true인 index만 담기니 모든요소[i]를 줘도 true인 i만담겨서 걸러낼수 있다)
+            if(res.data.item_present === true) {
+              this.list__save = true;
+              this.$refs.checkbox__list[i].checked = true
+            }
+            // console.log(e)
+            // console.log(this.$refs.checkbox__list[i]._value)
+            // if(Number(this.$refs.checkbox__list[i]._value) === e) {
+            //   // this.$refs.checkbox__list[i].checked = true;
+            // }
+
+
+          }).catch((e) => {
+            console.log(e)
+          })
+        })
+
+        // session 바로 else로 하니깐 로그인 안한상태에서도 실행되어 오류가 생긴다 앞으론 else if로 guest session으로 적어주자
+      } else if(localStorage.getItem('guest_session_id')) {
         // 게스트 평점
         axios.get(`https://api.themoviedb.org/3/guest_session/${localStorage.getItem('guest_session_id')}/rated/${this.CHECK_DATA === "movie" ? "movies" : "tv" }?api_key=${this.API_KEY}&language=en-US&sort_by=created_at.asc`)
         .then((res) => {
@@ -808,7 +987,7 @@ export default {
             <div class="__text">
               <div class="__title">{{ CHECK_DATA == "movie" ? detail_data.title : detail_data.name }}</div>
               <div class="my__list">
-                <div class="__list" :class="{ list__save }" @click="listOpenBtn()" title="목록에 추가"></div>
+                <div class="__list" :class="{ list__save }" @click="listOpenBtn()" title="재생목록에 추가"></div>
                 <div class="__listBox" :class="{ list__open }">
                   <div class="list__header">
                     <div class="list__title">재생목록 추가</div>
@@ -816,11 +995,13 @@ export default {
                   </div>
                   <!-- 재생목록 -->
                   <div class="list__body">
-                    <div class="__body">
+                    <div class="__body" v-for="listItem in listBoxData" :key="listItem">
+                      <!-- label - checkbox -> id, for로 연결하면 checkbox쪽 클릭이벤트가 id로 연결된 label에 도 같이 작동한다 -->
                       <div class="body__checkbox">
-                        <input type="checkbox" value="" class="__checkbox" />
+                        <input type="checkbox" ref="checkbox__list" class="__checkbox" :value="listItem.id" :id="listItem.id" @click="list_checkbox(listItem.id)" />
                       </div>
-                      <div class="body__title"></div>
+                      <label :for="listItem.id" class="body__title">{{ listItem.name }}</label>
+                      <span class="material-symbols-outlined body__close" @click="list_checkbox_close(listItem.id)">delete</span>
                     </div>
                   </div>
                   <div class="list__create" @click="create__listBtn()">
@@ -831,11 +1012,12 @@ export default {
                   <!-- 재생목록 추가 -->
                   <div class="__createBox" :class="{ create__list }">
                     <div class="__createText">
-                      <input type="text" class="__createContent" />
+                      <input type="text" class="__createContent" v-model="createlist" />
+                      <div v-if="error_createlist" class="error__createContent">입력되지 않았습니다</div>
                     </div>
                     <div class="__createBtnBox">
-                      <button class="__createClose">취소</button>
-                      <button class="__createBtn">추가하기</button>
+                      <button class="__createClose" @click="createClose()">취소</button>
+                      <button class="__createBtn" @click="createList()">추가하기</button>
                     </div>
                   </div>
                 </div>
@@ -1050,7 +1232,7 @@ export default {
                   display: block;
                   position: fixed;
                   top: 30%;
-                  width: 15vw;
+                  width: 20vw;
                   min-height: 50vh;
                   left: 0;
                   right: 0;
@@ -1115,6 +1297,12 @@ export default {
                         font-size: 18px;
                         color: #fff;
                       }
+                      .body__close {
+                        margin-left: auto;
+                        color: #fff;
+                        font-size: 23px;
+                        cursor: pointer;
+                      }
                     }
                   }
                   .list__create {
@@ -1141,8 +1329,8 @@ export default {
                   }
                   .__createBox.create__list {
                     display: block;
-                    width: 20vw;
-                    height: 14vh;
+                    width: 25vw;
+                    min-height: 10vh;
                     position: absolute;
                     top: 20%;
                     // bottom: 0;
@@ -1174,18 +1362,23 @@ export default {
                         border-radius: 5px;
                         border: 1px solid #797a7b;
                       }
+                      .error__createContent {
+                        padding-top: 0.5rem;
+                        color: red;
+                      }
                     }
                     .__createBtnBox {
                       display: flex;
-                      padding-top: 2rem;
+                      padding-top: 1rem;
                       justify-content: end;
                       .__createClose,
                       .__createBtn {
+                        // height, width를 지정하지 않으면 크기에따라 맞게 줄어든다, 지정하고싶으면 크기마다 변경해줘야 한다
                         background: #797a7b;
                         color: #fff;
                         border: none;
                         border-radius: 5px;
-                        width: 5vw;
+                        // width: 5vw;
                         height: 3vh;
                       }
                       .__createClose {
@@ -1285,6 +1478,10 @@ export default {
                     border-radius: 10px;
 
                     .star {
+                      margin-left: 1rem;
+                      &:first-child {
+                        margin-left: 0;
+                      }
                       &::before {
                         font-family: FontAwesome;
                         content: "\f005";
@@ -1592,6 +1789,15 @@ export default {
       -webkit-line-clamp: 7;
       -webkit-box-orient: vertical;
     }
+    .my__list {
+      justify-content: center;
+      .__listBox.list__open {
+        width: 40vw !important;
+      }
+      .__createBox.create__list {
+        width: 50vw !important;
+      }
+    }
   }
 
   @media screen and (max-width: 768px) {
@@ -1662,6 +1868,12 @@ export default {
                 }
                 .my__list {
                   justify-content: center;
+                  .__listBox.list__open {
+                    width: 50vw !important;
+                  }
+                  .__createBox.create__list {
+                    width: 60vw !important;
+                  }
                 }
                 .talineBox {
                   display: block !important;

@@ -955,6 +955,8 @@ export default {
         }
         input {
           width: 80 !important;
+          font-size: 14px !important;
+          padding-left: 1rem !important;
         }
       }
     }
@@ -978,7 +980,7 @@ export default {
             height: 22vh !important;
             .mv__box {
               .mv__video__title {
-                font-size: 16px !important;
+                font-size: 14px !important;
               }
             }
           } 
@@ -989,7 +991,10 @@ export default {
           }
         }
         .video__swiper {
-          height: 30vh !important;
+          height: 26vh !important;
+          .swiper {
+            padding: 1rem !important;
+          }
         }
       }
       .mv__first {

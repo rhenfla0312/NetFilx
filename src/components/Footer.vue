@@ -11,7 +11,7 @@ export default {
 
 <template>
   <div class="footer">
-    <div class="text">© 2022 SPMV - 영화 및 TV프로그램 정보 - - Welcome this is a speed movie.<span @click="myGithub()"></span></div>
+    <div class="text">© 2022 SPMV - 영화 및 TV프로그램 정보 Welcome this is a speed movie.<span @click="myGithub()"></span></div>
   </div>
 </template>
 
@@ -29,6 +29,7 @@ export default {
     align-items: center;
     color: #fff;
     .text {
+      text-align: center;
       span {
         &::after {
           font-family: FontAwesome;
@@ -50,7 +51,7 @@ export default {
 
   @media screen and (max-width: 768px) {
     .footer {
-      padding: 0 !important;
+      padding: 0 5rem !important;
       font-size: 12px !important;
     }
   }

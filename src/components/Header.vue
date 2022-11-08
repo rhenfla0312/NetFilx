@@ -12,6 +12,7 @@ export default {
       searchs : '',
       searchFile : [],
       page_searchFile : [],
+      listBoxData : [],
       total_page : 0,
 
       mobile__check : false,
@@ -22,6 +23,7 @@ export default {
       login__layout: false,
       singin__text: false,
       open__item: false,
+      open__list: false,
 
       id: "",
       pw: "",
@@ -44,7 +46,8 @@ export default {
     }
   },
   methods: {
-    searchText() {
+    searchText(e) {
+      // console.log(e);
       this.searchData = true;
     },
     login() {
@@ -58,6 +61,7 @@ export default {
     openItem() {
       this.open__item = !this.open__item;
       this.mobile__check = false;
+      this.open__list = false;
     },
     mobile_close_check() {
       this.mobile__close = true;
@@ -65,6 +69,9 @@ export default {
     mobile_close() {
       this.searchData = false;
       this.mobile__close = false;
+    },
+    scrollList() {
+      this.open__list = !this.open__list;
     },
     userInfo() {
       if(localStorage.getItem('guest_session_id')) {
@@ -80,6 +87,18 @@ export default {
         })
       }
       this.open__item = false;
+      this.open__list = false;
+    },
+    listUrl(id) {
+      this.$router.push({
+        // 기록 - push -> path로 경로를 많이 적었는데 name으로도 충분하다(객체로 적을땐 push가 안되고 name만 가능하고 객체가 아닐땐 push가 가능하다고 들었다)
+        name : "List",
+        params: {
+          id
+        }
+      })
+      this.open__item = false;
+      this.open__list = false;
     },
     logOut() {
       this.$swal.fire({
@@ -103,8 +122,11 @@ export default {
           localStorage.removeItem('guest_session_id');
           localStorage.removeItem('account_id');
           this.open__item = false;
-          this.$router.go();
+          setTimeout(() => {
+            this.$router.go();
+          },1000)
         }
+        this.$router.push('/')
       })
     },
     async search() {
@@ -276,7 +298,9 @@ export default {
             timer: 2000
           })
         })
-
+        setTimeout(() => {
+          this.$router.go();
+        },1000)
         // 생성된 세션으로 계정 관리 -> 계정 세부 정보 가져오기 (account id -> 이 id로 목록 검색가능)
         await axios.get(`https://api.themoviedb.org/3/account?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`)
         .then((res) => {
@@ -349,6 +373,16 @@ export default {
       }).catch((e) => {
         console.log(e)
       })
+      JSON.parse(localStorage.getItem('list_id')).forEach(async (e, i) => {
+        await axios.get(`https://api.themoviedb.org/3/list/${e}?api_key=${this.API_KEY}&language=ko`)
+        .then((res) => {
+          console.log(res)
+          this.listBoxData = this.listBoxData.concat(res.data);
+        }).catch((error) => {
+          console.log(error)
+        })
+      })
+      
     }
 
   }
@@ -363,9 +397,11 @@ export default {
       <RouterLink to="/popular" class="__tv">인기</RouterLink>
       <div class="__searchBox" :class="{ searchData }">
         <div class="__searchLineBox" :class="{ searchData }">
-          <input type="text" class="__searchText" ref="searchText" :class="{ searchData }" v-model="searchs" @keydown.enter="search()" @click="searchText(), mobile_close_check()" />
+          <input type="text" class="__searchText" ref="searchText" :class="{ searchData }" v-model="searchs" @keydown.enter="search()" @click="searchText($event), mobile_close_check()" />
           <div class="__search"><span @click="search()" class="material-symbols-outlined">search</span></div>
-          <span class="search__close" @click="mobile_close()" :class="{ mobile__close }">취소</span>
+          <span class="search__close" @click="mobile_close()" :class="{ mobile__close }">
+            <span class="material-symbols-outlined">cancel</span>
+          </span>
         </div>
       </div>
       <div class="__myInfo __users" v-if="login_check"><span class="material-symbols-outlined" @click="openItem()">account_circle</span></div>
@@ -373,6 +409,7 @@ export default {
       
       <!-- myinfo__item -->
       <div class="__myInfoItem" :class="{ open__item }">
+        <!-- 기록 - RouterLink -> 브라우저에선 a요소로 변한다 inline요소이기 때문에 RouterLink에 맞춰 스타일을 했다면 조건으로 같은 inline을 보여주기위해선 div가 아닌 span으로 사용하면 똑같은 디자인이 적용된다 -->
         <RouterLink to="/favorite" v-if="session_check">
           <div class="__saveMovie">즐겨찾기</div>
         </RouterLink>
@@ -385,6 +422,19 @@ export default {
         <span v-else @click.prevent="userInfo()">
           <div class="__saveTv">관심목록</div>
         </span>
+        <span v-if="session_check">
+          <div class="__saveTv __scrollList" @click="scrollList()">
+            <span>재생목록</span>
+            <!-- 기록 - 두 자식요소를 묶은 부모에다 flex를 주고 전체를 수평수직을 맞춰줄수도있지만 자식요소 하나에다가만줘서 자식요소 하나만 수평수직을 맞출수도있다 -->
+            <span class="material-symbols-outlined __scrollBtn" v-if="open__list">expand_less</span>
+            <span class="material-symbols-outlined __scrollBtn" v-else>expand_more</span>
+          </div>
+        </span>
+        <span v-else @click.prevent="userInfo()">
+          <div class="__saveTv">재생목록</div>
+        </span>
+        <!-- list__scroll -->
+        <div class="__list" @click="listUrl(listItem.id)"  v-for="listItem in listBoxData" :key="listItem" :class="{ open__list }">{{ listItem.name }}</div>
         <div class="__logOut" @click="logOut()">로그아웃</div>
       </div>
       <!-- login__item -->
@@ -454,7 +504,7 @@ export default {
         outline: none;
         border: none;
         margin-right: 2vw !important;
-        margin-left: 10vw !important;
+        // margin-left: 10vw !important;
         .__search {
           display: flex;
           justify-content: center;
@@ -476,7 +526,7 @@ export default {
         .__searchText {
           width: 50%;
           height: 3.3vh !important;
-          border-radius: 5px;
+          border-radius: 20px;
           margin-left: auto;
           opacity: 1;
           transition: .4s;
@@ -626,10 +676,13 @@ export default {
           border-bottom: 1px solid #ffffff !important;
           .__searchText.searchData {
             padding-left: 2rem;
+            font-size: 18px;
+            border: 2px solid #333;
+            border-radius: 20px !important;
             padding-right: 4rem;
             height: 5vh !important;
             border-radius: 0;
-            transition: 0 !important;
+            transition: 0s !important;
           }
           .__search {
             display: flex;
@@ -682,17 +735,17 @@ export default {
         // padding: 2rem;
         animation: fadeInUp 1s;
         background: #060d17;
-        box-shadow: 0 28px 48pxrgba(0, 0, 0, 0.4);
+        box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
         @keyframes fadeInUp {
           0% {
             opacity: 0;
             // translate(x, y)
-            transform: translate(-50%, 100%);
+            // transform: translate(-50%, 100%);
 
           }
           100% {
             opacity: 1;
-            transform: translate(-50%, 20%);
+            // transform: translate(-50%, 20%);
           }
         }
         div {
@@ -702,6 +755,12 @@ export default {
           border-radius: 0 !important;
           &:hover {
             background: #797a7b;
+          }
+        }
+        .__scrollList {
+          justify-content: center !important;
+          .__scrollBtn {
+            margin: 0 !important;
           }
         }
       }
@@ -821,7 +880,7 @@ export default {
         }
       }
       .mobileMenu {
-        margin-right: 7vw !important;
+        margin-right: 3vw !important;
         display: block !important;
         span {
           font-size: 35px !important;
@@ -834,7 +893,7 @@ export default {
         }
       }
       .mobile__list.mobile__check {
-        top: 46px !important;
+        top: 41px !important;
         transition: .3s !important;
         width: 100% !important;
         background: #060d17;
@@ -859,9 +918,7 @@ export default {
       }
       .mobile__close {
         span {
-          margin-left: 11rem;
-          font-size: 6vw !important;
-          margin-top: 0.3rem;
+          font-size: 8vw !important;
           transition: 0.3s;
           cursor: pointer;
           transform: rotate(0);
@@ -947,6 +1004,7 @@ a {
       .__searchLineBox {
         background: #10161d;
         display: flex;
+        border-radius: 20px;
         .__search {
           display: flex;
           justify-content: center;
@@ -967,11 +1025,10 @@ a {
         }
         .__searchText {
           padding-left: 1rem;
-          width: 100%;
-          border-radius: 5px;
+          border-radius: 20px;
           margin-left: auto;
           opacity: 1;
-          transition: .4s;
+          transition: .3s;
           font-size: 25px;
           outline: none;
           border: none;
@@ -982,6 +1039,8 @@ a {
         }
         .__searchText.searchData {
           width: 100% !important;
+          transition: .3s;
+
         }
       }
       .search__close {
@@ -1029,11 +1088,11 @@ a {
       @keyframes fadeInUps {
         0% {
           opacity: 0;
-          transform: translateY(100%);
+          // transform: translateY(100%);
         }
         100% {
           opacity: 1;
-          transform: translateY(0%);
+          // transform: translateY(0%);
         }
       }
       div {
@@ -1048,6 +1107,20 @@ a {
       }
       .__logOut {
         border-radius: 0 0 10px 10px;
+      }
+      .__scrollList {
+        display: flex;
+        align-items: center;
+        .__scrollBtn {
+          margin-left: auto;
+        }
+      }
+      .__list {
+        display: none;
+      }
+      .__list.open__list {
+        display: block;
+        text-align: center;
       }
     }
     .__login {
