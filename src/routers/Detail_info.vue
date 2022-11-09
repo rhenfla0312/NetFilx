@@ -95,9 +95,10 @@ export default {
           CHECK_DATA : this.CHECK_DATA
         }
       })
+      // 기록 -> 실시간으로 같은페이지에서 새로운걸 변화할거면 -> 같은페이지에서 새로운게 들어오면 감지해서 변화하는 -> watch로 바꾸자
       setTimeout(() => {
         this.$router.go();
-      },10) 
+      },1000) 
     },
     like_number_one() {
       this.like__one = true;
@@ -137,15 +138,26 @@ export default {
     like_number_four_out() {
       this.like__four == false;
     },
-    // 목록 추가
+    // 재생목록 창 열기
     listOpenBtn() {
+      // 기록 - and조건이면 하나의 조건에 하는게 효율적이지만 and조건이지만 그거에 따라 else의 내용이 다르다면 따로 적어줘야한다
       if(localStorage.getItem('session_id')) {
-        this.list__open = true;
+        if(this.CHECK_DATA === "movie") {
+          this.list__open = true;
+        } else {
+          this.$swal.fire({
+            position: 'center',
+            icon: 'info',
+            title: '영화만 추가 가능합니다',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        }
       } else if(localStorage.getItem('guest_session_id')) {
         this.$swal.fire({
           position: 'top-end',
           icon: 'warning',
-          title: '즐겨찾기 추가는 게스트 아이디로는 불가능합니다',
+          title: '재생목록 추가는 게스트 아이디로는 불가능합니다',
           showConfirmButton: false,
           timer: 2000
         })
@@ -169,6 +181,7 @@ export default {
       this.create__list = false;
       this.error_createlist = false;
     },
+    // 재생목록 추가
     async createList() {
       console.log(this.createlist.length)
       if(this.createlist.length > 0) {
@@ -209,7 +222,25 @@ export default {
           this.create__list = false;
 
           this.list_item = this.list_item.concat(res.data.list_id);
+
+          // localstorage는 set, get, remove 3가지밖에 없다 배열추가같은 concat, push는 사용못한다
+          // axios로 데이터를 불러올떄마다 새로고침으로인한 휘발성데이터를 로컬스토리지에 배열형식으로 한번 axios요청마다 추가하여 이어붙일려고한다
+          // localstorage는 문자형태로 되어있어서 저장할땐 json.stringify, 불러올땐 json.parse로 불러와야 배열/객체 형태로 가져올 수 있다
+          // 휘발성을 -> localstorage에 넣을려면 get으로 기존껄 불ㄹ와서 다시 set으로 넣어주면 된다
           localStorage.setItem('list_id', JSON.stringify(this.list_item));
+          // if()
+
+          this.$swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: '재생목록을 생성하였습니다',
+            showConfirmButton: false,
+            timer: 2000,
+          })
+          // 요청이 끝난다음 넣게되면 setTimeout같은건 필요없지만 끝난다음이란게 없다면 바로하게되면 실행되기도전에 새로고침될수있어서 1초를 임의로 건다
+          setTimeout(() => {
+            this.$router.go()
+          },1000)
         }).catch((e) => {
           console.log(e)
         })
@@ -270,6 +301,9 @@ export default {
             showConfirmButton: false,
             timer: 2000
           })
+          setTimeout(() => {
+            this.$router.go()
+          },1000)
         }).catch((e) => {
           console.log(e)
         })
@@ -291,6 +325,9 @@ export default {
             showConfirmButton: false,
             timer: 2000
           })
+          setTimeout(() => {
+            this.$router.go()
+          },1000)
         }).catch((e) => {
           console.log(e)
         })
@@ -722,7 +759,8 @@ export default {
         // id에 맞는 영상 가져오기
         axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/videos?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
-          // console.log(res)
+          console.log('영상')
+          console.log(res)
           if(res.data.results.length > 0) {
             this.detail_video = res.data.results[0].key
           } 
@@ -730,7 +768,7 @@ export default {
           console.log(error)
         })
   
-        // id에 맞는 비슷한 영상 가져오기
+        // id에 맞는 비슷한 영화 가져오기
         axios.get(`${this.MOVIE_INFO_URL}/${this.ID}/recommendations?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
           // console.log(res)
@@ -784,7 +822,7 @@ export default {
         // id에 맞는 영상 가져오기
         axios.get(`${this.TV_INFO_URL}/${this.ID}/videos?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
-          // console.log(res)
+          console.log(res)
           if(res.data.results.length > 0) {
             this.detail_video = res.data.results[0].key
           } 

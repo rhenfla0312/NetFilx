@@ -17,6 +17,7 @@ export default {
       list_created_by : "",
       list_des : "",
       list_bg : "",
+      list_id : "",
 
       ID : this.$route.params.id,
 
@@ -34,6 +35,9 @@ export default {
           CHECK_DATA : this.CHECK_DATA
         }
       })
+    },
+    list_delete() {
+      alert('준비중')
     }
   },
   // 기록 - 같은창에서 같은 데이터를 요청하면 덮어씌워지지 않는 문제가있다 -> 값은 가져오지만 ui적으로 안덮어씌워지는 부분을 watch로 실시간탐지하여 변경해줘라 (원래 데이터 변경되면 덮어씌워져야하는데 안되는 부분들만 사용하자)
@@ -44,12 +48,19 @@ export default {
         .then((res) => {
           console.log(res);
           this.list_items = res.data.items;
+
+          this.list_name = res.data.name;
+          this.list_created_by = res.data.created_by
+          this.list_des = res.data.description;
+          this.list_bg = res.data.items[0].backdrop_path;
+          this.list_id = res.data.items[0].id;
         }).catch((error) => {
           console.log(error)
         })
     }
   },
   async mounted() {
+    // 기록 - spa는 새로고침 없이 하는 장점이 있지만 axios처럼 api를 통해 서버로 부터 받아온 데이터들은 새로고침을 해야 적용되는 경우가 있기 떄문에 이같은 경우는 어쩔수 없이 새로고침을 해야한다
     try {
       // default -> movie
       await axios.get(`https://api.themoviedb.org/3/list/${this.ID}?api_key=${this.API_KEY}&language=ko`)
@@ -62,6 +73,7 @@ export default {
           this.list_des = res.data.description;
           // 첫번째 이미지를 배경이미로 하기 (보통 이렇게 한다 - 슬라이드로 하지 않는 경우에)
           this.list_bg = res.data.items[0].backdrop_path;
+          this.list_id = res.data.items[0].id;
         }).catch((error) => {
           console.log(error)
         })
@@ -112,14 +124,22 @@ export default {
       <div class="list__info">
         <div class="__info">
           <div class="left__item">
-            <div class="__bg"></div>
-            <div class="__createUser">{{ list_created_by }}</div>
-            <div class="__name">{{ list_name }}</div>
-            <div class="__des">{{ list_des !== null ? list_des : "상세설명이 없습니다"}}</div>
-            <div class="__btn">
-              <!-- 기록 - div로도 버튼처럼 css로 만들순 있지만, 버튼으로 쓸거면 button사용해라 - 괜히 있는게 아니다(누군가 내 코드를 볼때 의미를 모를수도 있다) -->
-              <button class="__startBtn">재생</button>
-              <button class="__deleteBtn">삭제</button>
+            <div class="__leftBox">
+              <div class="__bg" :style="{ 'backgroundImage' : `url(${IMG_URL}/${list_bg})`}" @click="detail(list_id)"></div>
+              <div class="__nameBox">
+                <div class="__name">{{ list_name }}</div>
+                <span class="material-symbols-outlined">edit</span>
+              </div>
+              <div class="__createUser">{{ list_created_by }}</div>
+              <div class="__btn">
+                <!-- 기록 - div로도 버튼처럼 css로 만들순 있지만, 버튼으로 쓸거면 button사용해라 - 괜히 있는게 아니다(누군가 내 코드를 볼때 의미를 모를수도 있다) -->
+                <button class="__startBtn" @click="detail(list_id)">보기</button>
+                <button class="__deleteBtn" @click="list_delete()">삭제</button>
+              </div>
+              <div class="__desBox">
+                <div class="__des">{{ list_des !== null ? list_des : "상세설명이 없습니다"}}</div>
+                <span class="material-symbols-outlined">edit</span>
+              </div>
             </div>
           </div>
           <div class="right__item">
@@ -169,11 +189,104 @@ export default {
           border-radius: 30px 30px 0 0;
           background: linear-gradient(to bottom, rgba(93,93,93,0.800) 0%, rgba(93,93,93,0.298) 33%, rgba(15,15,15,1.000) 100%);
           .left__item {
-            width: 40%;
+            width: 30%;
             min-height: 80vh;
+            padding: 1rem;
+            .__leftBox {
+              background: linear-gradient(to bottom, rgba(93,93,93,0.800) 0%, rgba(93,93,93,0.298) 33%, rgba(15,15,15,1.000) 100%);
+              box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
+              border-radius: 20px;
+              min-height: 80vh;
+              padding: 1rem;
+              .__bg {
+                position: relative;
+                height: 220px;
+                // background-position: center;
+                background-size: 100%;
+                background-repeat: no-repeat;
+                border-radius: 20px;
+                transition: .3s;
+                &:hover {
+                  background-color: rgba(0, 0, 0, 0.5);
+                  transform: scale(1.03);
+                  transition: .3s;
+                  background-blend-mode: multiply;
+                  cursor: pointer;
+                }
+                &::before {
+                  font-family: FontAwesome;
+                  content: "\f04b";
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  font-size: 50px;
+                  color: red;
+                }
+              }
+              .left {
+                margin-left: .5rem;
+              }
+              .__nameBox {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-top: 1rem;
+                color: #fff;
+                .__name {
+                  font-size: 30px;
+                }
+                span {
+                  font-size: 20px;
+                  cursor: pointer;
+                }
+              }
+              .__createUser {
+                padding-top: 1rem;
+                font-size: 20px;
+                color: #fff;
+              }
+              .__btn {
+                padding-top: 2rem;
+                width: 100%;
+                .__startBtn,
+                .__deleteBtn {
+                  width: 49%;
+                  height: 5vh;
+                  border-radius: 50px;
+                  border: none;
+                  outline: none;
+                  &:hover {
+                    background: linear-gradient(to bottom, rgba(93,93,93,0.800) 0%, rgba(93,93,93,0.298) 33%, rgba(15,15,15,1.000) 100%);
+                    box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
+                    color: #fff;
+                  }
+                }
+                .__startBtn {
+                  margin-right: 1%;
+                }
+                .__deleteBtn {
+                  margin-left: 1%;
+                }
+              }
+              .__desBox {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-top: 2rem;
+                color: #fff;
+                .__des {
+                  font-size: 20px;
+                }
+                span {
+                  font-size: 20px;
+                  cursor: pointer;
+                }
+              }
+            }
           }
           .right__item {
-            width: 60%;
+            width: 70%;
             min-height: 80vh;
             // background: blue;
             .__item {
@@ -247,6 +360,13 @@ export default {
         display: block !important;
         .left__item {
           width: 100% !important;
+          min-height: auto !important;
+          .__leftBox {
+            min-height: auto !important;
+            .__bg {
+              height: 180px !important;
+            }
+          }
         }
         .right__item {
           width: 100% !important;

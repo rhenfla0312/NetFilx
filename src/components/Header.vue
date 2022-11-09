@@ -24,6 +24,7 @@ export default {
       singin__text: false,
       open__item: false,
       open__list: false,
+      list_check : false,
 
       id: "",
       pw: "",
@@ -71,7 +72,11 @@ export default {
       this.mobile__close = false;
     },
     scrollList() {
-      this.open__list = !this.open__list;
+      if(this.list_check === true) {
+        this.open__list = !this.open__list;
+      } else {
+        this.open__list = false;
+      }
     },
     userInfo() {
       if(localStorage.getItem('guest_session_id')) {
@@ -367,17 +372,22 @@ export default {
       })
     } else if(localStorage.getItem('session_id')) {
       // id/pw_session_info
-      await axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/lists?api_key=${this.API_KEY}&language=en-US&session_id=${localStorage.getItem('session_id')}`)
-      .then((res) => {
-        // console.log(res)
-      }).catch((e) => {
-        console.log(e)
-      })
+      // await axios.get(`https://api.themoviedb.org/3/account/${localStorage.getItem('account_id')}/lists?api_key=${this.API_KEY}&language=en-US&session_id=${localStorage.getItem('session_id')}`)
+      // .then((res) => {
+      //   // console.log(res)
+      // }).catch((e) => {
+      //   console.log(e)
+      // })
       JSON.parse(localStorage.getItem('list_id')).forEach(async (e, i) => {
         await axios.get(`https://api.themoviedb.org/3/list/${e}?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
           console.log(res)
           this.listBoxData = this.listBoxData.concat(res.data);
+          if(res.data.items.length > 0) {
+            this.list_check = true;
+          } else {
+            this.list_check = false;
+          }
         }).catch((error) => {
           console.log(error)
         })
