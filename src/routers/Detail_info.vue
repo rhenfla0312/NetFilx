@@ -218,17 +218,27 @@ export default {
             language: "ko"
           }
         }).then((res) => {
+          console.log('list item')
           console.log(res);
+          console.log(res.data.list_id);
           this.create__list = false;
 
-          this.list_item = this.list_item.concat(res.data.list_id);
-
+          
           // localstorage는 set, get, remove 3가지밖에 없다 배열추가같은 concat, push는 사용못한다
           // axios로 데이터를 불러올떄마다 새로고침으로인한 휘발성데이터를 로컬스토리지에 배열형식으로 한번 axios요청마다 추가하여 이어붙일려고한다
           // localstorage는 문자형태로 되어있어서 저장할땐 json.stringify, 불러올땐 json.parse로 불러와야 배열/객체 형태로 가져올 수 있다
-          // 휘발성을 -> localstorage에 넣을려면 get으로 기존껄 불ㄹ와서 다시 set으로 넣어주면 된다
-          localStorage.setItem('list_id', JSON.stringify(this.list_item));
-          // if()
+          // 휘발성을 -> localstorage에 넣을려면 get으로 기존껄 불러와서 다시 set으로 넣어주면 된다
+          // 기록 - 로컬스토리지에 배열데이터 추가하는 방법 - getItem에다 push같은걸로 데이터를 추가할수가 있다? -> getItem에 추가한걸 setItem으로 다시 넣는다
+          this.list_item = this.list_item.concat(res.data.list_id);
+          if(localStorage.getItem('list_id')) {
+            // res.data.list_id 를 바로 넣으면 문자열이기때문에 배열에 넣어야해서 오류가 걸린다 -> 배열데이터를 선언후 배열데이터에 넣은걸 다시 할당해야한다
+            // JSON.parse(localStorage.getItem('list_id')).concat(this.list_item);
+            // 위에서 데이터추가후 넣으니까 안들어간다 바로 추가부분에 넣어라
+            localStorage.setItem('list_id', JSON.stringify( JSON.parse(localStorage.getItem('list_id')).concat(this.list_item)));        
+          } else {
+            console.log('데이터가 하나도 없음');
+            localStorage.setItem('list_id', JSON.stringify(this.list_item));
+          }
 
           this.$swal.fire({
             position: 'top-end',
@@ -742,7 +752,6 @@ export default {
   // try, catch문은 해당 함수가 async를 가지고있을때 사용이 가능하다 -> await쓰면서 await안에서 then, catch안할거면 async await을 쓰면서 전체를 try, catch 로 묶어라
   async mounted() { 
     this.displaySize = window.innerWidth;
-
     try {
       if(this.CHECK_DATA == "movie") {
         // movie
@@ -936,37 +945,40 @@ export default {
         // 재생목록 불러오기
         // localStorage에 배열을 넣을땐 stringify, localStorage에서 불러올떈 parse를 해야 사용이 가능하다 -> 안하고할경우 넣어지긴하지만 배열형태로 안들어간다(불러올때도)
         // tmdb api에서 현재 재생목록에 넣는걸 유지하는 방법을 못찾고있다 -> 현재 로컬스토리지를 이용해서 일시적으로 가지고있다 -> 그래서 로그아웃할떄도 일단 삭제는 하지않을거지만 그래도 언젠가 삭제되서 맞지않게되겠지 정보랑 -> 목록에 넣을때 id제공하고있던데 그거 받아오는 방법을 구상해보자
-        JSON.parse(localStorage.getItem('list_id')).forEach(async (e, i) => {
-          await axios.get(`https://api.themoviedb.org/3/list/${e}?api_key=${this.API_KEY}&language=ko`)
-          .then((res) => {
-            console.log(res)
-            this.listBoxData = this.listBoxData.concat(res.data);
-          }).catch((error) => {
-            console.log(error)
+        // 기록 - 데이터를 불러와서 할당하는것들은 데이터가 없으면 오류가 나기때문에 항상 예외처리를 해야한다 -> 조건으로 데이터가 있을때만 작동하게 해야 오류가 안난다
+        if(localStorage.getItem('list_id')) {          
+          JSON.parse(localStorage.getItem('list_id')).forEach(async (e, i) => {
+            await axios.get(`https://api.themoviedb.org/3/list/${e}?api_key=${this.API_KEY}&language=ko`)
+            .then((res) => {
+              console.log(res)
+              this.listBoxData = this.listBoxData.concat(res.data);
+            }).catch((error) => {
+              console.log(error)
+            })
+  
+            // 재생목록에 영화 들어있는지 확인
+            await axios.get(`https://api.themoviedb.org/3/list/${e}/item_status?api_key=${this.API_KEY}&movie_id=${this.ID}`)
+            .then((res) => {
+              console.log('영화 추가목록 확인')
+              console.log(res);
+              // 하나라도 이영화를 재생목록에 넣었다면 있는걸로 색깔을 바꾼다
+              // 이렇게 반복문중에서 true인 것만 안에다 담으면 false인것들은 지나간다 그래서 모든 반복문 요소에 true인 요소에만 변화주고 싶다면 이렇게 true인 요소안에 담긴요소들만 적용하게 할수있다 (foreach로 모든 index값을 줘도 true조건 안에는 true인 index만 담기니 모든요소[i]를 줘도 true인 i만담겨서 걸러낼수 있다)
+              if(res.data.item_present === true) {
+                this.list__save = true;
+                this.$refs.checkbox__list[i].checked = true
+              }
+              // console.log(e)
+              // console.log(this.$refs.checkbox__list[i]._value)
+              // if(Number(this.$refs.checkbox__list[i]._value) === e) {
+              //   // this.$refs.checkbox__list[i].checked = true;
+              // }
+  
+  
+            }).catch((e) => {
+              console.log(e)
+            })
           })
-
-          // 재생목록에 영화 들어있는지 확인
-          await axios.get(`https://api.themoviedb.org/3/list/${e}/item_status?api_key=${this.API_KEY}&movie_id=${this.ID}`)
-          .then((res) => {
-            console.log('영화 추가목록 확인')
-            console.log(res);
-            // 하나라도 이영화를 재생목록에 넣었다면 있는걸로 색깔을 바꾼다
-            // 이렇게 반복문중에서 true인 것만 안에다 담으면 false인것들은 지나간다 그래서 모든 반복문 요소에 true인 요소에만 변화주고 싶다면 이렇게 true인 요소안에 담긴요소들만 적용하게 할수있다 (foreach로 모든 index값을 줘도 true조건 안에는 true인 index만 담기니 모든요소[i]를 줘도 true인 i만담겨서 걸러낼수 있다)
-            if(res.data.item_present === true) {
-              this.list__save = true;
-              this.$refs.checkbox__list[i].checked = true
-            }
-            // console.log(e)
-            // console.log(this.$refs.checkbox__list[i]._value)
-            // if(Number(this.$refs.checkbox__list[i]._value) === e) {
-            //   // this.$refs.checkbox__list[i].checked = true;
-            // }
-
-
-          }).catch((e) => {
-            console.log(e)
-          })
-        })
+        }
 
         // session 바로 else로 하니깐 로그인 안한상태에서도 실행되어 오류가 생긴다 앞으론 else if로 guest session으로 적어주자
       } else if(localStorage.getItem('guest_session_id')) {

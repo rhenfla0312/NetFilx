@@ -94,16 +94,26 @@ export default {
       this.open__item = false;
       this.open__list = false;
     },
-    listUrl(id) {
-      this.$router.push({
-        // 기록 - push -> path로 경로를 많이 적었는데 name으로도 충분하다(객체로 적을땐 push가 안되고 name만 가능하고 객체가 아닐땐 push가 가능하다고 들었다)
-        name : "List",
-        params: {
-          id
-        }
-      })
-      this.open__item = false;
-      this.open__list = false;
+    listUrl(id, itemLength) {
+      if(itemLength === 0) {
+        this.$swal.fire({
+          position: 'center',
+          icon: 'warning',
+          title: '담긴목록이 없습니다',
+          showConfirmButton: false,
+          timer: 1500
+        })
+      } else {
+        this.$router.push({
+          // 기록 - push -> path로 경로를 많이 적었는데 name으로도 충분하다(객체로 적을땐 push가 안되고 name만 가능하고 객체가 아닐땐 push가 가능하다고 들었다)
+          name : "List",
+          params: {
+            id
+          }
+        })
+        this.open__item = false;
+        this.open__list = false;
+      }
     },
     logOut() {
       this.$swal.fire({
@@ -292,6 +302,9 @@ export default {
             showConfirmButton: false,
             timer: 2000
           })
+          setTimeout(() => {
+            this.$router.go();
+          },1000)
         }).catch((error) => {
           console.log(error)
           // 로그인 정보가 일치하지 않다면
@@ -303,9 +316,6 @@ export default {
             timer: 2000
           })
         })
-        setTimeout(() => {
-          this.$router.go();
-        },1000)
         // 생성된 세션으로 계정 관리 -> 계정 세부 정보 가져오기 (account id -> 이 id로 목록 검색가능)
         await axios.get(`https://api.themoviedb.org/3/account?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`)
         .then((res) => {
@@ -346,20 +356,6 @@ export default {
       this.mobile__tv__check = !this.mobile__tv__check;
     }
   },
-  updated() {
-    // 해당 요소 밖으로 클릭시 item false
-    // window.addEventListener('click', (e) => {
-    //   if(this.$refs.searchText) {
-    //     // console.log('window-hover')
-    //     this.searchData = true;
-    //     console.log(this.searchData);
-    //   } else {
-    //     // console.log('window-blur');
-    //     this.searchData = false;
-    //     console.log(searchData);
-    //   }
-    // })
-  },
   async mounted() {
 
     if(localStorage.getItem('guest_session_id')) {
@@ -378,20 +374,23 @@ export default {
       // }).catch((e) => {
       //   console.log(e)
       // })
-      JSON.parse(localStorage.getItem('list_id')).forEach(async (e, i) => {
-        await axios.get(`https://api.themoviedb.org/3/list/${e}?api_key=${this.API_KEY}&language=ko`)
-        .then((res) => {
-          console.log(res)
-          this.listBoxData = this.listBoxData.concat(res.data);
-          if(res.data.items.length > 0) {
-            this.list_check = true;
-          } else {
-            this.list_check = false;
-          }
-        }).catch((error) => {
-          console.log(error)
+      if(localStorage.getItem('list_id')) {                
+        JSON.parse(localStorage.getItem('list_id')).forEach(async (e, i) => {
+          await axios.get(`https://api.themoviedb.org/3/list/${e}?api_key=${this.API_KEY}&language=ko`)
+          .then((res) => {
+            console.log('test_data');
+            console.log(res)
+            this.listBoxData = this.listBoxData.concat(res.data);
+            if(res.data.items.length > 0) {
+              this.list_check = true;
+            } else {
+              this.list_check = false;
+            }
+          }).catch((error) => {
+            console.log(error)
+          })
         })
-      })
+      }
       
     }
 
@@ -444,7 +443,7 @@ export default {
           <div class="__saveTv">재생목록</div>
         </span>
         <!-- list__scroll -->
-        <div class="__list" @click="listUrl(listItem.id)"  v-for="listItem in listBoxData" :key="listItem" :class="{ open__list }">{{ listItem.name }}</div>
+        <div class="__list" @click="listUrl(listItem.id, listItem.items.length)"  v-for="listItem in listBoxData" :key="listItem" :class="{ open__list }">{{ listItem.name }}</div>
         <div class="__logOut" @click="logOut()">로그아웃</div>
       </div>
       <!-- login__item -->
@@ -656,10 +655,11 @@ export default {
           width: 50%;
           height: 2.5vh !important;
           border-radius: 5px;
-          margin-left: auto;
+          margin-left: 0 !important;
           opacity: 1;
           transition: .4s;
           outline: none;
+          font-size: 20px !important;
           border: none;
           color: #eeeeee;
           background: #fff;
@@ -683,6 +683,7 @@ export default {
         .__searchLineBox.searchData {
           width: 100%;
           height: 5.5vh;
+          border-radius: 0;
           border-bottom: 1px solid #ffffff !important;
           .__searchText.searchData {
             padding-left: 2rem;
@@ -1015,6 +1016,7 @@ a {
         background: #10161d;
         display: flex;
         border-radius: 20px;
+        align-items: center;
         .__search {
           display: flex;
           justify-content: center;

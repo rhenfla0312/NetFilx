@@ -11,4 +11,10 @@ import store from './store/index.js'
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 
-createApp(App).use(VueSweetalert2).use(router).use(store).mount('#app')
+
+// full page
+import 'vue-fullpage.js/dist/style.css'
+// import './fullpage.scrollHorizontally.min' // Optional. When using fullpage extensions
+import VueFullPage from 'vue-fullpage.js'
+
+createApp(App).use(VueSweetalert2).use(VueFullPage).use(router).use(store).mount('#app')
