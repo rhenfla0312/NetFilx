@@ -65,6 +65,8 @@ export default {
       like__three : false,
       like__four : false,
 
+      skeleton : true,
+
       video_check: false,
       displaySize : 0
 
@@ -295,6 +297,7 @@ export default {
       // if else하면 뭔가 안될때도 있다 불안하다 -> else말고 확실한 조건으로 else if로 걸고 연산자도 ===로 확실하게 하자
       if(this.item_present === false) {
         // await 했는데도 불과하고 axios 한번할때마다 안붙여도될 then, catch로 코드가 엄청 늘어간다 -> 다음부턴 async await쓸거면 then catch빼고 변수로 받고(then), 함수 전체를 try, catch로 묶어서 한꺼번에 사용해라
+        // 현재 디비가 아니라 로컬스토리지에 임의로 저장하고있기 때문에 -> 본인 아이디로 로그인한거에 대해서만 만든 재생목록에 목록들을 추가할수있다 -> 로그아웃할때 삭제해야 안전하다 vs 하나의 아이디로 한다는 가정하에 로그아웃후 다시 로그인해도 만들어져있는게 그대로다
         await axios({
           method: "POST",
           url: `https://api.themoviedb.org/3/list/${id}/add_item?api_key=${this.API_KEY}&session_id=${localStorage.getItem('session_id')}`,
@@ -750,7 +753,7 @@ export default {
 
   // },
   // try, catch문은 해당 함수가 async를 가지고있을때 사용이 가능하다 -> await쓰면서 await안에서 then, catch안할거면 async await을 쓰면서 전체를 try, catch 로 묶어라
-  async mounted() { 
+  async mounted() {
     this.displaySize = window.innerWidth;
     try {
       if(this.CHECK_DATA == "movie") {
@@ -816,6 +819,7 @@ export default {
         }).catch((e) => {
           console.log(e)
         })
+        this.skeleton = false;
       } else {
         // tv
         // id에 맞는 정보 가져오기
@@ -878,6 +882,7 @@ export default {
         }).catch((e) => {
           console.log(e)
         })
+        this.skeleton = false;
       }
 
       if(localStorage.getItem('session_id')) {
@@ -1023,7 +1028,8 @@ export default {
 <template>
   <div class="mv__detail">
     <div class="detail__box">
-      <div class="detail__bg" :style="{ 'backgroundImage' : `url(${MOVIE_IMG}/${detail_data.backdrop_path})` }">
+      <div class="skeleton__detail__bg" v-if="skeleton"></div>
+      <div class="detail__bg" v-else :style="{ 'backgroundImage' : `url(${MOVIE_IMG}/${detail_data.backdrop_path})` }">
         <span class="material-symbols-outlined mv__play" :class="{ video_check }" @click="detail__video__play()">youtube_activity</span>
         <!-- 버튼 클릭시 유튜브 재생 -->
         <iframe class="detail__video" :class="{ video_check }" :src="`https://www.youtube.com/embed/${detail_video}`"></iframe>
@@ -1031,12 +1037,15 @@ export default {
       <div class="detail__info">
         <div class="__info">
           <div class="__first">
-            <div class="__poster">
-              <img :src="`${MOVIE_IMG}/${detail_data.poster_path}`">
+            <div class="skeleton__poster" v-if="skeleton"></div>
+            <div class="__poster" v-else>
+              <img :src="`${MOVIE_IMG}/${detail_data.poster_path}`" onerror="this.src='/public/no_image.png'" >
             </div>
             <div class="__text">
-              <div class="__title">{{ CHECK_DATA == "movie" ? detail_data.title : detail_data.name }}</div>
-              <div class="my__list">
+              <div class="skeleton__title" v-if="skeleton"></div>
+              <div class="__title" v-else>{{ CHECK_DATA == "movie" ? detail_data.title : detail_data.name }}</div>
+              <div class="skeleton__myList" v-if="skeleton"></div>
+              <div class="my__list" v-else>
                 <div class="__list" :class="{ list__save }" @click="listOpenBtn()" title="재생목록에 추가"></div>
                 <div class="__listBox" :class="{ list__open }">
                   <div class="list__header">
@@ -1083,7 +1092,8 @@ export default {
                   </div>
                 </div>
               </div>
-              <div class="talineBox">
+              <div class="skeleton__talineBox" v-if="skeleton"></div>
+              <div class="talineBox" v-else>
                 <div class="__tagline">{{ detail_data.tagline}}</div>
                 <div class="__sns">
                   <div class="__instagram" @click="instagram()"></div>
@@ -1091,25 +1101,30 @@ export default {
                   <div class="__twitter" @click="twitter()"></div>
                 </div>
               </div>
-              <div class="__des">{{ detail_data.overview}}</div>
+              <div class="skeleton__des" v-if="skeleton"></div>
+              <div class="__des" v-else>{{ detail_data.overview}}</div>
             </div>
           </div>
           <div class="__second">
             <div class="__left">
               <hr />
-              <div class="date">
+              <div class="skeleton__date" v-if="skeleton"></div>
+              <div class="date" v-else>
                 <div class="date__text">개봉일 : </div>
                 <div class="date__item">{{ CHECK_DATA == "movie" ? detail_data.release_date : detail_data.first_air_date }}</div>
               </div>
-              <div class="genres">
+              <div class="skeleton__genres" v-if="skeleton"></div>
+              <div class="genres" v-else>
                 <div class="genres__text">장르 : </div>
                 <div class="genres__item">{{ detail_data_genres }}</div>
               </div>
-              <div class="runtime">
+              <div class="skeleton__runtime" v-if="skeleton"></div>
+              <div class="runtime" v-else>
                 <div class="runtime__text">시간 : </div>
                 <div class="runtime__item">{{ CHECK_DATA == "movie" ? detail_data.runtime : "24" }}</div>
               </div>
-              <div class="like">
+              <div class="skeleton__like" v-if="skeleton"></div>
+              <div class="like" v-else>
                 <div class="like__text">평점 : </div>
                 <div class="like__item">{{ detail_data.vote_average }}</div>
               </div>
@@ -1120,8 +1135,9 @@ export default {
               <div class="detail__true" v-if="this.detail_similar_Data.length > 0">
                 <swiper class="first__swiper swiper-slide" :slides-per-view="(displaySize > 1024) ? 4.2 : 3.2" :space-between="30" :modules="modules" Navigation="false">
                   <swiper-slide v-for="movie in detail_similar_Data" :key="movie" @click="detail(movie.id)">
-                    <div class="detail__info__box">
-                      <img class="detail__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" />
+                    <div class="skeleton__detail__info__box" v-if="skeleton"></div>
+                    <div class="detail__info__box" v-else>
+                      <img class="detail__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" onerror="this.src='/public/no_image.png'"  />
                       <div class="detail__name">{{ movie.title }}</div>
                     </div>
                   </swiper-slide>
@@ -1133,8 +1149,9 @@ export default {
               <div class="detail__cast__true" v-if="this.detail_similar_Data.length > 0">
                 <swiper class="first__swiper swiper-slide" :slides-per-view="(displaySize > 1024) ? 4.2 : 3.2" :space-between="30" :modules="modules" Navigation="false">
                   <swiper-slide v-for="cast in detail_cast" :key="cast">
-                    <div class="detail__cast__info__box">
-                      <img class="detail__cast__poster" :src="`${this.MOVIE_IMG}/${cast.profile_path}`">
+                    <div class="skeleton__detail__cast__info__box" v-if="skeleton"></div>
+                    <div class="detail__cast__info__box" v-else>
+                      <img class="detail__cast__poster" :src="`${this.MOVIE_IMG}/${cast.profile_path}`" onerror="this.src='/public/no_image.png'" >
                       <div class="detail__cast__name">{{ cast.name }}</div>
                     </div>
                   </swiper-slide>
@@ -1143,7 +1160,8 @@ export default {
               <div v-else class="detail__cast__false">관련 출연진이 없습니다</div>
               <!-- 리뷰 -->
               <div class="detail__cast__title">리뷰</div>
-              <div class="detail__reviews__true" v-if="this.detail_reviews.length > 0">
+              <div class="skeleton__detail__reviews__true" v-if="skeleton"></div>
+              <div class="detail__reviews__true" v-else-if="this.detail_reviews.length > 0">
                 <div class="detail__reviews__box" v-for="reviews in detail_reviews" :key="reviews">
                   <div class="reviews__content">{{ reviews.content }}</div>
                   <div class="reviews__info">
@@ -1175,6 +1193,7 @@ export default {
         background-position: center;
         background-size: 100%;
         background-repeat: no-repeat;
+        
         .mv__play {
           display: block;
           width: 100%;
@@ -1207,6 +1226,23 @@ export default {
           display: block;
         }
       }
+      .skeleton__detail__bg {
+        position: relative;
+        height: 40vh;
+        background-color: rgba(165, 165, 165, 0.1);
+        animation: pulse-bg 1s infinite;
+        @keyframes pulse-bg {
+          0% {
+          background-color: rgba(165, 165, 165, 0.1);
+          }
+          50% {
+              background-color: rgba(165, 165, 165, 0.3);
+            }
+          100% {
+              background-color: rgba(165, 165, 165, 0.1);
+          }
+        }
+      }
       .detail__info {
         background: #060d17;
         position: relative;
@@ -1229,6 +1265,29 @@ export default {
                 border-radius: 10px;
               }
             }
+            .skeleton__poster {
+              width: 20vw;
+              height: 50vh;
+              border-radius: 10px;
+              background-color: rgba(165, 165, 165, 0.1);
+              animation: pulse-bg 1s infinite;
+              @keyframes pulse-bg {
+                0% {
+                background-color: rgba(165, 165, 165, 0.1);
+                }
+                50% {
+                    background-color: rgba(165, 165, 165, 0.3);
+                  }
+                100% {
+                    background-color: rgba(165, 165, 165, 0.1);
+                }
+              }
+              img {
+                width: 100%;
+                height: 100%;
+                border-radius: 10px;
+              }
+            }
             .__text {
               padding-left: 5rem;
               width: 50vw;
@@ -1238,6 +1297,24 @@ export default {
                 font-size: 30px;
                 color: #fff;
                 font-weight: bold;
+              }
+              .skeleton__title {
+                width: 100%;
+                height: 10%;
+                border-radius: 10px;
+                background-color: rgba(165, 165, 165, 0.1);
+                animation: pulse-bg 1s infinite;
+                @keyframes pulse-bg {
+                  0% {
+                  background-color: rgba(165, 165, 165, 0.1);
+                  }
+                  50% {
+                      background-color: rgba(165, 165, 165, 0.3);
+                    }
+                  100% {
+                      background-color: rgba(165, 165, 165, 0.1);
+                  }
+                }
               }
               .my__list {
                 padding-top: 1rem;
@@ -1571,6 +1648,26 @@ export default {
                   }
                 }
               }
+              .skeleton__myList {
+                margin-top: 1rem;
+                display: flex;
+                width: 100%;
+                height: 14%;
+                border-radius: 10px;
+                background-color: rgba(165, 165, 165, 0.1);
+                animation: pulse-bg 1s infinite;
+                @keyframes pulse-bg {
+                  0% {
+                  background-color: rgba(165, 165, 165, 0.1);
+                  }
+                  50% {
+                      background-color: rgba(165, 165, 165, 0.3);
+                    }
+                  100% {
+                      background-color: rgba(165, 165, 165, 0.1);
+                  }
+                }
+              }
               .talineBox {
                 display: flex;
                 justify-content: space-between;
@@ -1648,11 +1745,52 @@ export default {
                   }
                 }
               }
+              .skeleton__talineBox {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 1rem;
+                align-items: center;
+                width: 100%;
+                height: 11%;
+                border-radius: 10px;
+                background-color: rgba(165, 165, 165, 0.1);
+                animation: pulse-bg 1s infinite;
+                @keyframes pulse-bg {
+                  0% {
+                  background-color: rgba(165, 165, 165, 0.1);
+                  }
+                  50% {
+                      background-color: rgba(165, 165, 165, 0.3);
+                    }
+                  100% {
+                      background-color: rgba(165, 165, 165, 0.1);
+                  }
+                }
+              }
               .__des {
                 font-family: 'IBM Plex Sans KR', sans-serif;
                 padding-top: 3rem;
                 font-size: 20px;
                 color: #fff;
+              }
+              .skeleton__des {
+                margin-top: 3rem;
+                width: 100%;
+                height: 50%;
+                border-radius: 10px;
+                background-color: rgba(165, 165, 165, 0.1);
+                animation: pulse-bg 1s infinite;
+                @keyframes pulse-bg {
+                  0% {
+                  background-color: rgba(165, 165, 165, 0.1);
+                  }
+                  50% {
+                      background-color: rgba(165, 165, 165, 0.3);
+                    }
+                  100% {
+                      background-color: rgba(165, 165, 165, 0.1);
+                  }
+                }
               }
             }
           }
@@ -1676,6 +1814,25 @@ export default {
                   width: 50%;
                 }
               }
+              .skeleton__date {
+                display: flex;
+                width: 100%;
+                height: 2.2%;
+                border-radius: 10px;
+                background-color: rgba(165, 165, 165, 0.1);
+                animation: pulse-bg 1s infinite;
+                @keyframes pulse-bg {
+                  0% {
+                  background-color: rgba(165, 165, 165, 0.1);
+                  }
+                  50% {
+                      background-color: rgba(165, 165, 165, 0.3);
+                    }
+                  100% {
+                      background-color: rgba(165, 165, 165, 0.1);
+                  }
+                }
+              }
               .genres {
                 font-size: 20px;
                 color: #fff;
@@ -1687,6 +1844,26 @@ export default {
                   width: 50%;
                 }
               }
+              .skeleton__genres {
+                display: flex;
+                width: 100%;
+                margin-top: .5rem;
+                height: 2.2%;
+                border-radius: 10px;
+                background-color: rgba(165, 165, 165, 0.1);
+                animation: pulse-bg 1s infinite;
+                @keyframes pulse-bg {
+                  0% {
+                  background-color: rgba(165, 165, 165, 0.1);
+                  }
+                  50% {
+                      background-color: rgba(165, 165, 165, 0.3);
+                    }
+                  100% {
+                      background-color: rgba(165, 165, 165, 0.1);
+                  }
+                }
+              }
               .runtime {
                 font-size: 20px;
                 color: #fff;
@@ -1696,6 +1873,26 @@ export default {
                 }
                 .runtime__item {
                   width: 50%;
+                }
+              }
+              .skeleton__runtime {
+                display: flex;
+                width: 100%;
+                margin-top: .5rem;
+                height: 2.2%;
+                border-radius: 10px;
+                background-color: rgba(165, 165, 165, 0.1);
+                animation: pulse-bg 1s infinite;
+                @keyframes pulse-bg {
+                  0% {
+                  background-color: rgba(165, 165, 165, 0.1);
+                  }
+                  50% {
+                      background-color: rgba(165, 165, 165, 0.3);
+                    }
+                  100% {
+                      background-color: rgba(165, 165, 165, 0.1);
+                  }
                 }
               }
               .like {
@@ -1711,6 +1908,26 @@ export default {
                     content: "\2605";
                     color: red;
                     margin-left: 5px;
+                  }
+                }
+              }
+              .skeleton__like {
+                display: flex;
+                width: 100%;
+                margin-top: .5rem;
+                height: 2.2%;
+                border-radius: 10px;
+                background-color: rgba(165, 165, 165, 0.1);
+                animation: pulse-bg 1s infinite;
+                @keyframes pulse-bg {
+                  0% {
+                  background-color: rgba(165, 165, 165, 0.1);
+                  }
+                  50% {
+                      background-color: rgba(165, 165, 165, 0.3);
+                    }
+                  100% {
+                      background-color: rgba(165, 165, 165, 0.1);
                   }
                 }
               }
@@ -1747,6 +1964,24 @@ export default {
                     text-align: center;
                   }
                 }
+                .skeleton__detail__info__box {
+                  width: 10vw;
+                  height: 31vh;
+                  border-radius: 10px;
+                  background-color: rgba(165, 165, 165, 0.1);
+                  animation: pulse-bg 1s infinite;
+                  @keyframes pulse-bg {
+                    0% {
+                    background-color: rgba(165, 165, 165, 0.1);
+                    }
+                    50% {
+                        background-color: rgba(165, 165, 165, 0.3);
+                      }
+                    100% {
+                        background-color: rgba(165, 165, 165, 0.1);
+                    }
+                  }
+                }
               }
               .detail__cast__title {
                 // padding-top: 1rem;
@@ -1777,6 +2012,24 @@ export default {
                     padding-top: 0.5rem
                   }
                 }
+                .skeleton__detail__cast__info__box {
+                  width: 10vw;
+                  height: 31vh;
+                  border-radius: 10px;
+                  background-color: rgba(165, 165, 165, 0.1);
+                  animation: pulse-bg 1s infinite;
+                  @keyframes pulse-bg {
+                    0% {
+                    background-color: rgba(165, 165, 165, 0.1);
+                    }
+                    50% {
+                        background-color: rgba(165, 165, 165, 0.3);
+                      }
+                    100% {
+                        background-color: rgba(165, 165, 165, 0.1);
+                    }
+                  }
+                }
               }
               .detail__reviews__true {
                 margin-top: 1rem;
@@ -1798,6 +2051,25 @@ export default {
                     .reviews__name {
                       margin-right: 1rem;
                     }
+                  }
+                }
+              }
+              .skeleton__detail__reviews__true {
+                margin-top: 1rem;
+                min-height: 30vh;
+                max-height: 50vh;
+                border-radius: 10px;
+                background-color: rgba(165, 165, 165, 0.1);
+                animation: pulse-bg 1s infinite;
+                @keyframes pulse-bg {
+                  0% {
+                  background-color: rgba(165, 165, 165, 0.1);
+                  }
+                  50% {
+                      background-color: rgba(165, 165, 165, 0.3);
+                    }
+                  100% {
+                      background-color: rgba(165, 165, 165, 0.1);
                   }
                 }
               }
@@ -1838,6 +2110,9 @@ export default {
       display: -webkit-box;
       -webkit-line-clamp: 7;
       -webkit-box-orient: vertical;
+    }
+    .skeleton__des {
+      height: 60% !important;
     }
     .my__list {
       justify-content: center;
@@ -1897,7 +2172,8 @@ export default {
             padding: 2rem !important;
             .__first {
               display: block !important;
-              .__poster {
+              .__poster,
+              .skeleton__poster {
                 width: 100%;
                 img {
                   width: 100%;
@@ -1916,7 +2192,8 @@ export default {
                   font-size: 30px;
                   color: #fff;
                 }
-                .my__list {
+                .my__list,
+                .skeleton__myList {
                   justify-content: center;
                   .__listBox.list__open {
                     width: 50vw !important;
@@ -1925,7 +2202,8 @@ export default {
                     width: 60vw !important;
                   }
                 }
-                .talineBox {
+                .talineBox,
+                .skeleton__talineBox {
                   display: block !important;
                   .__sns {
                     padding-top: 1rem;
@@ -1942,6 +2220,11 @@ export default {
                   display: -webkit-box;
                   -webkit-line-clamp: 5; // 원하는 라인수
                   -webkit-box-orient: vertical;
+                }
+                .skeleton__des {
+                  margin-top: 2rem;
+                  height: 70%;
+
                 }
               }
             }
@@ -2026,6 +2309,9 @@ export default {
                       transition: .2s;
                     }
                   }
+                  .skeleton__detail__info__box {
+                    width: 24vw !important;
+                  }
                 }
                 .detail__cast__title {
                   padding-top: 1rem;
@@ -2049,6 +2335,9 @@ export default {
                       transform: scale(1.1);
                       transition: .2s;
                     }
+                  }
+                  .skeleton__detail__cast__info__box {
+                    width: 24vw !important;
                   }
                 }
                 .detail__cast__false {

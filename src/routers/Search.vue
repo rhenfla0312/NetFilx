@@ -115,7 +115,7 @@ export default {
       <Skeleton v-if="skeleton" />
       <div class="search__item" v-else-if="this.CHECK_DATA !== ''">
         <div class="__item" v-for="item in SEARCH_FILE" :key="item" @click="detail(item.id)">
-          <img :src="`${SEARCHR_IMG}/${item.poster_path}`" />
+          <img :src="`${SEARCHR_IMG}/${item.poster_path}`" onerror="this.src='/public/no_image.png'"  />
         </div>
       </div>
       <div class="no__item" v-else>검색된 결과가 없습니다</div>

@@ -50,6 +50,8 @@ export default {
     searchText(e) {
       // console.log(e);
       this.searchData = true;
+      this.open__item = false;
+      this.mobile__check = false;
     },
     login() {
       this.login__layout = true;
@@ -136,6 +138,7 @@ export default {
           localStorage.removeItem('session_id');
           localStorage.removeItem('guest_session_id');
           localStorage.removeItem('account_id');
+          localStorage.removeItem('list_id');
           this.open__item = false;
           setTimeout(() => {
             this.$router.go();
@@ -652,7 +655,7 @@ export default {
           }
         }
         .__searchText {
-          width: 50%;
+          width: 100% !important;
           height: 2.5vh !important;
           border-radius: 5px;
           margin-left: 0 !important;

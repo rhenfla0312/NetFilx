@@ -1,6 +1,11 @@
 <script>
 import axios from 'axios';
+
+import List_Skeleton from '../components/List_Skeleton.vue'
 export default {
+  components: {
+    List_Skeleton
+  },
   data() {
     return {
       // KEY
@@ -18,6 +23,8 @@ export default {
       list_des : "",
       list_bg : "",
       list_id : "",
+
+      skeleton : true,
 
       ID : this.$route.params.id,
 
@@ -44,6 +51,7 @@ export default {
   watch: {
     // router data감시할땐 문자열로 감싸면서 함수로 만들어야 작동한다 -> 해당 라우터 데이터가 들어있는 변수로 함수선언할땐 왜 작동안하나?
     async "$route.params.id"(value) {
+      this.skeleton = true;
       await axios.get(`https://api.themoviedb.org/3/list/${value}?api_key=${this.API_KEY}&language=ko`)
         .then((res) => {
           console.log(res);
@@ -54,6 +62,7 @@ export default {
           this.list_des = res.data.description;
           this.list_bg = res.data.items[0].backdrop_path;
           this.list_id = res.data.items[0].id;
+          this.skeleton = false;
         }).catch((error) => {
           console.log(error)
         })
@@ -74,6 +83,7 @@ export default {
           // 첫번째 이미지를 배경이미로 하기 (보통 이렇게 한다 - 슬라이드로 하지 않는 경우에)
           this.list_bg = res.data.items[0].backdrop_path;
           this.list_id = res.data.items[0].id;
+          this.skeleton = false;
         }).catch((error) => {
           console.log(error)
         })
@@ -119,7 +129,8 @@ export default {
 
 
 <template>
-  <div class="list">
+  <List_Skeleton v-if="skeleton" />
+  <div class="list" v-else>
     <div class="list__box">
       <div class="list__info">
         <div class="__info">
@@ -147,7 +158,7 @@ export default {
             <div class="__item" v-for="item in list_items" :key="item" @click="detail(item.id)">
               <div class="__itemBox">
                 <div class="__imgBox">
-                  <img :src="`${IMG_URL}/${item.poster_path}`" />
+                  <img :src="`${IMG_URL}/${item.poster_path}`" onerror="this.src='/public/no_image.png'"  />
                 </div>
                 <div class="__textBox">
                   <div class="__titleBox">{{ item.title }}</div>
@@ -223,9 +234,6 @@ export default {
                   font-size: 50px;
                   color: red;
                 }
-              }
-              .left {
-                margin-left: .5rem;
               }
               .__nameBox {
                 display: flex;

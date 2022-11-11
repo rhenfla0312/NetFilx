@@ -124,7 +124,7 @@ export default {
       <Skeleton v-if="skeleton" />
       <div class="rating__item" v-else>
         <div class="__item" v-for="item in RATING_DATA" :key="item" @click="detail(item.id)">
-          <img :src="`${IMG_URL}/${item.poster_path}`" />
+          <img :src="`${IMG_URL}/${item.poster_path}`" onerror="this.src='/public/no_image.png'"  />
         </div>
       </div>
     </div>

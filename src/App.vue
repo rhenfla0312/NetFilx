@@ -7,6 +7,17 @@ export default {
     Header,
     Footer
   },
+  // data() {
+  //   return {
+  //     options: {
+  //       licenseKey: 'YOUR_KEY_HEERE',
+  //       menu: '#menu',
+  //       anchors: ['page1', 'page2', 'page3'],
+  //       // afterLoad: this.afterLoad,
+  //       sectionsColor: ['#d3959b', '#003973', '#283048'],
+  //     },
+  //   }
+  // },
   methods: {
     des__close() {
       this.$refs.des__close.style.display = 'none';
@@ -19,17 +30,6 @@ export default {
       this.$refs.des__close.style.display = 'none';
     }
   }
-  // data() {
-  //   return {
-  //     options: {
-  //       licenseKey: 'YOUR_KEY_HEERE',
-  //       menu: '#menu',
-  //       anchors: ['page1', 'page2', 'page3'],
-  //       // afterLoad: this.afterLoad,
-  //       sectionsColor: ['#d3959b', '#003973', '#283048'],
-  //     },
-  //   }
-  // },
 }
 </script>
 
@@ -54,10 +54,10 @@ export default {
         </div>
         <div class="__img">
           <div class="first__img">
-            <img src="../public/pc.PNG" alt="">
+            <img src="/public/pc.PNG" alt="">
           </div>
           <div class="second__img">
-            <img src="../public/mobile.PNG" alt="">
+            <img src="/public/mobile.PNG" alt="">
           </div>
         </div>
         <div class="scroll__text">로그인을 하시면 더 많은 기능을 이용하실 수 있습니다</div>
@@ -67,7 +67,7 @@ export default {
           </div>
           <div class="__loginText">
             <div class="des">테스트 로그인 정보</div>
-            <div class="top">ID : rhenfla0312</div>
+            <div class="top">ID : yym1623</div>
             <div class="bottom">PW : xldjf0312</div>
           </div>
         </div>
@@ -99,6 +99,7 @@ export default {
         right: 30px;
         top: 30px;
         color: #fff;
+        z-index: 1000;
         // 기록 - 호버로 동작을 시키고 놓을때 다시 돌아오게하고싶으면 호버전에 기본에다가도 기본값을 넣어놔야한다
         span {
           transition: .3s;
@@ -194,6 +195,18 @@ export default {
     }
   }
 
+  @media screen and (max-width: 1024px) {
+    .mv {
+      background: #000;
+      position: relative;
+      .mv__des {
+        .__info {
+          width: 90% !important;
+        }
+      }
+    }
+  }
+  
   @media screen and (max-width: 768px) {
     .__info {
       padding: 5rem 0 0 0 !important;

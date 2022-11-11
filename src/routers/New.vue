@@ -131,7 +131,7 @@ export default {
         <div class="__item" v-for="item in NEW_DATA" :key="item" @click="detail(item.id)">
           <!-- <Skeleton /> -->
           <!-- <div v-if="skeleton" class="__skeleton"></div> -->
-          <img :src="`${NEW_IMG}/${item.poster_path}`" />
+          <img :src="`${NEW_IMG}/${item.poster_path}`" onerror="this.src='/public/no_image.png'" />
         </div>
       </div>
     </div>

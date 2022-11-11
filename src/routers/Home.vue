@@ -5,6 +5,7 @@ import { Pagination, Navigation } from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import Slide_Skeleton from '../components/Slide_Skeleton.vue'
 import Slide_Video_Skeleton from '../components/Slide_Video_Skeleton.vue'
+import Home_Skeleton from '../components/Home_Skeleton.vue'
 
 import 'swiper/css'
 import 'swiper/css/pagination'
@@ -16,7 +17,8 @@ export default {
     Swiper,
     SwiperSlide,
     Slide_Skeleton,
-    Slide_Video_Skeleton
+    Slide_Video_Skeleton,
+    Home_Skeleton
   },
   setup() {
     return {
@@ -78,6 +80,11 @@ export default {
       skeleton_popular : true,
       skeleton_video : true,
       skeleton_trand : true,
+
+      skeleton_detail_new : true,
+      skeleton_detail_popular : true,
+      skeleton_detail_video : true,
+      skeleton_detail_trand : true,
 
       window : false,
     }
@@ -165,7 +172,7 @@ export default {
       }).catch((error) => {
         console.log(error)
       }) 
-
+      this.skeleton_detail_new = false;
     },
     new_movieInfo_close() {
       this.movie_info_new = false;
@@ -204,6 +211,7 @@ export default {
       .then((res) => {
         // console.log(res)
         this.movie_info_popular_id = res.data.results[0].key;
+        this.skeleton_detail_popular = false;
       }).catch((error) => {
         console.log(error)
       }) 
@@ -284,6 +292,7 @@ export default {
       .then((res) => {
         // console.log(res)
         this.movie_info_video_id = res.data.results[0].key;
+        this.skeleton_detail_trand = false;
       }).catch((error) => {
         console.log(error)
       }) 
@@ -293,17 +302,6 @@ export default {
       this.movie_info_trand = false;
     }
   },
-  // window esc event
-  //   updated() {
-  //     window.onkeydown = function(event){
-  //       if(event.keyCode == 27){
-  //         this.movie_info_new = false;
-  //         this.movie_info_popular = false;
-  //         this.movie_info_video = false;
-  //         this.movie_info_trand = false;
-  //       };
-  //     }
-  //   },
   async mounted() {
     this.displaySize = window.innerWidth;
     try {
@@ -402,7 +400,7 @@ export default {
       <swiper class="first__swiper" v-else :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in new_movies" :key="movie">
           <!-- <div v-if="skeleton_new" class="skeleton__poster"></div> -->
-          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="new_movieInfo(movie.id, movie.backdrop_path)">
+          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="new_movieInfo(movie.id, movie.backdrop_path)" onerror="this.src='/public/no_image.png'" >
           <!-- <span class="material-symbols-outlined bookmark">bookmark</span> -->
         </swiper-slide>
         <swiper-slide class="mv__next">
@@ -410,11 +408,12 @@ export default {
         </swiper-slide>
       </swiper>
       <!-- mv__detail__info -->
+      <!-- <Home_Skeleton v-if="skeleton_detail_new" :class="{ movie_info_new }" ref="detail_new_bg" /> -->
       <div class="mv__detail__info" :class="{ movie_info_new }" ref="detail_new_bg">
         <div class="detail__info">
           <!-- <img :src="(displaySize > 768) ? `${this.MOVIE_IMG}/${movie_info_new_data.poster_path}` : `${this.MOVIE_IMG}/${movie_info_new_data.backdrop_path}`" alt="" class="detail__poster" /> -->
           <div class="detail__box" v-if="displaySize > 768">
-            <img :src="`${MOVIE_IMG}/${movie_info_new_data.poster_path}`" class="detail__poster" @click="detail(movie_info_new_data.id)" />
+            <img :src="`${MOVIE_IMG}/${movie_info_new_data.poster_path}`" class="detail__poster" @click="detail(movie_info_new_data.id)" onerror="this.src='/public/no_image.png'"  />
             <!-- <div class="detail__btn" @click="detail(movie_info_new_data.id)">상세보기</div> -->
           </div>
           <div class="detail__text">
@@ -423,7 +422,7 @@ export default {
               <div class="__close"><span class="material-symbols-outlined" @click="new_movieInfo_close()">close</span></div>
             </div>
             <div class="detail__box" v-if="displaySize < 768">
-              <img :src="`${MOVIE_IMG}/${movie_info_new_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_new_data.id)" />
+              <img :src="`${MOVIE_IMG}/${movie_info_new_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_new_data.id)" onerror="this.src='/public/no_image.png'"  />
               <!-- <div class="detail__btn" @click="detail(movie_info_new_data.id)">상세보기</div> -->
             </div>
             <div class="__des">{{ movie_info_new_data.overview !== "" ? movie_info_new_data.overview : "상세설명이 없습니다" }}</div>
@@ -440,7 +439,7 @@ export default {
       <Slide_Skeleton v-if="skeleton_popular" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false" />
       <swiper class="first__swiper" v-else :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in popular_moviles" :key="movie">
-          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`"  @click="popular_movieInfo(movie.id, movie.backdrop_path)" />
+          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`"  @click="popular_movieInfo(movie.id, movie.backdrop_path)" onerror="this.src='/public/no_image.png'"  />
           <!-- <span class="material-symbols-outlined bookmark">bookmark</span> -->
         </swiper-slide>
         <swiper-slide class="mv__next">
@@ -448,10 +447,11 @@ export default {
         </swiper-slide>
       </swiper>
       <!-- mv__detail__info -->
+      <!-- <Home_Skeleton v-if="skeleton_detail_popular" :class="{ movie_info_popular }" /> -->
       <div class="mv__detail__info" :class="{ movie_info_popular }" ref="detail_popular_bg">
         <div class="detail__info">
           <div class="detail__box" v-if="displaySize > 768">
-            <img :src="`${MOVIE_IMG}/${movie_info_popular_data.poster_path}`" class="detail__poster" @click="detail(movie_info_popular_data.id)" />
+            <img :src="`${MOVIE_IMG}/${movie_info_popular_data.poster_path}`" class="detail__poster" @click="detail(movie_info_popular_data.id)" onerror="this.src='/public/no_image.png'"  />
             <!-- <div class="detail__btn" @click="detail(movie_info_popular_data.id)">상세보기</div> -->
           </div>
           <div class="detail__text">
@@ -460,7 +460,7 @@ export default {
               <div class="__close"><span class="material-symbols-outlined" @click="popular_movieInfo_close()">close</span></div>
             </div>
             <div class="detail__box" v-if="displaySize < 768">
-              <img :src="`${MOVIE_IMG}/${movie_info_popular_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_popular_data.id)" />
+              <img :src="`${MOVIE_IMG}/${movie_info_popular_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_popular_data.id)" onerror="this.src='/public/no_image.png'" />
               <!-- <div class="detail__btn" @click="detail(movie_info_popular_data.id)">상세보기</div> -->
             </div>
             <div class="__des">{{ movie_info_popular_data.overview !== "" ? movie_info_popular_data.overview : "상세설명이 없습니다" }}</div>
@@ -502,16 +502,17 @@ export default {
       <Slide_Skeleton v-if="skeleton_trand" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false" />
       <swiper class="first__swiper" v-else :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in trand_movies" :key="movie">
-          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="trand_movieInfo(movie.id, movie.backdrop_path)" />
+          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="trand_movieInfo(movie.id, movie.backdrop_path)" onerror="this.src='/public/no_image.png'" />
           <!-- <span class="material-symbols-outlined bookmark">bookmark</span> -->
         </swiper-slide>
         <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
       </swiper>
       <!-- mv__detail__info -->
+      <!-- <Home_Skeleton v-if="skeleton_detail_trand" :class="{ movie_info_trand }" /> -->
       <div class="mv__detail__info" :class="{ movie_info_trand }"  ref="detail_trand_bg">
         <div class="detail__info">
           <div class="detail__box" v-if="displaySize > 768">
-            <img :src="`${MOVIE_IMG}/${movie_info_trand_data.poster_path}`" class="detail__poster" @click="detail(movie_info_trand_data.id)" />
+            <img :src="`${MOVIE_IMG}/${movie_info_trand_data.poster_path}`" class="detail__poster" @click="detail(movie_info_trand_data.id)" onerror="this.src='/public/no_image.png'"  />
             <!-- <div class="detail__btn" @click="detail(movie_info_trand_data.id)">상세보기</div> -->
           </div>
           <div class="detail__text">
@@ -520,7 +521,7 @@ export default {
               <div class="__close"><span class="material-symbols-outlined" @click="trand_movieInfo_close()">close</span></div>
             </div>
             <div class="detail__box" v-if="displaySize < 768">
-              <img :src="`${MOVIE_IMG}/${movie_info_trand_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_trand_data.id)" />
+              <img :src="`${MOVIE_IMG}/${movie_info_trand_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_trand_data.id)" onerror="this.src='/public/no_image.png'"  />
               <!-- <div class="detail__btn" @click="detail(movie_info_trand_data.id)">상세보기</div> -->
             </div>
             <div class="__des">{{ movie_info_trand_data.overview !== "" ? movie_info_trand_data.overview : "상세설명이 없습니다" }}</div>
