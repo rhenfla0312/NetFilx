@@ -18,18 +18,18 @@ export default {
   //     },
   //   }
   // },
-  methods: {
-    des__close() {
-      this.$refs.des__close.style.display = 'none';
-      localStorage.setItem('appDisplay', 'none');
-    },
-  },
-  mounted() {
-    // 모든 사용자가 처음 접속하고 한번 껏다면 그후로는 안나오게 한다 -> 로컬스토리지 디스플레이값을 삭제를 안할거라서
-    if(localStorage.getItem('appDisplay') == 'none') {
-      this.$refs.des__close.style.display = 'none';
-    }
-  }
+  // methods: {
+  //   des__close() {
+  //     this.$refs.des__close.style.display = 'none';
+  //     localStorage.setItem('appDisplay', 'none');
+  //   },
+  // },
+  // mounted() {
+  //   // 모든 사용자가 처음 접속하고 한번 껏다면 그후로는 안나오게 한다 -> 로컬스토리지 디스플레이값을 삭제를 안할거라서
+  //   if(localStorage.getItem('appDisplay') == 'none') {
+  //     this.$refs.des__close.style.display = 'none';
+  //   }
+  // }
 }
 </script>
 
@@ -45,7 +45,7 @@ export default {
     </full-page> -->
 
     <!-- 처음접속시 상세정보 -->
-    <div class="mv__des" ref="des__close">
+    <!-- <div class="mv__des" ref="des__close">
       <div class="des__close"><span class="material-symbols-outlined" @click="des__close()">close</span></div>
       <div class="__info">
         <div class="__textBox">
@@ -72,7 +72,7 @@ export default {
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <Header />
     <RouterView />
