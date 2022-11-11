@@ -13,8 +13,8 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 
 
 // full page
-import 'vue-fullpage.js/dist/style.css'
-// import './fullpage.scrollHorizontally.min' // Optional. When using fullpage extensions
-import VueFullPage from 'vue-fullpage.js'
+// import 'vue-fullpage.js/dist/style.css'
+// // import './fullpage.scrollHorizontally.min' // Optional. When using fullpage extensions
+// import VueFullPage from 'vue-fullpage.js'
 
-createApp(App).use(VueSweetalert2).use(VueFullPage).use(router).use(store).mount('#app')
+createApp(App).use(VueSweetalert2).use(router).use(store).mount('#app')
