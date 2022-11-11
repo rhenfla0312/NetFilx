@@ -63,7 +63,7 @@ export default {
         <div class="scroll__text">로그인을 하시면 더 많은 기능을 이용하실 수 있습니다</div>
         <div class="login__img">
           <div class="__loginImg">
-            <img src="../public/regster.PNG" alt="">
+            <img src="/public/regster.PNG" alt="">
           </div>
           <div class="__loginText">
             <div class="des">테스트 로그인 정보</div>
