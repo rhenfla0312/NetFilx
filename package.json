@@ -18,7 +18,6 @@
     "vite-plugin-favicon": "^1.0.8",
     "vue": "^3.2.37",
     "vue-awesome-swiper": "^5.0.1",
-    "vue-fullpage.js": "^0.2.8",
     "vue-sweetalert2": "^5.0.5",
     "vuex": "^4.1.0"
   },
