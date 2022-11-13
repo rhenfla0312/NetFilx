@@ -138,6 +138,7 @@ export default {
           localStorage.removeItem('session_id');
           localStorage.removeItem('guest_session_id');
           localStorage.removeItem('account_id');
+          // 일회성 아이디로 -> 로그아웃할때마다 모든 저장목록 삭제 (일화성으로 여러명한테 안할려면 디비로 해야한다)
           localStorage.removeItem('list_id');
           this.open__item = false;
           setTimeout(() => {
