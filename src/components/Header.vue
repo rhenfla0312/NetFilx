@@ -26,8 +26,8 @@ export default {
       open__list: false,
       list_check : false,
 
-      id: "",
-      pw: "",
+      id: "yym1623",
+      pw: "xldjf0312",
       token: "",
       request_token: "",
 
