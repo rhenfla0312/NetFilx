@@ -1572,9 +1572,6 @@ export default {
                   }
                 }
               }
-              &:hover::before {
-                content: "";
-              }
               &:hover {
                 // scale() -> 1은 기본이다 1.1부터 변한다
                 cursor: pointer;
@@ -1637,18 +1634,24 @@ export default {
               .detail__box {
                 position: relative;
                 transition: .2s;
-                &:hover::before {
-                  // content: ">>";
+                &::before {
+                  content: ">>상세보기 클릭<<";              
                   position: absolute;
                   top: 50%;
                   left: 50%;
+                  font-size: 30px;
+                  width: 100%;
+                  text-align: center;
+                  margin: auto;
                   transform: translate(-50%, -50%);
-                  font-size: 100px;
                   font-weight: bold;
                   color: #fff;
                   animation: slice 1s infinite;
                   @keyframes slice {
                     0% {
+                      opacity: .3;
+                    }
+                    50% {
                       opacity: .8;
                     }
                     100% {
@@ -1741,18 +1744,24 @@ export default {
             .detail__box {
               position: relative;
               transition: .2s;
-              &:hover::before {
-                // content: ">>";
+              &::before {
+                content: ">>상세보기 클릭<<";              
                 position: absolute;
                 top: 50%;
                 left: 50%;
+                font-size: 30px;
+                width: 100%;
+                text-align: center;
+                margin: auto;
                 transform: translate(-50%, -50%);
-                font-size: 100px;
                 font-weight: bold;
                 color: #fff;
                 animation: slice 1s infinite;
                 @keyframes slice {
                   0% {
+                    opacity: .3;
+                  }
+                  50% {
                     opacity: .8;
                   }
                   100% {
@@ -1822,18 +1831,24 @@ export default {
               .detail__box {
                 position: relative;
                 transition: .2s;
-                &:hover::before {
-                  // content: ">>";
+                &::before {
+                  content: ">>상세보기 클릭<<";              
                   position: absolute;
                   top: 50%;
                   left: 50%;
+                  font-size: 30px;
+                  width: 100%;
+                  text-align: center;
+                  margin: auto;
                   transform: translate(-50%, -50%);
-                  font-size: 100px;
                   font-weight: bold;
                   color: #fff;
                   animation: slice 1s infinite;
                   @keyframes slice {
                     0% {
+                      opacity: .3;
+                    }
+                    50% {
                       opacity: .8;
                     }
                     100% {
@@ -1981,18 +1996,24 @@ export default {
             .detail__box {
               position: relative;
               transition: .2s;
-              &:hover::before {
-                // content: ">>";
+              &::before {
+                content: ">>상세보기 클릭<<";              
                 position: absolute;
                 top: 50%;
                 left: 50%;
+                font-size: 30px;
+                width: 100%;
+                text-align: center;
+                margin: auto;
                 transform: translate(-50%, -50%);
-                font-size: 100px;
                 font-weight: bold;
                 color: #fff;
                 animation: slice 1s infinite;
                 @keyframes slice {
                   0% {
+                    opacity: .3;
+                  }
+                  50% {
                     opacity: .8;
                   }
                   100% {
@@ -2063,18 +2084,24 @@ export default {
               .detail__box {
                 position: relative;
                 transition: .2s;
-                &:hover::before {
-                  // content: ">>";
+                &::before {
+                  content: ">>상세보기 클릭<<";              
                   position: absolute;
                   top: 50%;
                   left: 50%;
+                  font-size: 30px;
+                  width: 100%;
+                  text-align: center;
+                  margin: auto;
                   transform: translate(-50%, -50%);
-                  font-size: 100px;
                   font-weight: bold;
                   color: #fff;
                   animation: slice 1s infinite;
                   @keyframes slice {
                     0% {
+                      opacity: .3;
+                    }
+                    50% {
                       opacity: .8;
                     }
                     100% {
