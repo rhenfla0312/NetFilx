@@ -144,7 +144,7 @@ export default {
             this.$router.go();
           },1000)
         }
-        this.$router.push('/')
+        // this.$router.push('/')
       })
     },
     async search() {
