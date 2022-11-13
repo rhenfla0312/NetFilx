@@ -1572,6 +1572,9 @@ export default {
                   }
                 }
               }
+              &:hover:before {
+                content: "",
+              }
               &:hover {
                 // scale() -> 1은 기본이다 1.1부터 변한다
                 cursor: pointer;
@@ -1658,6 +1661,9 @@ export default {
                       opacity: 1;
                     }
                   }
+                }
+                &:hover:before {
+                  content: "",
                 }
                 &:hover {
                   // scale() -> 1은 기본이다 1.1부터 변한다
@@ -1769,6 +1775,9 @@ export default {
                   }
                 }
               }
+              &:hover:before {
+                content: "",
+              }
               &:hover {
                 // scale() -> 1은 기본이다 1.1부터 변한다
                 cursor: pointer;
@@ -1855,6 +1864,9 @@ export default {
                       opacity: 1;
                     }
                   }
+                }
+                &:hover:before {
+                  content: "",
                 }
                 &:hover {
                   // scale() -> 1은 기본이다 1.1부터 변한다
@@ -2021,6 +2033,9 @@ export default {
                   }
                 }
               }
+              &:hover:before {
+                content: "",
+              }
               &:hover {
                 // scale() -> 1은 기본이다 1.1부터 변한다
                 cursor: pointer;
@@ -2108,6 +2123,9 @@ export default {
                       opacity: 1;
                     }
                   }
+                }
+                &:hover:before {
+                  content: "",
                 }
                 &:hover {
                   // scale() -> 1은 기본이다 1.1부터 변한다
