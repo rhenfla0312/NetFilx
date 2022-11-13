@@ -126,7 +126,7 @@ export default {
       <Skeleton v-if="skeleton" />
       <div class="favorite__item" v-else>
         <div class="__item" v-for="item in FAVORITE_DATA" :key="item" @click="detail(item.id)">
-          <img :src="`${IMG_URL}/${item.poster_path}`" onerror="this.src='/public/no_image.png'"  />
+          <img :src="`${IMG_URL}/${item.poster_path}`" onerror="this.src='https://previews.123rf.com/images/julynx/julynx1408/julynx140800023/30746516-%EC%82%AC%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%97%86%EA%B1%B0%EB%82%98-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%82%AC%EC%A7%84-%EC%97%86%EC%9D%8C.jpg'"  />
         </div>
       </div>
     </div>

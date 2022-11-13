@@ -115,7 +115,7 @@ export default {
       <Skeleton v-if="skeleton" />
       <div class="search__item" v-else-if="this.CHECK_DATA !== ''">
         <div class="__item" v-for="item in SEARCH_FILE" :key="item" @click="detail(item.id)">
-          <img :src="`${SEARCHR_IMG}/${item.poster_path}`" onerror="this.src='/public/no_image.png'"  />
+          <img :src="`${SEARCHR_IMG}/${item.poster_path}`" onerror="this.src='https://previews.123rf.com/images/julynx/julynx1408/julynx140800023/30746516-%EC%82%AC%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%97%86%EA%B1%B0%EB%82%98-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%82%AC%EC%A7%84-%EC%97%86%EC%9D%8C.jpg'"  />
         </div>
       </div>
       <div class="no__item" v-else>검색된 결과가 없습니다</div>

@@ -384,7 +384,8 @@ export default {
 
 
 <template>
-  <div class="windows" :class="{ window }"></div>
+  <!-- 한 탬플릿에 두개이상의 최상위 부모요소가 있다면 에러코드가 생기지만 실행에는 문제없다 -> 하나의 탬플릿엔 하나의 최상위요소만 둔다(컴포넌트 분리) -->
+  <!-- <div class="windows" :class="{ window }"></div> -->
   <div class="mv__container">
   <div class="mv__img">
     <div class="mv__searchBox">
@@ -400,7 +401,7 @@ export default {
       <swiper class="first__swiper" v-else :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in new_movies" :key="movie">
           <!-- <div v-if="skeleton_new" class="skeleton__poster"></div> -->
-          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="new_movieInfo(movie.id, movie.backdrop_path)" onerror="this.src='/public/no_image.png'" >
+          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="new_movieInfo(movie.id, movie.backdrop_path)" onerror="this.src='https://previews.123rf.com/images/julynx/julynx1408/julynx140800023/30746516-%EC%82%AC%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%97%86%EA%B1%B0%EB%82%98-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%82%AC%EC%A7%84-%EC%97%86%EC%9D%8C.jpg'" >
           <!-- <span class="material-symbols-outlined bookmark">bookmark</span> -->
         </swiper-slide>
         <swiper-slide class="mv__next">
@@ -413,7 +414,7 @@ export default {
         <div class="detail__info">
           <!-- <img :src="(displaySize > 768) ? `${this.MOVIE_IMG}/${movie_info_new_data.poster_path}` : `${this.MOVIE_IMG}/${movie_info_new_data.backdrop_path}`" alt="" class="detail__poster" /> -->
           <div class="detail__box" v-if="displaySize > 768">
-            <img :src="`${MOVIE_IMG}/${movie_info_new_data.poster_path}`" class="detail__poster" @click="detail(movie_info_new_data.id)" onerror="this.src='/public/no_image.png'"  />
+            <img :src="`${MOVIE_IMG}/${movie_info_new_data.poster_path}`" class="detail__poster" @click="detail(movie_info_new_data.id)" onerror="this.src='https://previews.123rf.com/images/julynx/julynx1408/julynx140800023/30746516-%EC%82%AC%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%97%86%EA%B1%B0%EB%82%98-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%82%AC%EC%A7%84-%EC%97%86%EC%9D%8C.jpg'"  />
             <!-- <div class="detail__btn" @click="detail(movie_info_new_data.id)">상세보기</div> -->
           </div>
           <div class="detail__text">
@@ -422,7 +423,7 @@ export default {
               <div class="__close"><span class="material-symbols-outlined" @click="new_movieInfo_close()">close</span></div>
             </div>
             <div class="detail__box" v-if="displaySize < 768">
-              <img :src="`${MOVIE_IMG}/${movie_info_new_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_new_data.id)" onerror="this.src='/public/no_image.png'"  />
+              <img :src="`${MOVIE_IMG}/${movie_info_new_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_new_data.id)" onerror="this.src='https://previews.123rf.com/images/julynx/julynx1408/julynx140800023/30746516-%EC%82%AC%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%97%86%EA%B1%B0%EB%82%98-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%82%AC%EC%A7%84-%EC%97%86%EC%9D%8C.jpg'"  />
               <!-- <div class="detail__btn" @click="detail(movie_info_new_data.id)">상세보기</div> -->
             </div>
             <div class="__des">{{ movie_info_new_data.overview !== "" ? movie_info_new_data.overview : "상세설명이 없습니다" }}</div>
@@ -439,7 +440,7 @@ export default {
       <Slide_Skeleton v-if="skeleton_popular" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false" />
       <swiper class="first__swiper" v-else :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in popular_moviles" :key="movie">
-          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`"  @click="popular_movieInfo(movie.id, movie.backdrop_path)" onerror="this.src='/public/no_image.png'"  />
+          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`"  @click="popular_movieInfo(movie.id, movie.backdrop_path)" onerror="this.src='https://previews.123rf.com/images/julynx/julynx1408/julynx140800023/30746516-%EC%82%AC%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%97%86%EA%B1%B0%EB%82%98-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%82%AC%EC%A7%84-%EC%97%86%EC%9D%8C.jpg'"  />
           <!-- <span class="material-symbols-outlined bookmark">bookmark</span> -->
         </swiper-slide>
         <swiper-slide class="mv__next">
@@ -451,7 +452,7 @@ export default {
       <div class="mv__detail__info" :class="{ movie_info_popular }" ref="detail_popular_bg">
         <div class="detail__info">
           <div class="detail__box" v-if="displaySize > 768">
-            <img :src="`${MOVIE_IMG}/${movie_info_popular_data.poster_path}`" class="detail__poster" @click="detail(movie_info_popular_data.id)" onerror="this.src='/public/no_image.png'"  />
+            <img :src="`${MOVIE_IMG}/${movie_info_popular_data.poster_path}`" class="detail__poster" @click="detail(movie_info_popular_data.id)" onerror="this.src='https://previews.123rf.com/images/julynx/julynx1408/julynx140800023/30746516-%EC%82%AC%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%97%86%EA%B1%B0%EB%82%98-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%82%AC%EC%A7%84-%EC%97%86%EC%9D%8C.jpg'"  />
             <!-- <div class="detail__btn" @click="detail(movie_info_popular_data.id)">상세보기</div> -->
           </div>
           <div class="detail__text">
@@ -460,7 +461,7 @@ export default {
               <div class="__close"><span class="material-symbols-outlined" @click="popular_movieInfo_close()">close</span></div>
             </div>
             <div class="detail__box" v-if="displaySize < 768">
-              <img :src="`${MOVIE_IMG}/${movie_info_popular_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_popular_data.id)" onerror="this.src='/public/no_image.png'" />
+              <img :src="`${MOVIE_IMG}/${movie_info_popular_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_popular_data.id)" onerror="https://previews.123rf.com/images/julynx/julynx1408/julynx140800023/30746516-%EC%82%AC%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%97%86%EA%B1%B0%EB%82%98-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%82%AC%EC%A7%84-%EC%97%86%EC%9D%8C.jpg'" />
               <!-- <div class="detail__btn" @click="detail(movie_info_popular_data.id)">상세보기</div> -->
             </div>
             <div class="__des">{{ movie_info_popular_data.overview !== "" ? movie_info_popular_data.overview : "상세설명이 없습니다" }}</div>
@@ -502,7 +503,7 @@ export default {
       <Slide_Skeleton v-if="skeleton_trand" :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false" />
       <swiper class="first__swiper" v-else :slides-per-view="(displaySize > 1024) ? 7.1 : (displaySize > 768) ? 5.1 : 3.1" :space-between="30" :modules="modules" Navigation="false">
         <swiper-slide v-for="movie in trand_movies" :key="movie">
-          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="trand_movieInfo(movie.id, movie.backdrop_path)" onerror="this.src='/public/no_image.png'" />
+          <img class="mv__poster" :src="`${MOVIE_IMG}/${movie.poster_path}`" @click="trand_movieInfo(movie.id, movie.backdrop_path)" onerror="this.src='https://previews.123rf.com/images/julynx/julynx1408/julynx140800023/30746516-%EC%82%AC%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%97%86%EA%B1%B0%EB%82%98-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%82%AC%EC%A7%84-%EC%97%86%EC%9D%8C.jpg'" />
           <!-- <span class="material-symbols-outlined bookmark">bookmark</span> -->
         </swiper-slide>
         <swiper-slide class="mv__next"><span class="material-symbols-outlined">arrow_circle_right</span></swiper-slide>
@@ -512,7 +513,7 @@ export default {
       <div class="mv__detail__info" :class="{ movie_info_trand }"  ref="detail_trand_bg">
         <div class="detail__info">
           <div class="detail__box" v-if="displaySize > 768">
-            <img :src="`${MOVIE_IMG}/${movie_info_trand_data.poster_path}`" class="detail__poster" @click="detail(movie_info_trand_data.id)" onerror="this.src='/public/no_image.png'"  />
+            <img :src="`${MOVIE_IMG}/${movie_info_trand_data.poster_path}`" class="detail__poster" @click="detail(movie_info_trand_data.id)" onerror="this.src='https://previews.123rf.com/images/julynx/julynx1408/julynx140800023/30746516-%EC%82%AC%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%97%86%EA%B1%B0%EB%82%98-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%82%AC%EC%A7%84-%EC%97%86%EC%9D%8C.jpg'"  />
             <!-- <div class="detail__btn" @click="detail(movie_info_trand_data.id)">상세보기</div> -->
           </div>
           <div class="detail__text">
@@ -521,7 +522,7 @@ export default {
               <div class="__close"><span class="material-symbols-outlined" @click="trand_movieInfo_close()">close</span></div>
             </div>
             <div class="detail__box" v-if="displaySize < 768">
-              <img :src="`${MOVIE_IMG}/${movie_info_trand_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_trand_data.id)" onerror="this.src='/public/no_image.png'"  />
+              <img :src="`${MOVIE_IMG}/${movie_info_trand_data.backdrop_path}`" class="detail__poster" @click="detail(movie_info_trand_data.id)" onerror="this.src='https://previews.123rf.com/images/julynx/julynx1408/julynx140800023/30746516-%EC%82%AC%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%97%86%EA%B1%B0%EB%82%98-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%82%AC%EC%A7%84-%EC%97%86%EC%9D%8C.jpg'"  />
               <!-- <div class="detail__btn" @click="detail(movie_info_trand_data.id)">상세보기</div> -->
             </div>
             <div class="__des">{{ movie_info_trand_data.overview !== "" ? movie_info_trand_data.overview : "상세설명이 없습니다" }}</div>
@@ -540,6 +541,15 @@ export default {
 <style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700&family=Source+Sans+Pro:wght@600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+
+// 1920 이상부터 백그라운드 이미지가 줄어드는 문제로 인해서 그 이상부턴 center를 풀어서 크기를 맞춘다
+@media screen and (min-width: 1921px) {
+  .mv__container {
+    .mv__img {
+      background-position: 0 !important;
+    }
+  }
+}
 
 @media screen and (max-width: 1024px) {
   .mv__container {
@@ -940,13 +950,14 @@ export default {
         }
       }
     }
-    }
+  }
 }
 
 @media screen and (max-width: 768px) {
   .mv__container {
     .mv__img {
       height: 30vh !important;
+      background-size: auto !important;
 
       .mv__searchBox {
         // display: none !important;
@@ -1339,6 +1350,8 @@ export default {
     }
 }
 
+
+
 .mv__container {
     .mv__img {
       padding-top: 4rem;
@@ -1346,6 +1359,7 @@ export default {
       background-image: url('https://www.justwatch.com/appassets/img/home/bg-tiles/bg-tiles.webp');
       background-repeat: no-repeat;
       background-position: center;
+      background-size: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -1533,24 +1547,33 @@ export default {
             .detail__box {
               position: relative;
               transition: .2s;
-              &:hover::before {
-                // content: ">>";
+              &::before {
+                content: ">>상세보기 클릭<<";              
                 position: absolute;
                 top: 50%;
                 left: 50%;
+                font-size: 30px;
+                width: 100%;
+                text-align: center;
+                margin: auto;
                 transform: translate(-50%, -50%);
-                font-size: 100px;
                 font-weight: bold;
                 color: #fff;
                 animation: slice 1s infinite;
                 @keyframes slice {
                   0% {
+                    opacity: .3;
+                  }
+                  50% {
                     opacity: .8;
                   }
                   100% {
                     opacity: 1;
                   }
                 }
+              }
+              &:hover::before {
+                content: "";
               }
               &:hover {
                 // scale() -> 1은 기본이다 1.1부터 변한다

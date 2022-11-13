@@ -457,9 +457,9 @@ export default {
           <button class="btn" @click="guest_singIn()">Guest Sign In</button>
         </div>
         <div class="login__text" :class="{ singin__text }">
-          <input class="login__id" type="text" name="id" id="id" v-model="id" placeholder="ID" value="yym1623" />
+          <input class="login__id" type="text" name="id" id="id" v-model="id" placeholder="ID" />
           <div class="__error__id" :class="{ error_id }">아이디를 입력해주세요</div>
-          <input class="login__pw" type="password" name="pw" id="pw" v-model="pw" @keyup.enter="singIn()" placeholder="PW" value="xldjf0312" />
+          <input class="login__pw" type="password" name="pw" id="pw" v-model="pw" @keyup.enter="singIn()" placeholder="PW" />
           <div class="__error__pw" :class="{ error_pw }">비밀번호를 입력해주세요</div>
         </div>
         <div class="login__btn">
@@ -1020,6 +1020,7 @@ a {
         display: flex;
         border-radius: 20px;
         align-items: center;
+        height: 100%;
         .__search {
           display: flex;
           justify-content: center;

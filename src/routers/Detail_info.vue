@@ -1039,7 +1039,7 @@ export default {
           <div class="__first">
             <div class="skeleton__poster" v-if="skeleton"></div>
             <div class="__poster" v-else>
-              <img :src="`${MOVIE_IMG}/${detail_data.poster_path}`" onerror="this.src='/public/no_image.png'" >
+              <img :src="`${MOVIE_IMG}/${detail_data.poster_path}`" onerror="this.src='https://previews.123rf.com/images/julynx/julynx1408/julynx140800023/30746516-%EC%82%AC%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%97%86%EA%B1%B0%EB%82%98-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%82%AC%EC%A7%84-%EC%97%86%EC%9D%8C.jpg'" >
             </div>
             <div class="__text">
               <div class="skeleton__title" v-if="skeleton"></div>
@@ -1137,7 +1137,7 @@ export default {
                   <swiper-slide v-for="movie in detail_similar_Data" :key="movie" @click="detail(movie.id)">
                     <div class="skeleton__detail__info__box" v-if="skeleton"></div>
                     <div class="detail__info__box" v-else>
-                      <img class="detail__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" onerror="this.src='/public/no_image.png'"  />
+                      <img class="detail__poster" :src="`${this.MOVIE_IMG}/${movie.poster_path}`" onerror="this.src='https://previews.123rf.com/images/julynx/julynx1408/julynx140800023/30746516-%EC%82%AC%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%97%86%EA%B1%B0%EB%82%98-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%82%AC%EC%A7%84-%EC%97%86%EC%9D%8C.jpg'"  />
                       <div class="detail__name">{{ movie.title }}</div>
                     </div>
                   </swiper-slide>
@@ -1151,7 +1151,7 @@ export default {
                   <swiper-slide v-for="cast in detail_cast" :key="cast">
                     <div class="skeleton__detail__cast__info__box" v-if="skeleton"></div>
                     <div class="detail__cast__info__box" v-else>
-                      <img class="detail__cast__poster" :src="`${this.MOVIE_IMG}/${cast.profile_path}`" onerror="this.src='/public/no_image.png'" >
+                      <img class="detail__cast__poster" :src="`${this.MOVIE_IMG}/${cast.profile_path}`" onerror="this.src='https://previews.123rf.com/images/julynx/julynx1408/julynx140800023/30746516-%EC%82%AC%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%97%86%EA%B1%B0%EB%82%98-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%82%AC%EC%A7%84-%EC%97%86%EC%9D%8C.jpg'" >
                       <div class="detail__cast__name">{{ cast.name }}</div>
                     </div>
                   </swiper-slide>
