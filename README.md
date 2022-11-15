@@ -2,7 +2,7 @@
 <!-- 현 npm 버전 16.3.0 -> 버전적는곳이 없다(일단 17.0.0으로 보류 -> 추후에 현 버전으로 바꾼다) -->
 [![npm](https://img.shields.io/npm/v/standard.svg)](https://www.npmjs.com/package/npm-auto-version)
 ![vite](https://img.shields.io/badge/Vite-646CFF)
-![vue](https://img.shields.io/badge/Vue-4FC08D)
+![vue](https://img.shields.io/badge/Vue3-4FC08D)
 ![Node.js](https://img.shields.io/badge/Node.js-339933)
 <br />
 실시간 영화 및 TV프로그램 검색엔진 웹 프로그램 ([DEMO](https://spmv.netlify.app))
@@ -13,7 +13,7 @@
 
 
 ## 목차
-* <a href="#환경설정">환경설정</a>
+* <a href="#개발도구">개발도구</a>
 * <a href="#프로젝트-소개">프로젝트 소개</a>
   * <a href="#시나리오">시나리오</a>
   * <a href="#프로젝트-목표">프로젝트 목표</a>
@@ -22,8 +22,8 @@
 * <a href="#이후의-계획">이후의 계획</a>
 
 
-## 환경설정
-* FrontEnd - Vue
+## 개발도구
+* FrontEnd - Vue3
 * server - Node
 * bundler - Vite
 * build - Netlify
