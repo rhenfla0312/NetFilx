@@ -25,7 +25,6 @@
 ## 개발도구
 * FrontEnd - Vue3
 * bundler - Vite
-* server - Netlify
 
 ## 프로젝트 소개
 > #### 시나리오
