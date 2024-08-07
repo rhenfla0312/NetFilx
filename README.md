@@ -9,6 +9,8 @@
 
 ![image](https://user-images.githubusercontent.com/43946794/201836907-70417994-0657-4b41-9d49-d7f34ccc31ca.png)
 
+토이 프로젝트(FrontEnd - 윤영민)
+
 프로젝트 기간 : (2022.10 ~ 2022.11)
 
 
